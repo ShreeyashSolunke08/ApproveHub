@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}System Audit Log — ApproveHub{% endblock %}
+
+{% block content %}
+<div style="max-width:980px;margin:10px auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <div>
+            <h2 style="margin:0 0 4px;">Institutional Audit Log</h2>
+            <p style="color:var(--mu);margin:0;font-size:13px;">Append-only, immutable record of every document action and authorization event.</p>
+        </div>
+        <a href="{{ url_for('admin.export_audit_csv') }}" class="btn secondary">
+            📥 Export CSV
+        </a>
+    </div>
+
+    <div class="card" style="padding:16px;">
+        <table style="width:100%;border-collapse:collapse;font-size:12.5px;">
+            <thead>
+                <tr style="text-align:left;border-bottom:2px solid var(--bd);color:var(--mu);font-size:11px;">
+                    <th style="padding:8px;">Timestamp (UTC)</th>
+                    <th style="padding:8px;">Document ID</th>
+                    <th style="padding:8px;">Actor</th>
+                    <th style="padding:8px;">Event Type</th>
+                    <th style="padding:8px;">Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr style="border-bottom:1px solid var(--bd);">
+                    <td style="padding:10px 8px;font-family:monospace;font-size:11px;color:var(--mu);">{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td style="padding:10px 8px;"><b>#{{ log.document_id }}</b></td>
+                    <td style="padding:10px 8px;">{{ log.user.name if log.user else 'System' }}</td>
+                    <td style="padding:10px 8px;">
+                        <span class="pill {% if 'APPROVED' in log.event %}approved{% elif 'TAMPER' in log.event %}rejected{% else %}in_progress{% endif %}">
+                            {{ log.event }}
+                        </span>
+                    </td>
+                    <td style="padding:10px 8px;color:#444;">{{ log.details }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Document — Step 1{% endblock %}
+
+{% block content %}
+<div style="max-width:700px;margin:20px auto;">
+    <!-- Stepper Header -->
+    <div style="display:flex;justify-content:space-between;margin-bottom:24px;text-align:center;">
+        <div style="flex:1;color:var(--teal);font-weight:bold;">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--teal);color:#FFF;display:grid;place-items:center;margin:0 auto 6px;">1</div>
+            1. Select & Upload
+        </div>
+        <div style="flex:1;color:var(--mu);">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--bd);color:var(--mu);display:grid;place-items:center;margin:0 auto 6px;">2</div>
+            2. Authorities & QR Position
+        </div>
+        <div style="flex:1;color:var(--mu);">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--bd);color:var(--mu);display:grid;place-items:center;margin:0 auto 6px;">3</div>
+            3. Real-Time Tracking
+        </div>
+    </div>
+
+    <div class="card" style="padding:28px;">
+        <h3 style="margin:0 0 6px;">New Document Approval Request</h3>
+        <p style="color:var(--mu);margin:0 0 20px;font-size:13px;">
+            Choose your document type and upload an official PDF file (up to 10 MB).
+        </p>
+
+        {% if error %}
+        <div style="background:#FEE2E2;color:#991B1B;padding:10px 14px;border-radius:8px;margin-bottom:16px;">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data" action="{{ url_for('documents.upload_document') }}">
+            <!-- Document Type Selection Bar -->
+            <div class="form-group">
+                <label>Institutional Document Category</label>
+                <select name="document_type" id="docTypeSelect" onchange="autoFillTitle()" style="font-size:13.5px;font-weight:500;">
+                    {% for code, label in doc_types %}
+                        <option value="{{ code }}" data-label="{{ label }}">{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Document Subject / Specific Title</label>
+                <input type="text" name="title" id="titleInput" required placeholder="e.g. Bonafide Certificate Request" value="{{ doc_types[0][1] }}">
+            </div>
+
+            <div style="border:2px dashed var(--teal);border-radius:14px;padding:36px 20px;text-align:center;background:rgba(15,118,110,0.04);margin:24px 0;transition:all 0.2s ease;">
+                <div style="font-size:42px;margin-bottom:10px;">📤</div>
+                <div style="font-weight:700;font-size:14.5px;margin-bottom:4px;">Tap or drag official PDF document here</div>
+                <div style="font-size:12px;color:var(--mu);margin-bottom:16px;">Protected by SHA-256 integrity verification (max 10 MB)</div>
+                <input type="file" name="file" accept=".pdf" required style="display:inline-block;max-width:280px;font-size:12px;">
+            </div>
+
+            <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:20px;">
+                <a href="{{ url_for('documents.applicant_dashboard') }}" class="btn secondary">Cancel</a>
+                <button type="submit" class="btn">Continue to Authorities & QR Setup →</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function autoFillTitle() {
+    const sel = document.getElementById("docTypeSelect");
+    const chosenLabel = sel.options[sel.selectedIndex].getAttribute("data-label");
+    const titleInput = document.getElementById("titleInput");
+    if (chosenLabel && (!titleInput.value || titleInput.value.includes("Request") || titleInput.value.includes("Application"))) {
+        titleInput.value = chosenLabel;
+    }
+}
+</script>
+{% endblock %}

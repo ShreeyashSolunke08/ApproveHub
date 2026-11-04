@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Institutional Hierarchy — ApproveHub{% endblock %}
+
+{% block content %}
+<div style="max-width:880px;margin:10px auto;">
+    <h2 style="margin:0 0 4px;">Institutional Hierarchy Builder</h2>
+    <p style="color:var(--mu);margin:0 0 20px;font-size:13px;">Manage departments, designations, and authorized signatories for {{ user.institution.name if user.institution else "VIT Pune" }}.</p>
+
+    <div style="display:flex;flex-direction:column;gap:16px;">
+        {% for dept, designations in departments.items() %}
+        <div class="card" style="padding:18px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--bd);padding-bottom:10px;margin-bottom:12px;">
+                <b style="font-size:15px;color:var(--teal);">🏢 Department: {{ dept }}</b>
+                <span class="pill in_progress">{{ designations|length }} Designation Levels</span>
+            </div>
+
+            {% for desig, people in designations.items() %}
+            <div style="margin-bottom:12px;padding:10px;background:var(--bg);border-radius:8px;">
+                <b style="font-size:12.5px;color:var(--navy);">Role / Post: {{ desig }}</b>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;">
+                    {% for p in people %}
+                    <span style="background:var(--card);border:1px solid var(--bd);padding:4px 10px;border-radius:6px;font-size:12px;display:flex;align-items:center;gap:6px;">
+                        👤 {{ p.name }} <small style="color:var(--mu);">({{ p.email }})</small>
+                    </span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

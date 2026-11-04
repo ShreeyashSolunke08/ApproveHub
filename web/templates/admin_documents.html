@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}All Institutional Documents — ApproveHub Admin{% endblock %}
+
+{% block content %}
+<div style="max-width:1100px;margin:10px auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <div>
+            <h2 style="margin:0 0 4px;">Institutional Document Repository</h2>
+            <p style="color:var(--mu);margin:0;font-size:13px;">View and track every approval, pending review, and compliance request across {{ user.institution.name if user.institution else "VIT Pune" }}.</p>
+        </div>
+        <a href="{{ url_for('admin.export_audit_csv') }}" class="btn secondary">
+            📥 Export Audit Log (CSV)
+        </a>
+    </div>
+
+    <!-- Status Tabs -->
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+        <a href="{{ url_for('admin.admin_documents', status='all') }}" class="btn {% if status_filter == 'all' %}active{% else %}secondary{% endif %}" style="font-size:12px;padding:6px 14px;">
+            All ({{ counts.all }})
+        </a>
+        <a href="{{ url_for('admin.admin_documents', status='pending') }}" class="btn {% if status_filter == 'pending' %}active{% else %}secondary{% endif %}" style="font-size:12px;padding:6px 14px;color:var(--wad);">
+            Pending Review ({{ counts.pending }})
+        </a>
+        <a href="{{ url_for('admin.admin_documents', status='approved') }}" class="btn {% if status_filter == 'approved' %}active{% else %}secondary{% endif %}" style="font-size:12px;padding:6px 14px;color:var(--ok);">
+            Approved & Stamped ({{ counts.approved }})
+        </a>
+        <a href="{{ url_for('admin.admin_documents', status='compliance') }}" class="btn {% if status_filter == 'compliance' %}active{% else %}secondary{% endif %}" style="font-size:12px;padding:6px 14px;color:var(--vio);">
+            In Compliance ({{ counts.compliance }})
+        </a>
+        <a href="{{ url_for('admin.admin_documents', status='rejected') }}" class="btn {% if status_filter == 'rejected' %}active{% else %}secondary{% endif %}" style="font-size:12px;padding:6px 14px;color:var(--er);">
+            Rejected ({{ counts.rejected }})
+        </a>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="card" style="padding:14px 18px;margin-bottom:18px;">
+        <form method="GET" action="{{ url_for('admin.admin_documents') }}" style="display:flex;gap:10px;">
+            <input type="hidden" name="status" value="{{ status_filter }}">
+            <input type="text" name="q" value="{{ search_q or '' }}" placeholder="🔍 Search by document title, ID, or applicant name..." style="flex:1;padding:10px 14px;border:1px solid var(--bd);border-radius:10px;font-size:13px;">
+            <button type="submit" class="btn">Search</button>
+            {% if search_q %}
+                <a href="{{ url_for('admin.admin_documents', status=status_filter) }}" class="btn secondary" style="color:var(--er);">Reset</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- Documents Table -->
+    <div class="card" style="padding:16px;">
+        {% if not documents %}
+        <div style="text-align:center;padding:40px;color:var(--mu);">
+            <div style="font-size:36px;margin-bottom:8px;">📁</div>
+            <p style="margin:0;">No documents found matching this filter.</p>
+        </div>
+        {% else %}
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+            <thead>
+                <tr style="text-align:left;border-bottom:2px solid var(--bd);color:var(--mu);font-size:11.5px;">
+                    <th style="padding:10px;">ID</th>
+                    <th style="padding:10px;">Document Title</th>
+                    <th style="padding:10px;">Category</th>
+                    <th style="padding:10px;">Applicant</th>
+                    <th style="padding:10px;">Status</th>
+                    <th style="padding:10px;">Current Step</th>
+                    <th style="padding:10px;">Submitted</th>
+                    <th style="padding:10px;text-align:right;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for doc in documents %}
+                <tr style="border-bottom:1px solid var(--bd);">
+                    <td style="padding:12px 10px;font-family:monospace;font-weight:700;">#{{ doc.id }}</td>
+                    <td style="padding:12px 10px;font-weight:600;">
+                        <a href="{{ url_for('documents.document_detail', doc_id=doc.id) }}" style="color:var(--tx);text-decoration:none;">
+                            {{ doc.title }}
+                        </a>
+                    </td>
+                    <td style="padding:12px 10px;">
+                        <span class="pill waiting" style="font-size:10px;">{{ doc.document_type.replace('_', ' ') }}</span>
+                    </td>
+                    <td style="padding:12px 10px;color:var(--mu);">
+                        {{ doc.applicant.name }}
+                    </td>
+                    <td style="padding:12px 10px;">
+                        <span class="pill {{ doc.status }}">{{ doc.status.replace('_', ' ') }}</span>
+                    </td>
+                    <td style="padding:12px 10px;font-size:12px;color:var(--mu);">
+                        Step {{ doc.current_step }} of {{ doc.total_steps }}
+                    </td>
+                    <td style="padding:12px 10px;font-size:11.5px;color:var(--mu);">
+                        {{ doc.created_at.strftime('%d %b %Y') }}
+                    </td>
+                    <td style="padding:12px 10px;text-align:right;">
+                        <a href="{{ url_for('documents.document_detail', doc_id=doc.id) }}" class="btn secondary" style="padding:4px 12px;font-size:11.5px;">
+                            Track & Inspect →
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

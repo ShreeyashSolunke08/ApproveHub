@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block title %}Authorities & QR Setup — ApproveHub{% endblock %}
+
+{% block content %}
+<div style="max-width:1120px;margin:10px auto;">
+    <!-- Stepper Header -->
+    <div style="display:flex;justify-content:space-between;margin-bottom:20px;text-align:center;">
+        <div style="flex:1;color:var(--ok);font-weight:bold;">✓ 1. Document Uploaded</div>
+        <div style="flex:1;color:var(--teal);font-weight:bold;">
+            <div style="width:24px;height:24px;border-radius:50%;background:var(--teal);color:#FFF;display:inline-grid;place-items:center;font-size:12px;margin-right:4px;">2</div>
+            2. Authorities & QR Position
+        </div>
+        <div style="flex:1;color:var(--mu);">3. Real-Time Tracking</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:390px 1fr;gap:24px;align-items:start;">
+        <!-- Left: Hierarchical Authority Chain -->
+        <div class="card" style="padding:22px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <h3 style="margin:0;font-size:16px;">Sequential Authority Route</h3>
+                <span class="pill waiting" id="approverCountBadge">1 or More</span>
+            </div>
+            <p style="color:var(--mu);margin:0 0 16px;font-size:12px;">
+                Filter by department and designation to pick authorized signatories.
+            </p>
+
+            <div id="approverList" style="display:flex;flex-direction:column;gap:14px;margin-bottom:18px;">
+                <!-- Step 1 Card -->
+                <div class="step-card" data-step="1" style="background:var(--bg);border:1px solid var(--bd);border-radius:12px;padding:14px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                        <span style="font-weight:700;font-size:12.5px;color:var(--teal);">Step 1: Primary Authority</span>
+                        <span class="pill pending">Starts Pending</span>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom:8px;">
+                        <label style="font-size:11px;">1. Branch / Department</label>
+                        <select class="dept-select" style="font-size:12px;padding:6px;"></select>
+                    </div>
+                    <div class="form-group" style="margin-bottom:8px;">
+                        <label style="font-size:11px;">2. Designation / Post</label>
+                        <select class="desig-select" style="font-size:12px;padding:6px;"></select>
+                    </div>
+                    <div class="form-group" style="margin-bottom:8px;">
+                        <label style="font-size:11px;">3. Authorized Person</label>
+                        <select class="name-select approver-select" style="font-size:12px;padding:6px;"></select>
+                    </div>
+
+                    <div style="display:flex;gap:12px;font-size:11.5px;margin-top:6px;">
+                        <label><input type="radio" name="mark_type_1" value="signature" checked> Signature</label>
+                        <label><input type="radio" name="mark_type_1" value="stamp"> Stamp</label>
+                        <label><input type="radio" name="mark_type_1" value="seal"> Seal</label>
+                    </div>
+                </div>
+
+                <!-- Step 2 Card (Optional: Can be removed or kept) -->
+                <div class="step-card" data-step="2" style="background:var(--bg);border:1px solid var(--bd);border-radius:12px;padding:14px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                        <span style="font-weight:700;font-size:12.5px;color:var(--amb);">Step 2: Second Authority</span>
+                        <div style="display:flex;gap:6px;align-items:center;">
+                            <span class="pill waiting">Waiting</span>
+                            <button type="button" class="btn secondary" onclick="removeApproverTier(2)" style="padding:2px 8px;font-size:11px;color:var(--er);" title="Keep only 1 approver">✕</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom:8px;">
+                        <label style="font-size:11px;">1. Branch / Department</label>
+                        <select class="dept-select" style="font-size:12px;padding:6px;"></select>
+                    </div>
+                    <div class="form-group" style="margin-bottom:8px;">
+                        <label style="font-size:11px;">2. Designation / Post</label>
+                        <select class="desig-select" style="font-size:12px;padding:6px;"></select>
+                    </div>
+                    <div class="form-group" style="margin-bottom:8px;">
+                        <label style="font-size:11px;">3. Authorized Person</label>
+                        <select class="name-select approver-select" style="font-size:12px;padding:6px;"></select>
+                    </div>
+
+                    <div style="display:flex;gap:12px;font-size:11.5px;margin-top:6px;">
+                        <label><input type="radio" name="mark_type_2" value="signature"> Signature</label>
+                        <label><input type="radio" name="mark_type_2" value="stamp" checked> Stamp</label>
+                        <label><input type="radio" name="mark_type_2" value="seal"> Seal</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dynamic Add Another Authority Button -->
+            <button type="button" class="btn secondary full" onclick="addApproverTier()" style="margin-bottom:12px;font-size:12.5px;">
+                ➕ Add Another Approver Tier
+            </button>
+
+            <button type="button" class="btn secondary full" onclick="resetToStandardLayout()" style="font-size:12px;margin-bottom:12px;">
+                📐 Auto-Align Bottom Positions
+            </button>
+
+            <button type="button" class="btn full" onclick="submitApprovalChain()" id="submitChainBtn" style="padding:12px;font-size:14px;">
+                Send for Sequential Approval →
+            </button>
+        </div>
+
+        <!-- Right: Interactive A4 Canvas with Draggable Marks & Draggable QR Code -->
+        <div class="card" style="padding:22px;text-align:center;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                <h3 style="margin:0;font-size:15px;">Document Placement Preview</h3>
+                <span style="font-size:12px;color:var(--mu);">Drag authority marks AND the QR code anywhere</span>
+            </div>
+
+            <div class="a4-container">
+                <div class="a4-page" id="a4Canvas">
+                    <!-- Dashed Printable Area -->
+                    <div class="printable-area"></div>
+
+                    <!-- Simulated Document Text Lines -->
+                    <div style="padding:40px 30px;text-align:left;opacity:0.35;">
+                        <div style="height:14px;background:#888;border-radius:4px;width:75%;margin-bottom:20px;"></div>
+                        <div style="height:8px;background:#BBB;border-radius:3px;width:95%;margin-bottom:10px;"></div>
+                        <div style="height:8px;background:#BBB;border-radius:3px;width:90%;margin-bottom:10px;"></div>
+                        <div style="height:8px;background:#BBB;border-radius:3px;width:92%;margin-bottom:10px;"></div>
+                        <div style="height:8px;background:#BBB;border-radius:3px;width:80%;margin-bottom:30px;"></div>
+                        <div style="height:8px;background:#BBB;border-radius:3px;width:88%;margin-bottom:10px;"></div>
+                        <div style="height:8px;background:#BBB;border-radius:3px;width:70%;margin-bottom:10px;"></div>
+                    </div>
+
+                    <!-- Draggable QR Code Placement Target (Requested Feature) -->
+                    <div class="qr-stamp-mark" id="qrMark" style="left:380px;top:20px;" data-pos-x="0.78" data-pos-y="0.03">
+                        <div style="font-size:24px;">📱</div>
+                        <b style="color:var(--teal);margin-top:2px;">QR Code</b>
+                        <span style="color:#888;">Drag me</span>
+                    </div>
+
+                    <!-- Draggable Mark 1 -->
+                    <div class="stamp-mark" id="mark_1" data-step="1" style="left:35px;top:440px;" data-pos-x="0.08" data-pos-y="0.75">
+                        <div class="badge-icon">✓</div>
+                        <div style="text-align:left;line-height:1.2;">
+                            <b style="font-size:11px;color:var(--teal);">Step 1 Authority</b>
+                            <div class="mark-name" style="font-size:9.5px;color:var(--mu);">Prof. Meera Kulkarni</div>
+                            <div style="font-size:8px;color:#888;">Drag to reposition</div>
+                        </div>
+                    </div>
+
+                    <!-- Draggable Mark 2 -->
+                    <div class="stamp-mark" id="mark_2" data-step="2" style="left:240px;top:440px;border-color:var(--amb);" data-pos-x="0.55" data-pos-y="0.75">
+                        <div class="badge-icon" style="background:var(--amb);">✓</div>
+                        <div style="text-align:left;line-height:1.2;">
+                            <b style="font-size:11px;color:var(--amb);">Step 2 Authority</b>
+                            <div class="mark-name" style="font-size:9.5px;color:var(--mu);">Dr. R. Patil (HOD)</div>
+                            <div style="font-size:8px;color:#888;">Drag to reposition</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="font-size:12px;color:var(--mu);margin-top:10px;background:var(--bg);padding:10px 14px;border-radius:8px;">
+                💡 <b>Drag & Drop Enabled:</b> Both the authority stamps and the official verification QR code can be positioned anywhere on the preview canvas.
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function resetToStandardLayout() {
+    const mark1 = document.getElementById('mark_1');
+    const mark2 = document.getElementById('mark_2');
+    const qr = document.getElementById('qrMark');
+
+    if (qr) {
+        qr.style.left = '380px';
+        qr.style.top = '20px';
+        qr.dataset.posX = '0.78';
+        qr.dataset.posY = '0.03';
+    }
+    if (mark1) {
+        mark1.style.left = '35px';
+        mark1.style.top = '440px';
+        mark1.dataset.posX = '0.08';
+        mark1.dataset.posY = '0.75';
+    }
+    if (mark2) {
+        mark2.style.left = '240px';
+        mark2.style.top = '440px';
+        mark2.dataset.posX = '0.55';
+        mark2.dataset.posY = '0.75';
+    }
+}
+
+async function submitApprovalChain() {
+    const btn = document.getElementById('submitChainBtn');
+    btn.disabled = true;
+    btn.textContent = "Routing Document...";
+
+    const stepCards = document.querySelectorAll('.step-card');
+    const stepsPayload = [];
+
+    stepCards.forEach((card, idx) => {
+        const stepNum = card.dataset.step;
+        const nameSelect = card.querySelector('.name-select');
+        const mark = document.getElementById(`mark_${stepNum}`);
+        const markType = card.querySelector(`input[name="mark_type_${stepNum}"]:checked`)?.value || 'signature';
+
+        if (nameSelect && nameSelect.value) {
+            stepsPayload.push({
+                approver_id: nameSelect.value,
+                page_no: 1,
+                pos_x: parseFloat(mark?.dataset.posX || (0.08 + idx * 0.45)),
+                pos_y: parseFloat(mark?.dataset.posY || 0.75),
+                mark_type: markType
+            });
+        }
+    });
+
+    if (stepsPayload.length === 0) {
+        alert("Please select at least one approver.");
+        btn.disabled = false;
+        btn.textContent = "Send for Sequential Approval →";
+        return;
+    }
+
+    const qrMark = document.getElementById('qrMark');
+    const qrPayload = {
+        pos_x: parseFloat(qrMark?.dataset.posX || 0.78),
+        pos_y: parseFloat(qrMark?.dataset.posY || 0.03),
+        page_no: 1
+    };
+
+    try {
+        const resp = await fetch("{{ url_for('documents.place_marks', doc_id=document.id) }}", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                steps: stepsPayload,
+                qr_position: qrPayload
+            })
+        });
+        const res = await resp.json();
+        if (resp.ok && res.success) {
+            window.location.href = res.redirect_url;
+        } else {
+            alert(res.error || "Failed to configure approval chain.");
+            btn.disabled = false;
+            btn.textContent = "Send for Sequential Approval →";
+        }
+    } catch (err) {
+        alert("Network error.");
+        btn.disabled = false;
+        btn.textContent = "Send for Sequential Approval →";
+    }
+}
+</script>
+{% endblock %}

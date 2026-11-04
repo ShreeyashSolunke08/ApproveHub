@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ApproveHub — Digital Document Approval System{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <!-- Top Navigation -->
+    <header class="topbar">
+        <a href="/" class="brand">
+            <span class="brand-badge">✓</span>
+            ApproveHub
+        </a>
+
+        <div class="top-actions">
+            <button id="toggleViewMode" class="view-switcher" type="button">
+                📱 Switch to App View
+            </button>
+            <a href="{{ url_for('verification.public_verify_page') }}" style="color:#FFF;text-decoration:none;font-size:12px;opacity:0.9;">
+                🔍 Verify Document
+            </a>
+            <a href="{{ url_for('verification.scan_qr_page') }}" style="color:#FFF;text-decoration:none;font-size:12px;opacity:0.9;">
+                📷 Scan QR
+            </a>
+            {% if current_user %}
+                <a href="{{ url_for('auth.profile_page') }}" style="display:flex;align-items:center;gap:8px;text-decoration:none;color:#FFF;">
+                    <div style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--aqua));color:#FFF;display:grid;place-items:center;font-size:11px;font-weight:bold;">
+                        {{ current_user.name[0] }}
+                    </div>
+                    <span style="font-size:12px;">{{ current_user.name }}</span>
+                </a>
+                <span class="role-pill {{ current_user.role }}">{{ current_user.role }}</span>
+                <a href="{{ url_for('auth.logout') }}" style="color:#F87171;text-decoration:none;font-size:12px;font-weight:bold;margin-left:6px;">Log out</a>
+            {% else %}
+                <a href="{{ url_for('auth.login_page') }}" style="color:#FFF;text-decoration:none;font-size:12px;font-weight:bold;">Log in</a>
+                <a href="{{ url_for('auth.register_page') }}" class="btn" style="padding:4px 12px;font-size:11px;">Sign up</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <div class="layout-wrapper">
+        {% if current_user %}
+        <nav class="sidebar">
+            <div style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;margin-bottom:8px;padding-left:12px;">
+                {{ current_user.institution.name if current_user.institution else "VIT Pune" }}
+            </div>
+
+            {% if current_user.role == 'applicant' %}
+                <a href="{{ url_for('documents.applicant_dashboard') }}" class="{% if request.endpoint == 'documents.applicant_dashboard' %}active{% endif %}">
+                    📂 My Documents
+                </a>
+                <a href="{{ url_for('documents.upload_document') }}" class="{% if request.endpoint == 'documents.upload_document' %}active{% endif %}">
+                    ➕ New Request
+                </a>
+            {% elif current_user.role == 'approver' %}
+                <a href="{{ url_for('approvals.approver_inbox') }}" class="{% if request.endpoint == 'approvals.approver_inbox' %}active{% endif %}">
+                    📥 Approval Desk
+                </a>
+                <a href="{{ url_for('approvals.approver_history') }}" class="{% if request.endpoint == 'approvals.approver_history' %}active{% endif %}">
+                    📋 Action History
+                </a>
+                <div style="border-top:1px solid var(--bd);margin:6px 0;padding-top:6px;">
+                    <span style="font-size:10.5px;color:var(--mu);text-transform:uppercase;font-weight:700;padding-left:12px;">Staff Requests</span>
+                    <a href="{{ url_for('documents.upload_document') }}" class="{% if request.endpoint == 'documents.upload_document' %}active{% endif %}">
+                        ➕ Submit Request
+                    </a>
+                    <a href="{{ url_for('documents.applicant_dashboard') }}" class="{% if request.endpoint == 'documents.applicant_dashboard' %}active{% endif %}">
+                        📤 My Sent Requests
+                    </a>
+                </div>
+            {% elif current_user.role == 'admin' %}
+                <a href="{{ url_for('admin.admin_dashboard') }}" class="{% if request.endpoint == 'admin.admin_dashboard' %}active{% endif %}">
+                    📊 Overview
+                </a>
+                <a href="{{ url_for('admin.admin_documents') }}" class="{% if request.endpoint == 'admin.admin_documents' %}active{% endif %}">
+                    📑 All Documents
+                </a>
+                <a href="{{ url_for('admin.hierarchy_builder') }}" class="{% if request.endpoint == 'admin.hierarchy_builder' %}active{% endif %}">
+                    🏛️ Hierarchy
+                </a>
+                <a href="{{ url_for('admin.people_management') }}" class="{% if request.endpoint == 'admin.people_management' %}active{% endif %}">
+                    👥 People & Roles
+                </a>
+                <a href="{{ url_for('admin.audit_log') }}" class="{% if request.endpoint == 'admin.audit_log' %}active{% endif %}">
+                    📜 Audit Trail
+                </a>
+                <a href="{{ url_for('admin.institution_settings') }}" class="{% if request.endpoint == 'admin.institution_settings' %}active{% endif %}">
+                    ⚙️ Institution Rules
+                </a>
+            {% endif %}
+
+            <div style="margin-top:auto;padding-top:14px;border-top:1px solid var(--bd);">
+                <a href="{{ url_for('auth.profile_page') }}" class="{% if request.endpoint == 'auth.profile_page' %}active{% endif %}">
+                    🛡️ My Profile & PIN
+                </a>
+            </div>
+        </nav>
+        {% endif %}
+
+        <main class="content-area">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

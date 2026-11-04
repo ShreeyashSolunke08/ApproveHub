@@ -1,0 +1,57 @@
+import os
+from flask import Flask, render_template
+from backend.config import Config
+from backend.models import db
+from backend.routes.auth import auth_bp
+from backend.routes.documents import documents_bp
+from backend.routes.approvals import approvals_bp
+from backend.routes.verification import verification_bp
+from backend.routes.admin import admin_bp
+from backend.utils.security import get_current_user
+from backend.fixtures import seed_database
+
+def create_app():
+    template_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "web", "templates"))
+    static_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "web", "static"))
+    
+    app = Flask(
+        __name__,
+        template_folder=template_dir,
+        static_folder=static_dir
+    )
+    app.config.from_object(Config)
+
+    # Initialize extensions
+    db.init_app(app)
+
+    # Register Route Blueprints
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(documents_bp)
+    app.register_blueprint(approvals_bp)
+    app.register_blueprint(verification_bp)
+    app.register_blueprint(admin_bp)
+
+    # Global template context processor
+    @app.context_processor
+    def inject_user():
+        return {"current_user": get_current_user()}
+
+    @app.errorhandler(404)
+    def page_not_found(e):
+        return render_template("404.html"), 404
+
+    @app.errorhandler(500)
+    def internal_server_error(e):
+        return render_template("500.html", error=str(e)), 500
+
+    # Initialize database & seed fixtures
+    with app.app_context():
+        db.create_all()
+        seed_database(app)
+
+    return app
+
+app = create_app()
+
+if __name__ == "__main__":
+    app.run(host="127.0.0.1", port=5000, debug=True)

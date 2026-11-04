@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile & Digital Credentials — ApproveHub{% endblock %}
+
+{% block content %}
+<div style="max-width:780px;margin:15px auto;">
+    <!-- Profile Card Header -->
+    <div class="card" style="padding:26px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:18px;background:linear-gradient(135deg, rgba(15,118,110,0.06), rgba(245,158,11,0.04));border:1.5px solid var(--teal);">
+        <div style="display:flex;align-items:center;gap:18px;">
+            <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg, var(--teal), var(--aqua));color:#FFF;display:grid;place-items:center;font-size:30px;font-weight:900;box-shadow:0 6px 18px rgba(15,118,110,0.3);">
+                {{ user.name[0] }}
+            </div>
+            <div>
+                <h2 style="margin:0 0 4px;font-size:22px;">{{ user.name }}</h2>
+                <div style="font-size:13px;color:var(--mu);margin-bottom:6px;">
+                    {{ user.designation or 'Institutional User' }} • {{ user.department or 'VIT Pune' }}
+                </div>
+                <div style="display:flex;gap:8px;">
+                    <span class="role-pill {{ user.role }}">{{ user.role }}</span>
+                    {% if user.google_id %}
+                        <span class="pill approved" style="font-size:10px;">Google SSO Connected</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Activity Badges -->
+        <div style="display:flex;gap:12px;">
+            <div style="text-align:center;padding:10px 16px;background:var(--card);border:1px solid var(--bd);border-radius:12px;">
+                <b style="font-size:18px;color:var(--teal);">{{ total_submitted }}</b>
+                <div style="font-size:11px;color:var(--mu);">Submitted</div>
+            </div>
+            <div style="text-align:center;padding:10px 16px;background:var(--card);border:1px solid var(--bd);border-radius:12px;">
+                <b style="font-size:18px;color:var(--ok);">{{ total_approved }}</b>
+                <div style="font-size:11px;color:var(--mu);">Approved</div>
+            </div>
+            {% if user.role in ['approver', 'admin'] %}
+            <div style="text-align:center;padding:10px 16px;background:var(--card);border:1px solid var(--bd);border-radius:12px;">
+                <b style="font-size:18px;color:var(--amb);">{{ total_acted_steps }}</b>
+                <div style="font-size:11px;color:var(--mu);">Signed Off</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if message %}
+    <div style="background:#ECFDF5;color:#065F46;padding:14px;border-radius:10px;margin-bottom:18px;font-size:13px;border:1px solid #A7F3D0;">
+        ✓ {{ message }}
+    </div>
+    {% endif %}
+
+    <!-- 1. Account Details Form -->
+    <div class="card" style="padding:22px;">
+        <h3 style="margin:0 0 14px;font-size:15px;">👤 Personal & Institutional Information</h3>
+        <form method="POST" action="{{ url_for('auth.profile_page') }}">
+            <input type="hidden" name="action" value="update_info">
+            
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                <div class="form-group">
+                    <label>Full Official Name</label>
+                    <input type="text" name="name" value="{{ user.name }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Registered Institutional Email</label>
+                    <input type="email" value="{{ user.email }}" disabled style="background:#F3F4F6;cursor:not-allowed;">
+                </div>
+                <div class="form-group">
+                    <label>Contact Mobile Number</label>
+                    <input type="text" name="mobile" value="{{ user.mobile or '' }}" placeholder="+91 98765 43210">
+                </div>
+                <div class="form-group">
+                    <label>Department / School</label>
+                    <input type="text" name="department" value="{{ user.department or 'Information Technology' }}">
+                </div>
+                <div class="form-group">
+                    <label>Designation / Academic Standing</label>
+                    <input type="text" name="designation" value="{{ user.designation or '' }}">
+                </div>
+                <div class="form-group">
+                    <label>Institution / Affiliation</label>
+                    <input type="text" value="{{ user.institution.name if user.institution else 'VIT Pune' }}" disabled style="background:#F3F4F6;">
+                </div>
+            </div>
+
+            <button type="submit" class="btn" style="margin-top:6px;">Update Information</button>
+        </form>
+    </div>
+
+    <!-- 2. Security PIN Configuration -->
+    <div class="card" style="padding:22px;">
+        <h3 style="margin:0 0 6px;font-size:15px;">🔐 Digital Signoff Security PIN</h3>
+        <p style="color:var(--mu);margin:0 0 16px;font-size:12.5px;">
+            Your 4-6 digit PIN is required to authorize and stamp official approvals. Failed attempts trigger brute-force lockout.
+        </p>
+
+        <form method="POST" action="{{ url_for('auth.profile_page') }}" style="display:flex;gap:12px;align-items:flex-end;">
+            <input type="hidden" name="action" value="update_pin">
+            <div class="form-group" style="max-width:220px;margin:0;">
+                <label>New Security PIN</label>
+                <input type="password" name="pin" required maxlength="6" placeholder="4 to 6 digits">
+            </div>
+            <button type="submit" class="btn secondary">Set New PIN</button>
+        </form>
+    </div>
+
+    <!-- 3. Approver Official Assets (Signatures & Stamps) -->
+    {% if user.role in ['approver', 'admin'] %}
+    <div class="card" style="padding:22px;">
+        <h3 style="margin:0 0 6px;font-size:15px;">✍️ Approver Digital Assets (Transparent PNGs)</h3>
+        <p style="color:var(--mu);margin:0 0 16px;font-size:12.5px;">
+            Upload your personal transparent signature and departmental stamp. They are automatically composited onto approved documents.
+        </p>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+            <!-- Signature Upload -->
+            <div style="border:1px solid var(--bd);border-radius:12px;padding:16px;text-align:center;">
+                <b style="font-size:13px;display:block;margin-bottom:8px;">Personal Signature</b>
+                {% if user.signature_path %}
+                    <div style="height:60px;margin-bottom:10px;display:grid;place-items:center;background:#F9FAFB;border-radius:6px;">
+                        <span style="font-size:11px;color:var(--teal);">✓ Signature file loaded</span>
+                    </div>
+                {% else %}
+                    <div style="height:60px;margin-bottom:10px;display:grid;place-items:center;background:#F9FAFB;border-radius:6px;color:var(--mu);font-size:12px;">
+                        No signature image yet
+                    </div>
+                {% endif %}
+                <form method="POST" enctype="multipart/form-data" action="{{ url_for('auth.profile_page') }}">
+                    <input type="hidden" name="action" value="upload_signature">
+                    <input type="file" name="signature" accept=".png" required style="font-size:11px;margin-bottom:8px;width:100%;">
+                    <button type="submit" class="btn secondary" style="width:100%;font-size:11.5px;padding:6px;">Upload PNG</button>
+                </form>
+            </div>
+
+            <!-- Department Stamp Upload -->
+            <div style="border:1px solid var(--bd);border-radius:12px;padding:16px;text-align:center;">
+                <b style="font-size:13px;display:block;margin-bottom:8px;">Department Stamp</b>
+                {% if user.stamp_path %}
+                    <div style="height:60px;margin-bottom:10px;display:grid;place-items:center;background:#F9FAFB;border-radius:6px;">
+                        <span style="font-size:11px;color:var(--teal);">✓ Stamp asset loaded</span>
+                    </div>
+                {% else %}
+                    <div style="height:60px;margin-bottom:10px;display:grid;place-items:center;background:#F9FAFB;border-radius:6px;color:var(--mu);font-size:12px;">
+                        No departmental stamp yet
+                    </div>
+                {% endif %}
+                <form method="POST" enctype="multipart/form-data" action="{{ url_for('auth.profile_page') }}">
+                    <input type="hidden" name="action" value="upload_stamp">
+                    <input type="file" name="stamp" accept=".png" required style="font-size:11px;margin-bottom:8px;width:100%;">
+                    <button type="submit" class="btn secondary" style="width:100%;font-size:11.5px;padding:6px;">Upload PNG</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

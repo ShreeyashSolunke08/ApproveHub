@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Manage People & Roles — ApproveHub{% endblock %}
+
+{% block content %}
+<div style="max-width:1050px;margin:10px auto;">
+    <h2 style="margin:0 0 4px;">User Directory & Institutional Roles</h2>
+    <p style="color:var(--mu);margin:0 0 20px;font-size:13px;">Manage users, assign institutional authority roles, and toggle account access.</p>
+
+    <!-- Search Bar -->
+    <div class="card" style="padding:14px 18px;margin-bottom:16px;">
+        <form method="GET" action="{{ url_for('admin.people_management') }}" style="display:flex;gap:10px;">
+            <input type="text" name="q" value="{{ search_q or '' }}" placeholder="🔍 Search users by name, email, or department..." style="flex:1;padding:10px 14px;border:1px solid var(--bd);border-radius:10px;font-size:13px;">
+            <button type="submit" class="btn secondary">Search</button>
+            {% if search_q %}
+                <a href="{{ url_for('admin.people_management') }}" class="btn secondary" style="color:var(--er);">Clear</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <div class="card" style="padding:16px;">
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+            <thead>
+                <tr style="text-align:left;border-bottom:2px solid var(--bd);color:var(--mu);font-size:11.5px;">
+                    <th style="padding:10px;">Name</th>
+                    <th style="padding:10px;">Email</th>
+                    <th style="padding:10px;">Role</th>
+                    <th style="padding:10px;">Department</th>
+                    <th style="padding:10px;">Designation</th>
+                    <th style="padding:10px;">Status</th>
+                    <th style="padding:10px;text-align:right;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                <tr style="border-bottom:1px solid var(--bd);">
+                    <td style="padding:12px 10px;font-weight:600;">
+                        {{ u.name }}
+                        {% if u.google_id %}
+                            <span style="font-size:10px;color:var(--teal);">[Google SSO]</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding:12px 10px;color:var(--mu);">{{ u.email }}</td>
+                    <td style="padding:12px 10px;"><span class="role-pill {{ u.role }}">{{ u.role }}</span></td>
+                    <td style="padding:12px 10px;">{{ u.department or '-' }}</td>
+                    <td style="padding:12px 10px;">{{ u.designation or '-' }}</td>
+                    <td style="padding:12px 10px;">
+                        {% if u.is_active %}
+                            <span class="pill approved">Active</span>
+                        {% else %}
+                            <span class="pill rejected">Disabled</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding:12px 10px;text-align:right;">
+                        <form method="POST" action="{{ url_for('admin.people_management') }}" style="display:inline;">
+                            <input type="hidden" name="user_id" value="{{ u.id }}">
+                            <input type="hidden" name="action" value="toggle_active">
+                            <button type="submit" class="btn secondary" style="padding:4px 10px;font-size:11.5px;">
+                                {{ 'Disable' if u.is_active else 'Enable' }}
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

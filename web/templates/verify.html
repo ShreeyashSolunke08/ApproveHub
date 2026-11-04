@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Verify Document — ApproveHub Public Portal{% endblock %}
+
+{% block content %}
+<div style="max-width:680px;margin:20px auto;">
+    <div style="text-align:center;margin-bottom:24px;">
+        <span class="role-pill" style="background:var(--navy);">Public Portal</span>
+        <h2 style="margin:8px 0 4px;font-size:24px;">Verify Document Authenticity</h2>
+        <p style="color:var(--mu);margin:0;font-size:13px;">
+            Enter the unique approval number printed on the document or scan its QR code.
+        </p>
+    </div>
+
+    <!-- Code Search Card -->
+    <div class="card" style="padding:24px;">
+        <form method="GET" action="{{ url_for('verification.public_verify_page') }}">
+            <div style="display:flex;gap:10px;">
+                <input type="text" name="number" required placeholder="e.g. AH-26-IT-0412-7KQ3" value="{{ query_no or '' }}" style="flex:1;padding:12px;border:1px solid var(--bd);border-radius:10px;font-family:monospace;font-size:14px;">
+                <button type="submit" class="btn">Verify Number</button>
+            </div>
+        </form>
+
+        {% if result %}
+        <div style="margin-top:20px;border:1px solid var(--ok);border-radius:12px;padding:20px;background:#F0FDF4;">
+            <div style="width:48px;height:48px;border-radius:50%;background:var(--ok);color:#FFF;display:grid;place-items:center;font-size:26px;margin:0 auto 10px;">✓</div>
+            <h3 style="text-align:center;margin:0 0 4px;color:var(--ok);">Valid Institutional Approval</h3>
+            <p style="text-align:center;color:var(--mu);margin:0 0 16px;font-size:13px;">
+                {{ result.document_title }} • Issued by {{ result.institution_name }}
+            </p>
+
+            <div class="timeline" style="margin:16px 0;">
+                {% for step in result.approved_steps %}
+                <div class="tl-item ok">
+                    <b>{{ step.approver.name }}</b> — {{ step.approver.designation }} ({{ step.approver.department }})
+                    <div style="font-size:11.5px;color:var(--mu);margin-top:2px;">
+                        Status: Approved • {{ step.acted_at.strftime('%d %b %Y, %H:%M UTC') if step.acted_at else '' }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div style="padding-top:12px;border-top:1px dashed #A7F3D0;font-family:monospace;font-size:11px;color:#065F46;">
+                🔒 Original Hash: {{ result.original_hash[:24] }}...<br>
+                🔒 Stamped Hash: {{ result.final_hash[:24] if result.final_hash else 'In Progress' }}...
+            </div>
+        </div>
+        {% elif not_found %}
+        <div style="margin-top:20px;border:1px solid var(--er);border-radius:12px;padding:20px;background:#FEF2F2;text-align:center;">
+            <div style="width:44px;height:44px;border-radius:50%;background:var(--er);color:#FFF;display:grid;place-items:center;font-size:22px;margin:0 auto 8px;">✕</div>
+            <h3 style="margin:0 0 4px;color:var(--er);">No Official Record Found</h3>
+            <p style="color:var(--mu);margin:0;font-size:12.5px;">
+                The code <b>{{ query_no }}</b> does not exist in our institutional database. This document may be altered, invalid, or forged.
+            </p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Feature: Upload to Verify File Check (High-Impact Improvement) -->
+    <div class="card" style="padding:22px;margin-top:20px;">
+        <h4 style="margin:0 0 6px;font-size:14px;">📄 Upload Document to Verify (Byte-for-Byte Check)</h4>
+        <p style="color:var(--mu);margin:0 0 14px;font-size:12px;">
+            Have the PDF? Drop it here. Our server recomputes its cryptographic SHA-256 fingerprint in real time and matches it against all issued records.
+        </p>
+
+        <div style="display:flex;gap:10px;align-items:center;">
+            <input type="file" id="verifyFileInput" accept=".pdf" style="font-size:12px;">
+            <button type="button" class="btn secondary" onclick="uploadAndVerifyHash()">Verify Integrity</button>
+        </div>
+        <div id="uploadVerifyResult" style="margin-top:12px;font-size:12.5px;"></div>
+    </div>
+</div>
+
+<script>
+async function uploadAndVerifyHash() {
+    const fileInput = document.getElementById('verifyFileInput');
+    const resultDiv = document.getElementById('uploadVerifyResult');
+    if (!fileInput.files.length) {
+        alert("Please select a PDF file first.");
+        return;
+    }
+    resultDiv.innerHTML = "Computing cryptographic SHA-256 hash...";
+    const formData = new FormData();
+    formData.append("file", fileInput.files[0]);
+
+    try {
+        const resp = await fetch("/api/verify/upload-hash", {
+            method: "POST",
+            body: formData
+        });
+        const data = await resp.json();
+        if (resp.ok && data.valid) {
+            resultDiv.innerHTML = `
+                <div style="color:var(--ok);font-weight:bold;background:#F0FDF4;padding:10px;border-radius:8px;border:1px solid var(--ok);">
+                    ✓ ${data.message}<br>
+                    <span style="font-size:11px;font-family:monospace;">Title: ${data.title} | Hash: ${data.hash.slice(0, 24)}...</span>
+                </div>
+            `;
+        } else {
+            resultDiv.innerHTML = `
+                <div style="color:var(--er);font-weight:bold;background:#FEF2F2;padding:10px;border-radius:8px;border:1px solid var(--er);">
+                    ✕ ${data.message || data.error}<br>
+                    <span style="font-size:11px;font-family:monospace;">Computed: ${data.hash ? data.hash.slice(0, 24) : ''}...</span>
+                </div>
+            `;
+        }
+    } catch(err) {
+        resultDiv.innerHTML = `<span style="color:var(--er);">Network error during verification.</span>`;
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard — ApproveHub{% endblock %}
+
+{% block content %}
+<div style="max-width:980px;margin:10px auto;">
+    <div style="background:linear-gradient(135deg, var(--navy), #0F766E);color:#FFF;border-radius:14px;padding:22px;margin-bottom:20px;">
+        <h2 style="margin:0 0 4px;">Institutional System Controller</h2>
+        <p style="margin:0;opacity:0.9;font-size:13px;">{{ user.institution.name if user.institution else "VIT Pune" }} — System Overview</p>
+    </div>
+
+    <!-- Metrics Grid -->
+    <div class="stat-grid">
+        <div class="stat-tile">
+            <b>{{ total_requests }}</b>
+            <span>Total Requests</span>
+        </div>
+        <div class="stat-tile amber">
+            <b>{{ pending_count }}</b>
+            <span>Pending Review</span>
+        </div>
+        <div class="stat-tile green">
+            <b>{{ approved_count }}</b>
+            <span>Approved & Stamped</span>
+        </div>
+        <div class="stat-tile violet">
+            <b>{{ total_people }}</b>
+            <span>Registered Users</span>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="card" style="padding:20px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <h3 style="margin:0;font-size:15px;">Real-Time Institutional Audit Feed</h3>
+            <a href="{{ url_for('admin.audit_log') }}" class="btn secondary" style="font-size:12px;padding:6px 12px;">View Full Log →</a>
+        </div>
+
+        <div class="timeline">
+            {% for item in recent_activity %}
+            <div class="tl-item {% if 'APPROVED' in item.event %}ok{% elif 'TAMPER' in item.event %}red{% endif %}">
+                <div style="font-weight:700;font-size:12.5px;">{{ item.event.replace('_', ' ') }}</div>
+                <div style="font-size:12px;color:var(--mu);margin-top:2px;">{{ item.details }}</div>
+                <div style="font-size:10.5px;color:#999;margin-top:3px;">
+                    Actor: {{ item.user.name if item.user else 'System' }} • {{ item.timestamp.strftime('%d %b, %H:%M UTC') }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

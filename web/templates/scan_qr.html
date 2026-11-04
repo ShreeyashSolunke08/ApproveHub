@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Scan QR Code — ApproveHub{% endblock %}
+
+{% block content %}
+<div style="max-width:440px;margin:20px auto;text-align:center;">
+    <h2 style="margin:0 0 6px;">Scan Verification QR</h2>
+    <p style="color:var(--mu);margin:0 0 16px;font-size:13px;">Point camera at the QR code printed on the official document</p>
+
+    <!-- Camera Viewfinder Simulation -->
+    <div style="background:#06141A;border-radius:24px;height:360px;position:relative;display:grid;place-items:center;color:#FFF;overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,0.3);">
+        <div style="position:absolute;inset:50px 40px;border:3px solid var(--aqua);border-radius:18px;opacity:0.9;"></div>
+        
+        <div style="text-align:center;position:relative;z-index:2;">
+            <div style="font-size:48px;margin-bottom:8px;">📷</div>
+            <div style="font-size:13px;opacity:0.85;">Align QR within frame</div>
+        </div>
+    </div>
+
+    <div style="margin-top:20px;">
+        <button type="button" class="btn full" onclick="window.location.href='/verify/AH-26-IT-0412-7KQ3'">
+            ⚡ Simulate Scan of Sample Verified QR
+        </button>
+        <div style="margin-top:10px;">
+            <a href="{{ url_for('verification.public_verify_page') }}" style="color:var(--teal);text-decoration:none;font-size:12.5px;">
+                Or enter approval code manually →
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

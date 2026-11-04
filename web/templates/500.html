@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Internal Server Error — ApproveHub{% endblock %}
+{% block content %}
+<div style="text-align:center;padding:60px 20px;">
+    <div style="font-size:54px;margin-bottom:12px;">⚠️</div>
+    <h2>500 — Internal Server Error</h2>
+    <p style="color:var(--mu);margin-bottom:20px;">An unexpected error occurred. Please contact the administrator.</p>
+    {% if error %}
+    <pre style="background:#FEE2E2;color:#991B1B;padding:12px;border-radius:8px;max-width:500px;margin:0 auto 20px;text-align:left;font-size:12px;">{{ error }}</pre>
+    {% endif %}
+    <a href="/" class="btn">Return to Dashboard</a>
+</div>
+{% endblock %}
