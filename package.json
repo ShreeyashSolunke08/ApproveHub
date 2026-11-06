@@ -1,0 +1,15 @@
+{
+  "name": "approvehub-mobile",
+  "version": "1.0.0",
+  "description": "ApproveHub Official Mobile Application",
+  "scripts": {
+    "build": "echo 'Web assets ready in web/'"
+  },
+  "dependencies": {
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/android": "^6.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.0.0"
+  }
+}

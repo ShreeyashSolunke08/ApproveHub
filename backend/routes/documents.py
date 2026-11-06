@@ -32,6 +32,11 @@ STAFF_DOC_TYPES = [
 ]
 
 @documents_bp.route("/")
+def home():
+    user = get_current_user()
+    return render_template("index.html", user=user)
+
+@documents_bp.route("/dashboard")
 @documents_bp.route("/user")
 @login_required
 def applicant_dashboard():
