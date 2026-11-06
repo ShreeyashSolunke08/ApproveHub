@@ -2,10 +2,20 @@ services:
   - type: web
     name: approvehub
     runtime: python
-    buildCommand: pip install -r requirements.txt
+    buildCommand: pip install -r requirements.txt && python init_db.py
     startCommand: gunicorn wsgi:app --bind 0.0.0.0:$PORT
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9
       - key: SECRET_KEY
         generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: approvehub-db
+          property: connectionString
+
+databases:
+  - name: approvehub-db
+    databaseName: approvehub
+    user: approvehub_user
+    plan: free

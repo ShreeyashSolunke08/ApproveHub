@@ -5,3 +5,6 @@ venv/
 .env
 .vscode/
 .idea/
+android_build_artifact/
+android/
+node_modules/
