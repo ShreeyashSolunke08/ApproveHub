@@ -1,0 +1,19 @@
+User-agent: *
+Allow: /
+Allow: /verify/
+Allow: /verify
+Allow: /scan
+Allow: /login
+Allow: /register
+Allow: /static/
+
+# Disallow internal administrative & raw upload directories from crawling
+Disallow: /admin/
+Disallow: /api/
+Disallow: /documents/
+Disallow: /uploads/docs/
+Disallow: /uploads/assets/
+Disallow: /mobile-sign/
+
+# Sitemap location
+Sitemap: https://approvehub.onrender.com/sitemap.xml

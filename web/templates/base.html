@@ -5,6 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>{% block title %}ApproveHub — Verified Digital Document Approvals{% endblock %}</title>
 
+    <!-- Search Engine Optimization (SEO) Meta Tags -->
+    <meta name="description" content="{% block meta_description %}ApproveHub is an automated institutional document approval and verification platform. Features sequential multi-level signoffs, smartphone QR signing, PyMuPDF vector stamping, and instant SHA-256 tamper verification. Developed at VIT Pune by Shreeyash Solunke.{% endblock %}">
+    <meta name="keywords" content="ApproveHub, document approval system, digital approval platform, PyMuPDF vector stamping, QR verification, Vishwakarma Institute of Technology, VIT Pune, Shreeyash Solunke, academic document workflow, tamper detection, digital signatures">
+    <meta name="author" content="Shreeyash Solunke">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="{{ request.base_url }}">
+
+    <!-- Open Graph (OG) Meta Tags for Social & Messaging Previews -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="ApproveHub">
+    <meta property="og:title" content="{% block og_title %}ApproveHub — Verified Digital Document Approvals{% endblock %}">
+    <meta property="og:description" content="{% block og_desc %}Automated document approval platform with smartphone QR signing, PyMuPDF vector stamping, and instant cryptographic tamper-evident verification. Developed at VIT Pune by Shreeyash Solunke.{% endblock %}">
+    <meta property="og:image" content="{{ url_for('static', filename='img/brand-logo.png', _external=True) }}">
+    <meta property="og:url" content="{{ request.base_url }}">
+
+    <!-- Twitter / X Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="ApproveHub — Verified Digital Document Approvals">
+    <meta name="twitter:description" content="Institutional digital document approval platform with smartphone QR signing and cryptographic tamper verification. Developed at VIT Pune.">
+    <meta name="twitter:image" content="{{ url_for('static', filename='img/brand-logo.png', _external=True) }}">
+
     <!-- PWA & Mobile Native App Meta Tags -->
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
     <meta name="theme-color" content="#4F46E5">
@@ -24,7 +45,7 @@
     <!-- Institutional Frosted Glass Topbar Navigation -->
     <header class="topbar">
         <a href="/" class="brand" style="display:flex;align-items:center;text-decoration:none;gap:10px;">
-            <img src="{{ url_for('static', filename='img/brand-logo.png') }}" alt="ApproveHub" style="height:38px;width:auto;display:block;max-width:200px;object-fit:contain;">
+            <img src="{{ url_for('static', filename='img/brand-logo.png') }}" alt="ApproveHub — Verified Digital Approvals" style="height:38px;width:auto;display:block;max-width:200px;object-fit:contain;">
         </a>
 
         <div class="top-actions">

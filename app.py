@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template
+from flask import Flask, render_template, send_from_directory
 from backend.config import Config
 from backend.models import db
 from backend.routes.auth import auth_bp
@@ -46,6 +46,15 @@ def create_app():
     def inject_user():
         return {"current_user": get_current_user()}
 
+    # SEO Crawling Endpoints
+    @app.route("/robots.txt")
+    def robots_txt():
+        return send_from_directory(app.static_folder, "robots.txt", mimetype="text/plain")
+
+    @app.route("/sitemap.xml")
+    def sitemap_xml():
+        return send_from_directory(app.static_folder, "sitemap.xml", mimetype="application/xml")
+
     @app.errorhandler(404)
     def page_not_found(e):
         return render_template("404.html"), 404
@@ -64,5 +73,4 @@ def create_app():
 app = create_app()
 
 if __name__ == "__main__":
-    # Host on 0.0.0.0 so smartphones on the same Wi-Fi network can scan and access mobile signing
     app.run(host="0.0.0.0", port=5000, debug=True)

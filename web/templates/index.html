@@ -1,6 +1,84 @@
 {% extends "base.html" %}
 
-{% block title %}ApproveHub — Verified Institutional Document Approvals{% endblock %}
+{% block title %}ApproveHub — Verified Institutional Document Approvals &amp; Tamper Verification | VIT Pune{% endblock %}
+
+{% block extra_head %}
+<!-- Schema.org JSON-LD Structured Data for Google Rich Results & SEO -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://approvehub.onrender.com/#webapp",
+      "name": "ApproveHub",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "All (Web, Android, iOS)",
+      "url": "https://approvehub.onrender.com",
+      "description": "Next-Gen Institutional Document Approval & Cryptographic Verification Platform developed at Vishwakarma Institute of Technology (VIT Pune) by Shreeyash Solunke.",
+      "image": "https://approvehub.onrender.com/static/img/brand-logo.png",
+      "author": {
+        "@type": "Person",
+        "name": "Shreeyash Solunke",
+        "jobTitle": "Lead Software Architect & Full-Stack Developer",
+        "affiliation": {
+          "@type": "CollegeOrUniversity",
+          "name": "Vishwakarma Institute of Technology, Pune"
+        }
+      },
+      "publisher": {
+        "@type": "CollegeOrUniversity",
+        "name": "Vishwakarma Institute of Technology, Pune",
+        "url": "https://www.vit.edu"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "INR"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://approvehub.onrender.com/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is ApproveHub?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "ApproveHub is an automated academic document approval platform developed at VIT Pune that replaces physical paperwork with sequential multi-tier workflows, smartphone QR finger signing, PyMuPDF vector stamping, and instant cryptographic verification."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Who developed ApproveHub?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "ApproveHub was designed and developed by Shreeyash Solunke, Lead Software Architect & Full-Stack Developer at the Department of Information Technology, Vishwakarma Institute of Technology (VIT), Pune."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does document verification work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Every approved document receives a unique cryptographic approval code and dynamic QR code generated using PyMuPDF. Anyone scanning the QR code or searching the public portal can instantly view the official signoff trail, authority credentials, and tamper status via SHA-256 hash checks."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do authorities need to install an app to sign?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Approvers simply point their smartphone camera at the dynamic QR code displayed on their screen to open a zero-install touch canvas and sign directly with their finger."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+{% endblock %}
 
 {% block content %}
 <div style="max-width:1160px;margin:0 auto;padding:20px 20px 60px;">
