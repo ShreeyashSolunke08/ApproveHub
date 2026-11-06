@@ -36,6 +36,17 @@ def home():
     user = get_current_user()
     return render_template("index.html", user=user)
 
+@documents_bp.route("/download-apk")
+@documents_bp.route("/download/app")
+def download_apk():
+    apk_path = os.path.join(current_app.static_folder, "downloads", "ApproveHub.apk")
+    if not os.path.exists(apk_path):
+        alt_path = os.path.join(current_app.root_path, "android_build_artifact", "ApproveHub-Android-APK", "app-debug.apk")
+        if os.path.exists(alt_path):
+            return send_file(alt_path, as_attachment=True, download_name="ApproveHub.apk", mimetype="application/vnd.android.package-archive")
+        abort(404)
+    return send_file(apk_path, as_attachment=True, download_name="ApproveHub.apk", mimetype="application/vnd.android.package-archive")
+
 @documents_bp.route("/dashboard")
 @documents_bp.route("/user")
 @login_required

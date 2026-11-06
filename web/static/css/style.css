@@ -846,3 +846,37 @@ body.mobile-mode .content-area {
   background: var(--indigo-primary);
   color: #FFFFFF;
 }
+
+/* ==========================================================================
+   Responsive Mobile & Tablet Viewport Rules
+   ========================================================================== */
+@media (max-width: 860px) {
+  .hero-section-grid {
+    grid-template-columns: 1fr !important;
+    gap: 30px !important;
+    padding: 30px 20px !important;
+  }
+  
+  .mobile-app-showcase-grid {
+    grid-template-columns: 1fr !important;
+    text-align: center;
+    gap: 20px !important;
+  }
+  
+  .mobile-app-showcase-grid > div:first-child {
+    display: flex;
+    justify-content: center;
+  }
+
+  .mobile-app-showcase-grid > div:last-child {
+    width: 100%;
+  }
+
+  .topbar {
+    padding: 10px 16px;
+  }
+
+  .top-actions {
+    gap: 8px;
+  }
+}

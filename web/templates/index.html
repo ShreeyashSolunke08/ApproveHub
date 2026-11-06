@@ -84,7 +84,7 @@
 <div style="max-width:1160px;margin:0 auto;padding:20px 20px 60px;">
 
     <!-- 1. HERO SECTION -->
-    <div style="background:linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%);border:1.5px solid rgba(99,102,241,0.2);border-radius:28px;padding:54px 44px;margin-bottom:36px;box-shadow:0 20px 60px rgba(79,70,229,0.07);position:relative;overflow:hidden;display:grid;grid-template-columns:1.2fr 0.8fr;gap:40px;align-items:center;">
+    <div class="hero-section-grid" style="background:linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%);border:1.5px solid rgba(99,102,241,0.2);border-radius:28px;padding:54px 44px;margin-bottom:36px;box-shadow:0 20px 60px rgba(79,70,229,0.07);position:relative;overflow:hidden;display:grid;grid-template-columns:1.2fr 0.8fr;gap:40px;align-items:center;">
         
         <!-- Decorative subtle background glow -->
         <div style="position:absolute;top:-100px;right:-80px;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle, rgba(79,70,229,0.12) 0%, transparent 70%);pointer-events:none;"></div>
@@ -157,26 +157,131 @@
             </div>
         </div>
 
-        <!-- Hero App Visual Presentation -->
-        <div style="position:relative;display:flex;justify-content:center;align-items:center;">
-            <div style="background:#FFFFFF;border:2px solid rgba(99,102,241,0.25);border-radius:24px;padding:24px;box-shadow:0 24px 50px rgba(15,23,42,0.1);max-width:340px;width:100%;text-align:center;">
-                <div style="display:flex;justify-content:center;margin-bottom:16px;">
-                    <img src="{{ url_for('static', filename='img/app-logo.png') }}" alt="ApproveHub Mobile App" style="width:110px;height:110px;border-radius:22px;box-shadow:0 12px 30px rgba(15,23,42,0.18);">
+        <!-- Hero Right: Direct Homepage Login Portal & Quick Role Switcher -->
+        <div style="position:relative;display:flex;justify-content:center;align-items:stretch;">
+            {% if current_user %}
+            <!-- Logged In User State Card -->
+            <div style="background:#FFFFFF;border:2px solid rgba(99,102,241,0.25);border-radius:24px;padding:30px 26px;box-shadow:0 24px 50px rgba(15,23,42,0.08);width:100%;max-width:380px;display:flex;flex-direction:column;justify-content:space-between;">
+                <div>
+                    <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,0.1);padding:4px 10px;border-radius:99px;font-size:11.5px;font-weight:800;color:#047857;margin-bottom:16px;">
+                        <span style="width:7px;height:7px;border-radius:50%;background:#10B981;display:inline-block;"></span> Active Session
+                    </div>
+                    <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;">
+                        <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg, var(--indigo-primary), #06B6D4);color:#FFF;display:grid;place-items:center;font-weight:900;font-size:22px;border:2px solid #E0E7FF;box-shadow:0 6px 16px rgba(79,70,229,0.25);">
+                            {{ current_user.full_name[:2].upper() }}
+                        </div>
+                        <div>
+                            <h3 style="margin:0 0 4px;font-size:18px;font-weight:800;color:#0F172A;">{{ current_user.full_name }}</h3>
+                            <div style="font-size:12.5px;color:#64748B;">@{{ current_user.username }} • <span style="font-weight:700;color:var(--indigo-primary);text-transform:capitalize;">{{ current_user.role }}</span></div>
+                        </div>
+                    </div>
+                    <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:14px;padding:12px;font-size:12.5px;color:#475569;margin-bottom:20px;line-height:1.5;">
+                        <strong style="color:#0F172A;">Department:</strong> {{ current_user.department or 'Information Technology' }}<br>
+                        <strong style="color:#0F172A;">Institutional Email:</strong> {{ current_user.email }}
+                    </div>
                 </div>
-                <h3 style="margin:0 0 6px;font-size:18px;font-weight:800;color:#0F172A;">ApproveHub Mobile</h3>
-                <p style="font-size:13px;color:#64748B;margin:0 0 16px;line-height:1.4;">
-                    Official progressive web &amp; native mobile app for student submissions and authority signoffs.
+
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                    {% if current_user.role == 'applicant' %}
+                        <a href="{{ url_for('documents.applicant_dashboard') }}" class="btn full" style="padding:12px;font-size:14px;border-radius:12px;font-weight:700;">🚀 Open My Documents Desk →</a>
+                        <a href="{{ url_for('documents.upload_document') }}" class="btn secondary full" style="padding:11px;font-size:13px;border-radius:12px;">➕ Submit New Request</a>
+                    {% elif current_user.role == 'approver' %}
+                        <a href="{{ url_for('approvals.approver_inbox') }}" class="btn full" style="padding:12px;font-size:14px;border-radius:12px;font-weight:700;">📥 Open Approval Desk →</a>
+                    {% elif current_user.role == 'admin' %}
+                        <a href="{{ url_for('admin.admin_dashboard') }}" class="btn full" style="padding:12px;font-size:14px;border-radius:12px;font-weight:700;">📊 Open Admin Portal →</a>
+                    {% endif %}
+                    <a href="{{ url_for('auth.logout') }}" style="text-align:center;font-size:12.5px;color:#EF4444;text-decoration:none;font-weight:700;margin-top:4px;">Log Out & Switch Account</a>
+                </div>
+            </div>
+            {% else %}
+            <!-- Direct Homepage Login Card -->
+            <div style="background:#FFFFFF;border:2px solid rgba(99,102,241,0.25);border-radius:24px;padding:26px 24px;box-shadow:0 24px 50px rgba(15,23,42,0.1);width:100%;max-width:380px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                    <div style="font-size:16px;font-weight:800;color:#0F172A;display:flex;align-items:center;gap:6px;">
+                        <span>🔐</span> Portal Quick Login
+                    </div>
+                    <span style="font-size:11px;background:#EEF2FF;color:var(--indigo-primary);padding:3px 8px;border-radius:99px;font-weight:700;">All Devices</span>
+                </div>
+
+                <form method="POST" action="{{ url_for('auth.login_page') }}" style="display:flex;flex-direction:column;gap:12px;">
+                    <div>
+                        <label style="display:block;font-size:11.5px;font-weight:700;color:#475569;margin-bottom:4px;">College ID / Email / Username</label>
+                        <input type="text" id="homeLoginUser" name="username" required placeholder="e.g. student_it or roll_no" style="width:100%;padding:10px 12px;border:1.5px solid #CBD5E1;border-radius:10px;font-size:13px;box-sizing:border-box;background:#F8FAFC;outline:none;">
+                    </div>
+                    <div>
+                        <label style="display:block;font-size:11.5px;font-weight:700;color:#475569;margin-bottom:4px;">Password</label>
+                        <input type="password" id="homeLoginPass" name="password" required placeholder="••••••••" style="width:100%;padding:10px 12px;border:1.5px solid #CBD5E1;border-radius:10px;font-size:13px;box-sizing:border-box;background:#F8FAFC;outline:none;">
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;font-size:11.5px;">
+                        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;color:#64748B;">
+                            <input type="checkbox" name="remember" checked style="accent-color:var(--indigo-primary);"> Remember me
+                        </label>
+                        <a href="{{ url_for('auth.forgot_password_page') }}" style="color:var(--indigo-primary);text-decoration:none;font-weight:700;">Forgot PIN?</a>
+                    </div>
+                    <button type="submit" class="btn full" style="padding:11px;font-size:13.5px;font-weight:700;border-radius:10px;">
+                        Sign In with Institutional ID →
+                    </button>
+                </form>
+
+                <!-- 1-Click Fast Demo Credentials Switcher -->
+                <div style="margin-top:16px;padding-top:14px;border-top:1px dashed #E2E8F0;">
+                    <div style="font-size:11px;font-weight:700;color:#64748B;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.04em;">
+                        ⚡ 1-Click Demo Profiles for Evaluators:
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+                        <button type="button" onclick="fillDemo('student_it', 'Student@123')" style="background:#F1F5F9;border:1px solid #CBD5E1;padding:5px 8px;border-radius:8px;font-size:11px;font-weight:700;color:#334155;cursor:pointer;text-align:left;">
+                            👨‍🎓 Student
+                        </button>
+                        <button type="button" onclick="fillDemo('faculty_guide', 'Faculty@123')" style="background:#F1F5F9;border:1px solid #CBD5E1;padding:5px 8px;border-radius:8px;font-size:11px;font-weight:700;color:#334155;cursor:pointer;text-align:left;">
+                            👩‍🏫 Faculty
+                        </button>
+                        <button type="button" onclick="fillDemo('hod_it', 'Hod@123')" style="background:#F1F5F9;border:1px solid #CBD5E1;padding:5px 8px;border-radius:8px;font-size:11px;font-weight:700;color:#334155;cursor:pointer;text-align:left;">
+                            🏢 HOD IT
+                        </button>
+                        <button type="button" onclick="fillDemo('principal_vit', 'Principal@123')" style="background:#F1F5F9;border:1px solid #CBD5E1;padding:5px 8px;border-radius:8px;font-size:11px;font-weight:700;color:#334155;cursor:pointer;text-align:left;">
+                            🏛️ Principal
+                        </button>
+                    </div>
+                    <div style="margin-top:8px;text-align:center;">
+                        <a href="{{ url_for('auth.register_page') }}" style="font-size:12px;color:var(--indigo-primary);text-decoration:none;font-weight:700;">
+                            New student or faculty? Create Account &rarr;
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 2. NATIVE MOBILE APP SHOWCASE (.APK + PWA FOR ANY DEVICE LIKE YT / WHATSAPP / ZOMATO / SWIGGY) -->
+    <div class="card" style="padding:32px 36px;margin-bottom:36px;border:2px solid rgba(79,70,229,0.25);background:linear-gradient(135deg, #FFFFFF 0%, #F5F7FF 100%);border-radius:24px;">
+        <div class="mobile-app-showcase-grid" style="display:grid;grid-template-columns:auto 1fr auto;gap:28px;align-items:center;">
+            <div style="flex:none;">
+                <img src="{{ url_for('static', filename='img/app-logo.png') }}" alt="ApproveHub Mobile App" style="width:96px;height:96px;border-radius:22px;box-shadow:0 12px 28px rgba(79,70,229,0.25);display:block;">
+            </div>
+
+            <div>
+                <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(79,70,229,0.1);padding:4px 12px;border-radius:99px;font-size:11.5px;font-weight:800;color:var(--indigo-primary);margin-bottom:8px;">
+                    <span>📲</span> Standalone Mobile Application • Android &amp; iOS
+                </div>
+                <h3 style="margin:0 0 6px;font-size:22px;font-weight:900;color:#0F172A;">
+                    ApproveHub Standalone Mobile App — Use Anywhere, Anytime, on Any Device
+                </h3>
+                <p style="font-size:13.5px;color:#475569;margin:0 0 10px;line-height:1.5;">
+                    Just like YouTube, WhatsApp, Zomato, or Swiggy, ApproveHub is packaged as a <strong>real standalone application</strong> that sits on your smartphone's home screen. Submit documents on the go, receive real-time push alerts, and sign certificates with finger touch.
                 </p>
-                <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:14px;padding:12px 14px;margin-bottom:16px;font-size:12px;text-align:left;">
-                    <div style="font-weight:700;color:#0F172A;margin-bottom:4px;display:flex;align-items:center;gap:6px;">
-                        <span>📲</span> Install on Any Phone
-                    </div>
-                    <div style="color:#64748B;line-height:1.4;">
-                        Add directly to your home screen from Chrome, Edge, or iOS Safari with zero app store setup.
-                    </div>
+                <div style="display:flex;gap:18px;font-size:12.5px;color:#64748B;flex-wrap:wrap;">
+                    <span>⚡ <strong>Individual Cloud Database</strong>: Your profile and documents stay privately isolated</span>
+                    <span>🌐 <strong>Multi-Device Sync</strong>: Switch between phone, tablet, and PC seamlessly</span>
                 </div>
-                <button type="button" class="btn full" onclick="installPWA()" style="padding:11px;font-size:13px;border-radius:12px;">
-                    📲 Install ApproveHub App
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:10px;min-width:210px;flex:none;">
+                <a href="{{ url_for('documents.download_apk') }}" class="btn" style="padding:12px 18px;font-size:13.5px;font-weight:800;border-radius:12px;text-align:center;box-shadow:0 8px 20px rgba(79,70,229,0.3);text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;">
+                    <span>🤖</span> Download Android APK
+                </a>
+                <button type="button" class="btn secondary" onclick="installPWA()" style="padding:10px 16px;font-size:12.5px;font-weight:700;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:6px;background:#FFF;">
+                    <span>🍎</span> Install PWA (iOS / Web)
                 </button>
             </div>
         </div>
@@ -296,35 +401,90 @@
         </div>
     </div>
 
-    <!-- 5. LEADERSHIP & ARCHITECT CREDITS (PROJECT LEAD PROFILE) -->
-    <div class="card" style="padding:34px;margin-bottom:44px;border-left:5px solid var(--indigo-primary);background:linear-gradient(135deg, #FFFFFF 0%, #FAFBFF 100%);">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:24px;">
-            <div style="display:flex;align-items:center;gap:22px;">
-                <div style="width:84px;height:84px;border-radius:50%;background:linear-gradient(135deg, var(--indigo-primary), #06B6D4);color:#FFF;display:grid;place-items:center;font-size:34px;font-weight:900;box-shadow:0 10px 24px rgba(79,70,229,0.3);flex:none;border:3px solid #FFF;">
-                    SS
+    <!-- 5. MULTI-DEVICE CLOUD ARCHITECTURE & SEPARATE DATABASE ISOLATION -->
+    <div class="card" style="padding:32px 36px;margin-bottom:44px;border:1.5px solid #E2E8F0;background:#FFFFFF;border-radius:24px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
+            <div style="width:40px;height:40px;border-radius:12px;background:rgba(79,70,229,0.1);color:var(--indigo-primary);display:grid;place-items:center;font-size:20px;">
+                ☁️
+            </div>
+            <div>
+                <h3 style="margin:0;font-size:20px;font-weight:900;color:#0F172A;">Multi-Device Cloud Architecture &amp; Isolated User Databases</h3>
+                <p style="margin:0;font-size:13px;color:#64748B;">Built for scale, privacy, and continuous 24/7 availability across all your devices</p>
+            </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:20px;">
+            <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:16px;padding:20px;">
+                <div style="font-size:14.5px;font-weight:800;color:#0F172A;margin-bottom:6px;display:flex;align-items:center;gap:8px;">
+                    <span>🔒</span> Individual Data Isolation
                 </div>
-                <div>
-                    <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(79,70,229,0.1);padding:3px 10px;border-radius:99px;font-size:11px;font-weight:800;color:var(--indigo-primary);margin-bottom:6px;">
-                        👨‍💻 Project Architect &amp; Lead Full-Stack Developer
-                    </div>
-                    <h3 style="margin:0 0 4px;font-size:22px;font-weight:900;color:#0F172A;">Shreeyash Solunke</h3>
-                    <div style="font-size:13.5px;color:#475569;margin-bottom:6px;">
-                        Department of Information Technology • Vishwakarma Institute of Technology, Pune
-                    </div>
-                    <p style="font-size:13px;color:#64748B;margin:0;max-width:620px;line-height:1.5;">
-                        Architected and implemented the end-to-end ApproveHub ecosystem: multi-tier sequential state engine, PyMuPDF cryptographic vector stamping, zero-install smartphone signature bridge, PWA mobile application, and tamper verification portal.
-                    </p>
-                </div>
+                <p style="font-size:12.5px;color:#64748B;line-height:1.5;margin:0;">
+                    Every registered student and faculty member receives a distinct tenant ID in the database. Personal documents, private touch signatures, security PIN hashes, and audit logs are strictly isolated and never mixed or accessible to unauthorized users.
+                </p>
             </div>
 
-            <div style="display:flex;flex-direction:column;gap:8px;text-align:right;">
-                <span class="pill approved" style="font-size:11.5px;padding:6px 14px;">EDI Capstone 2026</span>
-                <span style="font-size:12px;color:#64748B;">VIT Pune IT Department</span>
+            <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:16px;padding:20px;">
+                <div style="font-size:14.5px;font-weight:800;color:#0F172A;margin-bottom:6px;display:flex;align-items:center;gap:8px;">
+                    <span>📱</span> Multi-Device Real-Time Sync
+                </div>
+                <p style="font-size:12.5px;color:#64748B;line-height:1.5;margin:0;">
+                    Just like YouTube, WhatsApp, or Zomato, start an application on your laptop and track or approve it directly on your mobile app. Real-time database synchronisation guarantees instant status updates across smartphones, tablets, and PCs.
+                </p>
+            </div>
+
+            <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:16px;padding:20px;">
+                <div style="font-size:14.5px;font-weight:800;color:#0F172A;margin-bottom:6px;display:flex;align-items:center;gap:8px;">
+                    <span>🗄️</span> Cloud Database Engine
+                </div>
+                <p style="font-size:12.5px;color:#64748B;line-height:1.5;margin:0;">
+                    Engineered with SQLAlchemy ORM supporting production PostgreSQL on Render / Railway. Fully managed, persistent cloud storage ensures high availability and zero data loss even during heavy multi-user peak submission cycles.
+                </p>
             </div>
         </div>
     </div>
 
-    <!-- 6. FOOTER -->
+    <!-- 6. LEADERSHIP & ARCHITECT CREDITS (PROJECT LEAD PROFILE - SHREEYASH SOLUNKE) -->
+    <div class="card" style="padding:36px;margin-bottom:44px;border-left:6px solid var(--indigo-primary);background:linear-gradient(135deg, #FFFFFF 0%, #FAFBFF 100%);border-radius:24px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:24px;">
+            <div style="display:flex;align-items:flex-start;gap:22px;">
+                <div style="width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg, var(--indigo-primary), #06B6D4);color:#FFF;display:grid;place-items:center;font-size:34px;font-weight:900;box-shadow:0 12px 28px rgba(79,70,229,0.3);flex:none;border:3px solid #FFF;">
+                    SS
+                </div>
+                <div>
+                    <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(79,70,229,0.1);padding:4px 12px;border-radius:99px;font-size:11.5px;font-weight:800;color:var(--indigo-primary);margin-bottom:8px;">
+                        👨‍💻 Project Architect &amp; Lead Full-Stack Developer
+                    </div>
+                    <h3 style="margin:0 0 4px;font-size:24px;font-weight:900;color:#0F172A;">Shreeyash Solunke</h3>
+                    <div style="font-size:14px;color:#475569;margin-bottom:10px;font-weight:600;">
+                        Department of Information Technology • Vishwakarma Institute of Technology (VIT), Pune
+                    </div>
+                    <p style="font-size:13.5px;color:#64748B;margin:0 0 16px;max-width:680px;line-height:1.6;">
+                        Conceived, designed, and engineered the complete ApproveHub platform end-to-end as an EDI Capstone initiative. Built the sequential multi-tier workflow engine, PyMuPDF cryptographic vector stamping, zero-install smartphone signature bridge, standalone Android mobile application (.apk), installable PWA, and tamper verification portal.
+                    </p>
+
+                    <!-- Tech Stack Pills -->
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <span style="font-size:11.5px;background:#F1F5F9;color:#334155;padding:4px 10px;border-radius:8px;font-weight:700;">Python 3.14 &amp; Flask</span>
+                        <span style="font-size:11.5px;background:#F1F5F9;color:#334155;padding:4px 10px;border-radius:8px;font-weight:700;">PyMuPDF (fitz)</span>
+                        <span style="font-size:11.5px;background:#F1F5F9;color:#334155;padding:4px 10px;border-radius:8px;font-weight:700;">PostgreSQL &amp; SQLite</span>
+                        <span style="font-size:11.5px;background:#F1F5F9;color:#334155;padding:4px 10px;border-radius:8px;font-weight:700;">Capacitor Android (.APK)</span>
+                        <span style="font-size:11.5px;background:#F1F5F9;color:#334155;padding:4px 10px;border-radius:8px;font-weight:700;">SHA-256 Cryptography</span>
+                        <span style="font-size:11.5px;background:#F1F5F9;color:#334155;padding:4px 10px;border-radius:8px;font-weight:700;">PWA Service Workers</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:8px;text-align:right;">
+                <span class="pill approved" style="font-size:12px;padding:6px 14px;align-self:flex-end;">EDI Capstone 2026</span>
+                <span style="font-size:12px;color:#64748B;">VIT Pune IT Department</span>
+                <a href="https://github.com/ShreeyashSolunke08/ApproveHub" target="_blank" rel="noopener" style="font-size:12px;color:var(--indigo-primary);text-decoration:none;font-weight:700;display:inline-flex;align-items:center;gap:4px;justify-content:flex-end;">
+                    <span>📂</span> GitHub Repository &rarr;
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 7. FOOTER -->
     <div style="text-align:center;padding-top:24px;border-top:1px solid #E2E8F0;font-size:13px;color:#64748B;">
         <div style="display:flex;justify-content:center;margin-bottom:12px;">
             <img src="{{ url_for('static', filename='img/brand-logo.png') }}" alt="ApproveHub" style="max-height:38px;width:auto;display:block;">
@@ -333,13 +493,23 @@
             ApproveHub — Verified Institutional Document Approvals &amp; Tamper-Evident Verification Platform.
         </p>
         <p style="margin:0;font-size:12px;color:#94A3B8;">
-            Developed by Shreeyash Solunke • Vishwakarma Institute of Technology (VIT), Pune. All rights reserved.
+            Developed by <strong>Shreeyash Solunke</strong> • Vishwakarma Institute of Technology (VIT), Pune. All rights reserved.
         </p>
     </div>
 
 </div>
 
 <script>
+function fillDemo(username, password) {
+    const userInput = document.getElementById("homeLoginUser");
+    const passInput = document.getElementById("homeLoginPass");
+    if (userInput && passInput) {
+        userInput.value = username;
+        passInput.value = password;
+        userInput.focus();
+    }
+}
+
 function handleDirectVerify(e, form) {
     e.preventDefault();
     const code = document.getElementById("directApprovalInput").value.trim();
