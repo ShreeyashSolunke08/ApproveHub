@@ -11,6 +11,10 @@
     <meta name="author" content="Shreeyash Solunke">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="{{ request.base_url }}">
+    {% if google_site_verification %}
+    <meta name="google-site-verification" content="{{ google_site_verification }}">
+    {% endif %}
+    {% block google_verification %}{% endblock %}
 
     <!-- Open Graph (OG) Meta Tags for Social & Messaging Previews -->
     <meta property="og:type" content="website">

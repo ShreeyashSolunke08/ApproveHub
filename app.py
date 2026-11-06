@@ -44,7 +44,10 @@ def create_app():
     # Global template context processor
     @app.context_processor
     def inject_user():
-        return {"current_user": get_current_user()}
+        return {
+            "current_user": get_current_user(),
+            "google_site_verification": os.environ.get("GOOGLE_SITE_VERIFICATION", "")
+        }
 
     # SEO Crawling Endpoints
     @app.route("/robots.txt")
