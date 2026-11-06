@@ -1,3 +1,14 @@
+"""
+ApproveHub — Cryptographic Hashing Utilities
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Deterministic SHA-256 digest computation for file integrity verification,
+in-memory byte stream hashing, and composite immutable audit ledger records.
+
+Author: Shreeyash Solunke
+Institution: VIT Pune, Department of Information Technology
+"""
+
 import hashlib
 
 def sha256_file(path):

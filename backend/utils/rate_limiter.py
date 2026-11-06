@@ -1,3 +1,14 @@
+"""
+ApproveHub — In-Memory Rate Limiting Decorator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Sliding-window IP rate limiter safeguarding authentication, PIN verification,
+and signing endpoints against brute-force intrusion and resource exhaustion.
+
+Author: Shreeyash Solunke
+Institution: VIT Pune, Department of Information Technology
+"""
+
 import time
 from functools import wraps
 from flask import request, jsonify

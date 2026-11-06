@@ -1,8 +1,12 @@
+# ==============================================================================
+# ApproveHub — Search Engine Crawler Directives
+# ==============================================================================
+
 User-agent: *
 Allow: /
 Allow: /verify/
 Allow: /verify
-Allow: /scan
+Allow: /scan-qr
 Allow: /login
 Allow: /register
 Allow: /static/
@@ -14,6 +18,7 @@ Disallow: /documents/
 Disallow: /uploads/docs/
 Disallow: /uploads/assets/
 Disallow: /mobile-sign/
+Disallow: /download-apk
 
 # Sitemap location
 Sitemap: https://approvehub.onrender.com/sitemap.xml

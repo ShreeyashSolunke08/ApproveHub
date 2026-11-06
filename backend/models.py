@@ -1,3 +1,21 @@
+"""
+ApproveHub — Relational Database Models
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+SQLAlchemy ORM models representing the core entities of the ApproveHub
+institutional document approval and verification ecosystem.
+
+Entities:
+    - Institution: Multi-tenant organizational unit (e.g., college/university)
+    - User: Institutional stakeholders (applicants, approvers, administrators)
+    - Document: Requisition documents submitted for multi-stage approval
+    - ApprovalStep: Discrete sequential signoff stages within a document workflow
+    - Timeline: Immutable audit ledger tracking every state transition and event
+
+Author: Shreeyash Solunke
+Institution: VIT Pune, Department of Information Technology
+"""
+
 import secrets
 from datetime import datetime, timezone, timedelta
 from flask_sqlalchemy import SQLAlchemy
@@ -6,6 +24,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 db = SQLAlchemy()
 
 def utc_now():
+    """Return timezone-aware current UTC datetime."""
     return datetime.now(timezone.utc)
 
 class Institution(db.Model):

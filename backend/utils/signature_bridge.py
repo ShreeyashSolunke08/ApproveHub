@@ -1,3 +1,14 @@
+"""
+ApproveHub — Zero-Install Smartphone Signature Bridge
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Relays real-time touch signatures from mobile smartphone screens to desktop
+workstations via secure ephemeral session tokens and dynamic QR optical handshakes.
+
+Author: Shreeyash Solunke
+Institution: VIT Pune, Department of Information Technology
+"""
+
 import os
 import time
 import socket

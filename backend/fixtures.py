@@ -1,3 +1,15 @@
+"""
+ApproveHub — Institutional Fixtures & Demo Seeder
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Seeds baseline institutional entities, departments, role accounts,
+digital signature assets, and initial sample documents for evaluation
+and demonstration workflows.
+
+Author: Shreeyash Solunke
+Institution: VIT Pune, Department of Information Technology
+"""
+
 import os
 import pymupdf
 from PIL import Image, ImageDraw

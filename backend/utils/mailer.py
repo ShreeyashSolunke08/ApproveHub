@@ -1,3 +1,14 @@
+"""
+ApproveHub — Transactional Email Dispatcher
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Asynchronous, non-blocking email delivery engine providing responsive HTML
+templates for status changes, password resets, and approval notifications.
+
+Author: Shreeyash Solunke
+Institution: VIT Pune, Department of Information Technology
+"""
+
 import os
 import smtplib
 import threading

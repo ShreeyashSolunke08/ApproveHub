@@ -807,7 +807,3 @@ def api_set_pin():
     db.session.commit()
     return jsonify({"success": True, "message": "Security PIN updated successfully."})
 
-@auth_bp.route("/api/debug/latest-emails", methods=["GET"])
-def api_debug_latest_emails():
-    """Diagnostic endpoint to inspect dispatched transactional emails."""
-    return jsonify(get_latest_emails())

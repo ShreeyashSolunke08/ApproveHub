@@ -1,3 +1,14 @@
+"""
+ApproveHub — Input & Payload Validation Utilities
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Deep file inspection validating MIME types, header magic bytes (%PDF-),
+and maximum byte thresholds for secure institutional document uploads.
+
+Author: Shreeyash Solunke
+Institution: VIT Pune, Department of Information Technology
+"""
+
 import os
 
 def validate_pdf_file(file_storage, max_bytes=10 * 1024 * 1024):

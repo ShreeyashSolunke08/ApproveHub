@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}403 Forbidden — Access Restricted — ApproveHub{% endblock %}
+{% block content %}
+<div style="text-align:center;padding:80px 20px;max-width:500px;margin:0 auto;">
+    <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--rose),#BE123C);color:#FFF;display:grid;place-items:center;font-size:36px;margin:0 auto 18px;box-shadow:0 10px 30px rgba(225,29,72,0.3);animation:floatGentle 3s ease-in-out infinite;">🔒</div>
+    <h2 style="margin:0 0 8px;font-size:20px;font-weight:800;color:var(--tx);">403 — Access Restricted</h2>
+    <p style="color:var(--tx-muted);margin:0 0 28px;font-size:14px;">You do not possess the required institutional role or permissions to access this administrative desk.</p>
+    <a href="/" class="btn" style="padding:13px 28px;font-size:14px;border-radius:14px;">Return to Portal Home</a>
+</div>
+{% endblock %}

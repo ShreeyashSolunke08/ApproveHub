@@ -1,3 +1,15 @@
+"""
+ApproveHub — PyMuPDF PDF Vector Stamping Engine
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+High-performance digital vector stamping that dynamically bakes touch signatures,
+departmental seals, approver metadata, and cryptographic QR verification slips
+directly onto original PDF pages with sub-pixel resolution and tamper validation.
+
+Author: Shreeyash Solunke
+Institution: VIT Pune, Department of Information Technology
+"""
+
 import os
 import pymupdf  # PyMuPDF
 import qrcode

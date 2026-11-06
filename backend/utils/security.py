@@ -1,3 +1,14 @@
+"""
+ApproveHub — Security & Authentication Utilities
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Session management, access control decorators, cryptographically secure
+password generation, and standardized approval serial formatting.
+
+Author: Shreeyash Solunke
+Institution: VIT Pune, Department of Information Technology
+"""
+
 import secrets
 import string
 from datetime import datetime
