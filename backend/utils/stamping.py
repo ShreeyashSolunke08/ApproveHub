@@ -63,10 +63,25 @@ def stamp_final_document(document, base_url="http://127.0.0.1:5000"):
         approver = step.approver
         name_text = f"{approver.name}"
 
+        # Resolve signature file path (supports relative, absolute, and fallback paths)
+        sig_file = None
+        if approver.signature_path:
+            abs_p = os.path.abspath(approver.signature_path)
+            if os.path.exists(abs_p):
+                sig_file = abs_p
+            elif os.path.exists(approver.signature_path):
+                sig_file = approver.signature_path
+
+        # Fallback check for user-specific sketch in assets folder
+        if not sig_file:
+            alt_path = os.path.abspath(os.path.join("uploads", "assets", f"sig_{approver.id}_sketch.png"))
+            if os.path.exists(alt_path):
+                sig_file = alt_path
+
         # Render ONLY the approver's signature and their name underneath - nothing else
-        if approver.signature_path and os.path.exists(approver.signature_path):
+        if sig_file:
             sig_rect = pymupdf.Rect(x0, y0, x0 + 115.0, y0 + 32.0)
-            page.insert_image(sig_rect, filename=approver.signature_path, keep_proportion=True)
+            page.insert_image(sig_rect, filename=sig_file, keep_proportion=True)
         else:
             # Professional digital signature calligraphy stroke in fountain pen ink
             sig_base_y = y0 + 20.0
@@ -143,3 +158,25 @@ def stamp_final_document(document, base_url="http://127.0.0.1:5000"):
     # 6. Compute SHA-256 fingerprint of the final document
     final_hash = sha256_file(final_output_path)
     return final_output_path, final_hash
+
+def restamp_user_approved_documents(user_id, base_url="http://127.0.0.1:5000"):
+    """
+    Automatically re-stamps all approved documents where user_id is an approver,
+    ensuring newly drawn/updated signatures reflect immediately on all finalized documents.
+    """
+    from backend.models import db, Document, ApprovalStep
+    try:
+        steps = ApprovalStep.query.filter_by(approver_id=user_id, status="approved").all()
+        doc_ids = set(s.document_id for s in steps)
+        for doc_id in doc_ids:
+            doc = Document.query.get(doc_id)
+            if doc and doc.status == "approved":
+                try:
+                    final_path, final_hash = stamp_final_document(doc, base_url=base_url)
+                    doc.final_path = final_path
+                    doc.final_hash = final_hash
+                except Exception as e:
+                    print(f"[RE-STAMP] Could not restamp doc {doc_id}: {e}")
+        db.session.commit()
+    except Exception as e:
+        print(f"[RE-STAMP] Error: {e}")

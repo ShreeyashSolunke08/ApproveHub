@@ -3,26 +3,32 @@
 {% block title %}Scan QR Code — ApproveHub{% endblock %}
 
 {% block content %}
-<div style="max-width:440px;margin:20px auto;text-align:center;">
-    <h2 style="margin:0 0 6px;">Scan Verification QR</h2>
-    <p style="color:var(--mu);margin:0 0 16px;font-size:13px;">Point camera at the QR code printed on the official document</p>
+<div style="max-width:440px;margin:28px auto;text-align:center;">
+    <h2 style="margin:0 0 6px;font-size:22px;font-weight:800;">Scan Verification QR</h2>
+    <p style="color:var(--tx-muted);margin:0 0 22px;font-size:13.5px;">Point camera at the QR code printed on the official document</p>
 
-    <!-- Camera Viewfinder Simulation -->
-    <div style="background:#06141A;border-radius:24px;height:360px;position:relative;display:grid;place-items:center;color:#FFF;overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,0.3);">
-        <div style="position:absolute;inset:50px 40px;border:3px solid var(--aqua);border-radius:18px;opacity:0.9;"></div>
-        
+    <!-- Camera Viewfinder -->
+    <div style="background:linear-gradient(145deg,#0F172A,#1E293B);border-radius:28px;height:360px;position:relative;display:grid;place-items:center;color:#FFF;overflow:hidden;box-shadow:0 20px 50px rgba(15,23,42,0.3);">
+        <!-- Scan frame -->
+        <div style="position:absolute;inset:50px 40px;border:2.5px solid rgba(99,102,241,0.7);border-radius:20px;box-shadow:0 0 30px rgba(99,102,241,0.15);"></div>
+        <!-- Corner accents -->
+        <div style="position:absolute;top:42px;left:32px;width:24px;height:24px;border-top:3px solid var(--cyan-neon);border-left:3px solid var(--cyan-neon);border-radius:4px 0 0 0;"></div>
+        <div style="position:absolute;top:42px;right:32px;width:24px;height:24px;border-top:3px solid var(--cyan-neon);border-right:3px solid var(--cyan-neon);border-radius:0 4px 0 0;"></div>
+        <div style="position:absolute;bottom:42px;left:32px;width:24px;height:24px;border-bottom:3px solid var(--cyan-neon);border-left:3px solid var(--cyan-neon);border-radius:0 0 0 4px;"></div>
+        <div style="position:absolute;bottom:42px;right:32px;width:24px;height:24px;border-bottom:3px solid var(--cyan-neon);border-right:3px solid var(--cyan-neon);border-radius:0 0 4px 0;"></div>
+
         <div style="text-align:center;position:relative;z-index:2;">
-            <div style="font-size:48px;margin-bottom:8px;">📷</div>
-            <div style="font-size:13px;opacity:0.85;">Align QR within frame</div>
+            <div style="font-size:52px;margin-bottom:10px;">📷</div>
+            <div style="font-size:13px;opacity:0.8;font-weight:500;">Align QR within frame</div>
         </div>
     </div>
 
-    <div style="margin-top:20px;">
-        <button type="button" class="btn full" onclick="window.location.href='/verify/AH-26-IT-0412-7KQ3'">
-            ⚡ Simulate Scan of Sample Verified QR
+    <div style="margin-top:24px;">
+        <button type="button" class="btn full" onclick="window.location.href='/verify/AH-26-IT-0412-7KQ3'" style="padding:14px;font-size:14px;border-radius:14px;">
+            ⚡ Simulate Sample QR Scan
         </button>
-        <div style="margin-top:10px;">
-            <a href="{{ url_for('verification.public_verify_page') }}" style="color:var(--teal);text-decoration:none;font-size:12.5px;">
+        <div style="margin-top:14px;">
+            <a href="{{ url_for('verification.public_verify_page') }}" style="color:var(--indigo-primary);text-decoration:none;font-size:13px;font-weight:600;">
                 Or enter approval code manually →
             </a>
         </div>

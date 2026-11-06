@@ -1,61 +1,71 @@
 {% extends "base.html" %}
 
-{% block title %}Upload Document — Step 1{% endblock %}
+{% block title %}Upload Document — Step 1 — ApproveHub{% endblock %}
 
 {% block content %}
-<div style="max-width:700px;margin:20px auto;">
-    <!-- Stepper Header -->
-    <div style="display:flex;justify-content:space-between;margin-bottom:24px;text-align:center;">
-        <div style="flex:1;color:var(--teal);font-weight:bold;">
-            <div style="width:28px;height:28px;border-radius:50%;background:var(--teal);color:#FFF;display:grid;place-items:center;margin:0 auto 6px;">1</div>
-            1. Select & Upload
+<div style="max-width:720px;margin:16px auto;">
+    <!-- Modern Connected Stepper Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:30px;position:relative;">
+        <div style="position:absolute;top:16px;left:15%;right:15%;height:2px;background:#E2E8F0;z-index:0;"></div>
+        
+        <div style="flex:1;text-align:center;position:relative;z-index:1;">
+            <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg, #4F46E5, #06B6D4);color:#FFF;display:grid;place-items:center;margin:0 auto 8px;font-weight:800;font-size:14px;box-shadow:0 4px 12px rgba(79,70,229,0.35);">1</div>
+            <span style="font-weight:700;font-size:12.5px;color:var(--indigo-primary);">1. Select & Upload</span>
         </div>
-        <div style="flex:1;color:var(--mu);">
-            <div style="width:28px;height:28px;border-radius:50%;background:var(--bd);color:var(--mu);display:grid;place-items:center;margin:0 auto 6px;">2</div>
-            2. Authorities & QR Position
+        <div style="flex:1;text-align:center;position:relative;z-index:1;">
+            <div style="width:34px;height:34px;border-radius:50%;background:#F1F5F9;border:2px solid #CBD5E1;color:var(--tx-muted);display:grid;place-items:center;margin:0 auto 8px;font-weight:700;font-size:14px;">2</div>
+            <span style="font-weight:600;font-size:12.5px;color:var(--tx-muted);">2. Authorities & QR</span>
         </div>
-        <div style="flex:1;color:var(--mu);">
-            <div style="width:28px;height:28px;border-radius:50%;background:var(--bd);color:var(--mu);display:grid;place-items:center;margin:0 auto 6px;">3</div>
-            3. Real-Time Tracking
+        <div style="flex:1;text-align:center;position:relative;z-index:1;">
+            <div style="width:34px;height:34px;border-radius:50%;background:#F1F5F9;border:2px solid #CBD5E1;color:var(--tx-muted);display:grid;place-items:center;margin:0 auto 8px;font-weight:700;font-size:14px;">3</div>
+            <span style="font-weight:600;font-size:12.5px;color:var(--tx-muted);">3. Live Tracking</span>
         </div>
     </div>
 
-    <div class="card" style="padding:28px;">
-        <h3 style="margin:0 0 6px;">New Document Approval Request</h3>
-        <p style="color:var(--mu);margin:0 0 20px;font-size:13px;">
-            Choose your document type and upload an official PDF file (up to 10 MB).
-        </p>
+    <div class="card" style="padding:32px;">
+        <div style="margin-bottom:24px;">
+            <h3 style="margin:0 0 6px;font-size:20px;font-weight:800;color:var(--tx);">New Document Approval Requisition</h3>
+            <p style="color:var(--tx-secondary);margin:0;font-size:13.5px;">
+                Select your institutional application category and upload an official PDF document.
+            </p>
+        </div>
 
         {% if error %}
-        <div style="background:#FEE2E2;color:#991B1B;padding:10px 14px;border-radius:8px;margin-bottom:16px;">
-            {{ error }}
+        <div style="background:rgba(225,29,72,0.1);border:1px solid rgba(225,29,72,0.25);color:var(--rose);padding:12px 16px;border-radius:12px;margin-bottom:20px;font-size:13px;font-weight:600;">
+            ⚠️ {{ error }}
         </div>
         {% endif %}
 
         <form method="POST" enctype="multipart/form-data" action="{{ url_for('documents.upload_document') }}">
-            <!-- Document Type Selection Bar -->
+            <!-- Document Category Selector -->
             <div class="form-group">
                 <label>Institutional Document Category</label>
-                <select name="document_type" id="docTypeSelect" onchange="autoFillTitle()" style="font-size:13.5px;font-weight:500;">
+                <select name="document_type" id="docTypeSelect" onchange="autoFillTitle()" style="font-size:14px;font-weight:600;">
                     {% for code, label in doc_types %}
                         <option value="{{ code }}" data-label="{{ label }}">{{ label }}</option>
                     {% endfor %}
                 </select>
             </div>
 
+            <!-- Subject / Title -->
             <div class="form-group">
                 <label>Document Subject / Specific Title</label>
                 <input type="text" name="title" id="titleInput" required placeholder="e.g. Bonafide Certificate Request" value="{{ doc_types[0][1] }}">
             </div>
 
-            <div style="border:2px dashed var(--teal);border-radius:14px;padding:36px 20px;text-align:center;background:rgba(15,118,110,0.04);margin:24px 0;transition:all 0.2s ease;">
-                <div style="font-size:42px;margin-bottom:10px;">📤</div>
-                <div style="font-weight:700;font-size:14.5px;margin-bottom:4px;">Tap or drag official PDF document here</div>
-                <div style="font-size:12px;color:var(--mu);margin-bottom:16px;">Protected by SHA-256 integrity verification (max 10 MB)</div>
-                <input type="file" name="file" accept=".pdf" required style="display:inline-block;max-width:280px;font-size:12px;">
+            <!-- Modern Creative File Dropzone -->
+            <div style="border:2px dashed rgba(99,102,241,0.45);border-radius:18px;padding:40px 24px;text-align:center;background:linear-gradient(135deg, rgba(99,102,241,0.03), rgba(6,182,212,0.05));margin:26px 0;transition:all 0.25s ease;" ondragover="this.style.borderColor='var(--indigo-primary)';this.style.background='rgba(99,102,241,0.08)';" ondragleave="this.style.borderColor='rgba(99,102,241,0.45)';this.style.background='linear-gradient(135deg, rgba(99,102,241,0.03), rgba(6,182,212,0.05))';">
+                <div style="width:58px;height:58px;border-radius:16px;background:rgba(99,102,241,0.1);color:var(--indigo-primary);display:grid;place-items:center;font-size:28px;margin:0 auto 14px;box-shadow:0 4px 14px rgba(99,102,241,0.15);">
+                    📤
+                </div>
+                <div style="font-weight:800;font-size:16px;color:var(--tx);margin-bottom:6px;">Choose or drag official PDF document here</div>
+                <div style="font-size:12.5px;color:var(--tx-muted);margin-bottom:20px;">
+                    Protected by SHA-256 integrity seal • Accepts .pdf up to 10 MB
+                </div>
+                <input type="file" name="file" id="fileField" accept=".pdf" required style="display:inline-block;max-width:300px;font-size:13px;color:var(--tx-secondary);">
             </div>
 
-            <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:20px;">
+            <div style="display:flex;justify-content:flex-end;gap:14px;margin-top:24px;">
                 <a href="{{ url_for('documents.applicant_dashboard') }}" class="btn secondary">Cancel</a>
                 <button type="submit" class="btn">Continue to Authorities & QR Setup →</button>
             </div>

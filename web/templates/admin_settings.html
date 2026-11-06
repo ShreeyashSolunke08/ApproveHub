@@ -3,42 +3,46 @@
 {% block title %}Institution Settings — ApproveHub{% endblock %}
 
 {% block content %}
-<div style="max-width:640px;margin:10px auto;">
-    <h2 style="margin:0 0 4px;">Institution Settings & Policies</h2>
-    <p style="color:var(--mu);margin:0 0 20px;font-size:13px;">Configure workflow security rules and compliance policies for {{ institution.name }}.</p>
+<div style="max-width:660px;margin:16px auto;">
+    <div style="margin-bottom:22px;">
+        <h2 style="margin:0 0 4px;font-size:22px;font-weight:800;">Institution Settings &amp; Policies</h2>
+        <p style="color:var(--tx-muted);margin:0;font-size:13.5px;">Configure workflow security rules and compliance policies for {{ institution.name }}.</p>
+    </div>
 
-    <div class="card" style="padding:24px;">
+    <div class="card" style="padding:28px;">
         <form method="POST" action="{{ url_for('admin.institution_settings') }}">
             <div class="form-group">
                 <label>Institution Legal Name</label>
                 <input type="text" name="name" value="{{ institution.name }}" required>
             </div>
 
-            <div style="margin:20px 0;border-top:1px solid var(--bd);padding-top:16px;display:flex;flex-direction:column;gap:14px;">
-                <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
-                    <input type="checkbox" name="sequential_enforced" {% if institution.sequential_enforced %}checked{% endif %} style="width:18px;height:18px;">
+            <div style="margin:24px 0;border-top:1px solid var(--bd);padding-top:22px;">
+                <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:var(--tx-muted);margin-bottom:16px;">Security Policies</div>
+
+                <label style="display:flex;align-items:flex-start;gap:14px;cursor:pointer;padding:16px;background:#F8FAFC;border-radius:14px;border:1px solid var(--bd);margin-bottom:12px;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(99,102,241,0.3)'" onmouseout="this.style.borderColor='var(--bd)'">
+                    <input type="checkbox" name="sequential_enforced" {% if institution.sequential_enforced %}checked{% endif %} style="width:20px;height:20px;margin-top:2px;accent-color:var(--indigo-primary);">
                     <div>
-                        <b style="font-size:13px;">Enforce Strict Sequential Routing</b>
-                        <div style="font-size:11.5px;color:var(--mu);">Approvers can only view and act on documents when all preceding steps are approved.</div>
+                        <b style="font-size:13.5px;color:var(--tx);">Enforce Strict Sequential Routing</b>
+                        <div style="font-size:12px;color:var(--tx-muted);margin-top:3px;">Approvers can only act on documents when all preceding steps are approved.</div>
                     </div>
                 </label>
 
-                <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
-                    <input type="checkbox" name="require_pin" {% if institution.require_pin %}checked{% endif %} style="width:18px;height:18px;">
+                <label style="display:flex;align-items:flex-start;gap:14px;cursor:pointer;padding:16px;background:#F8FAFC;border-radius:14px;border:1px solid var(--bd);transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(99,102,241,0.3)'" onmouseout="this.style.borderColor='var(--bd)'">
+                    <input type="checkbox" name="require_pin" {% if institution.require_pin %}checked{% endif %} style="width:20px;height:20px;margin-top:2px;accent-color:var(--indigo-primary);">
                     <div>
-                        <b style="font-size:13px;">Require 4-Digit PIN for All Mark Applications</b>
-                        <div style="font-size:11.5px;color:var(--mu);">Protects against unauthorized signoffs with brute-force rate-limiting.</div>
+                        <b style="font-size:13.5px;color:var(--tx);">Require 4-Digit PIN for All Marks</b>
+                        <div style="font-size:12px;color:var(--tx-muted);margin-top:3px;">Protects against unauthorized signoffs with brute-force rate-limiting.</div>
                     </div>
                 </label>
             </div>
 
             <div class="form-group">
                 <label>Auto-Expiry Timeline (Days)</label>
-                <input type="number" name="auto_expire_days" value="{{ institution.auto_expire_days }}" min="1" max="90" style="max-width:140px;">
-                <div style="font-size:11px;color:var(--mu);margin-top:4px;">Unacted requests auto-expire after this period.</div>
+                <input type="number" name="auto_expire_days" value="{{ institution.auto_expire_days }}" min="1" max="90" style="max-width:160px;">
+                <div style="font-size:11.5px;color:var(--tx-muted);margin-top:6px;">Unacted requests auto-expire after this period.</div>
             </div>
 
-            <button type="submit" class="btn" style="margin-top:14px;">Save Institutional Policies</button>
+            <button type="submit" class="btn" style="margin-top:18px;">Save Institutional Policies</button>
         </form>
     </div>
 </div>

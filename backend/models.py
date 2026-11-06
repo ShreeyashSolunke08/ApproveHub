@@ -1,3 +1,4 @@
+import secrets
 from datetime import datetime, timezone, timedelta
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -52,6 +53,9 @@ class User(db.Model):
     locked_until = db.Column(db.DateTime, nullable=True)
     google_id = db.Column(db.String(100), nullable=True)
     avatar_url = db.Column(db.String(255), nullable=True)
+    avatar_path = db.Column(db.String(255), nullable=True)
+    reset_token = db.Column(db.String(100), nullable=True)
+    reset_token_expiry = db.Column(db.DateTime, nullable=True)
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=utc_now)
     
@@ -64,6 +68,20 @@ class User(db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    def generate_reset_token(self):
+        self.reset_token = secrets.token_urlsafe(24)
+        self.reset_token_expiry = utc_now() + timedelta(hours=2)
+        return self.reset_token
+
+    def verify_reset_token(self, token):
+        if not self.reset_token or self.reset_token != token:
+            return False
+        if not self.reset_token_expiry:
+            return False
+        now = utc_now()
+        exp = self.reset_token_expiry.replace(tzinfo=timezone.utc) if self.reset_token_expiry.tzinfo is None else self.reset_token_expiry
+        return now <= exp
 
     def set_pin(self, pin_str):
         self.pin_hash = generate_password_hash(str(pin_str).strip())
@@ -106,6 +124,7 @@ class User(db.Model):
             "role": self.role,
             "department": self.department,
             "designation": self.designation,
+            "avatar_url": self.avatar_url or f"/user/avatar/{self.id}",
             "has_pin": bool(self.pin_hash),
             "is_active": self.is_active,
             "institution_id": self.institution_id

@@ -21,6 +21,16 @@ def create_app():
     )
     app.config.from_object(Config)
 
+    # Ensure all upload directories exist immediately
+    for folder in [
+        app.config["UPLOAD_FOLDER"],
+        app.config["DOCS_FOLDER"],
+        app.config["FINAL_FOLDER"],
+        app.config["ASSETS_FOLDER"],
+        app.config["QR_FOLDER"]
+    ]:
+        os.makedirs(folder, exist_ok=True)
+
     # Initialize extensions
     db.init_app(app)
 
@@ -54,4 +64,5 @@ def create_app():
 app = create_app()
 
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=5000, debug=True)
+    # Host on 0.0.0.0 so smartphones on the same Wi-Fi network can scan and access mobile signing
+    app.run(host="0.0.0.0", port=5000, debug=True)

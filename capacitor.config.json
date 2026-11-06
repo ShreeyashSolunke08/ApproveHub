@@ -1,0 +1,16 @@
+{
+  "appId": "edu.vit.approvehub",
+  "appName": "ApproveHub",
+  "webDir": "web",
+  "bundledWebRuntime": false,
+  "server": {
+    "url": "https://approvehub.onrender.com",
+    "cleartext": true
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#F8FAFC"
+    }
+  }
+}

@@ -1,76 +1,106 @@
 {% extends "base.html" %}
 
-{% block title %}Review & Approve — {{ document.title }}{% endblock %}
+{% block title %}Review &amp; Approve — {{ document.title }}{% endblock %}
 
 {% block content %}
-<div style="max-width:1050px;margin:10px auto;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+<div style="max-width:1060px;margin:16px auto;">
+    <!-- Header -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:14px;">
         <div>
-            <div style="font-size:12px;color:var(--mu);margin-bottom:4px;">
-                <a href="{{ url_for('approvals.approver_inbox') }}" style="color:var(--teal);text-decoration:none;">← Back to Inbox</a>
-            </div>
-            <h2 style="margin:0 0 4px;">{{ document.title }}</h2>
-            <div style="font-size:12.5px;color:var(--mu);">
-                Requested by <b>{{ document.applicant.name }}</b> • Assigned Mark: <b>{{ step.mark_type.capitalize() }}</b>
+            <a href="{{ url_for('approvals.approver_inbox') }}" style="color:var(--indigo-primary);text-decoration:none;font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:4px;">
+                ← Back to Inbox
+            </a>
+            <h2 style="margin:6px 0 4px;font-size:22px;font-weight:800;">{{ document.title }}</h2>
+            <div style="font-size:13px;color:var(--tx-muted);">
+                Requested by <b style="color:var(--tx);">{{ document.applicant.name }}</b> • Assigned Mark: <b style="color:var(--indigo-primary);">{{ step.mark_type.capitalize() }}</b>
             </div>
         </div>
 
-        <div style="display:flex;gap:10px;">
-            <button type="button" class="btn warning" onclick="openActionModal('pending')">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button type="button" class="btn warning" onclick="openActionModal('pending')" style="font-size:12.5px;">
                 ⏳ Keep Pending
             </button>
-            <button type="button" class="btn danger" onclick="openActionModal('compliance')">
-                ⚠️ Request Compliance
+            <button type="button" class="btn danger" onclick="openActionModal('compliance')" style="font-size:12.5px;">
+                ⚠️ Compliance
             </button>
-            <button type="button" class="btn" onclick="openPinModal({{ step.id }})">
+            <button type="button" class="btn" onclick="openPinModal({{ step.id }})" style="font-size:12.5px;">
                 🔐 Approve with PIN
             </button>
         </div>
     </div>
 
     {% if tamper_error %}
-    <div style="background:#FEE2E2;color:#991B1B;padding:14px;border-radius:10px;margin-bottom:16px;border:1px solid #F87171;">
-        <b>🚨 {{ tamper_error }}</b>
-        <p style="margin:4px 0 0;font-size:12px;">The original uploaded PDF failed SHA-256 verification. Approval actions have been frozen.</p>
+    <div style="background:rgba(225,29,72,0.08);color:#BE123C;padding:16px 20px;border-radius:16px;margin-bottom:20px;border:1px solid rgba(225,29,72,0.2);">
+        <b style="font-size:14px;">🚨 {{ tamper_error }}</b>
+        <p style="margin:6px 0 0;font-size:12.5px;color:#9F1239;">The original uploaded PDF failed SHA-256 verification. Approval actions have been frozen.</p>
     </div>
     {% endif %}
 
     <div style="display:grid;grid-template-columns:320px 1fr;gap:24px;align-items:start;">
-        <!-- Left: Meta Info & Mark Placement Details -->
-        <div class="card" style="padding:18px;">
-            <h4 style="margin:0 0 12px;font-size:14px;">Authority Review Summary</h4>
-            <div style="display:flex;flex-direction:column;gap:10px;font-size:12.5px;">
-                <div><b>Your Role:</b> {{ user.designation }} ({{ user.department }})</div>
-                <div><b>Execution Order:</b> Step {{ step.step_order }} of {{ document.total_steps }}</div>
-                <div><b>Mark Position:</b> Page {{ step.page_no }}, X: {{ (step.pos_x * 100)|round(1) }}%, Y: {{ (step.pos_y * 100)|round(1) }}%</div>
-                <div><b>Unique Code:</b> <span style="font-family:monospace;color:var(--teal);">{{ step.approval_no }}</span></div>
+        <!-- Left: Review Summary -->
+        <div class="card" style="padding:22px;border-left:3px solid var(--indigo-primary);">
+            <h4 style="margin:0 0 16px;font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px;">
+                <span style="width:28px;height:28px;border-radius:8px;background:rgba(79,70,229,0.08);display:grid;place-items:center;font-size:14px;">📋</span>
+                Authority Review Summary
+            </h4>
+            <div style="display:flex;flex-direction:column;gap:12px;font-size:13px;">
+                <div style="padding:10px 14px;background:#F8FAFC;border-radius:10px;">
+                    <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--tx-muted);font-weight:700;margin-bottom:4px;">Your Role</div>
+                    <div style="font-weight:600;">{{ user.designation }} ({{ user.department }})</div>
+                </div>
+                <div style="padding:10px 14px;background:#F8FAFC;border-radius:10px;">
+                    <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--tx-muted);font-weight:700;margin-bottom:4px;">Execution Order</div>
+                    <div style="font-weight:600;">Step {{ step.step_order }} of {{ document.total_steps }}</div>
+                </div>
+                <div style="padding:10px 14px;background:#F8FAFC;border-radius:10px;">
+                    <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--tx-muted);font-weight:700;margin-bottom:4px;">Mark Position</div>
+                    <div style="font-weight:600;">Page {{ step.page_no }}, X: {{ (step.pos_x * 100)|round(1) }}%, Y: {{ (step.pos_y * 100)|round(1) }}%</div>
+                </div>
+                <div style="padding:10px 14px;background:#F8FAFC;border-radius:10px;">
+                    <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--tx-muted);font-weight:700;margin-bottom:4px;">Unique Code</div>
+                    <div style="font-family:monospace;font-weight:700;color:var(--indigo-primary);">{{ step.approval_no }}</div>
+                </div>
+
+                <!-- Approver Active Signature Display -->
+                <div style="padding:10px 14px;background:#F8FAFC;border-radius:10px;">
+                    <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--tx-muted);font-weight:700;margin-bottom:6px;">Your Stamped Signature</div>
+                    <div style="height:44px;background:#FFF;border:1px dashed var(--bd);border-radius:8px;display:grid;place-items:center;padding:2px;margin-bottom:6px;overflow:hidden;">
+                        {% if user.signature_path %}
+                            <img src="{{ url_for('auth.get_user_signature', user_id=user.id) }}" alt="Approver Signature" style="max-height:38px;max-width:130px;object-fit:contain;">
+                        {% else %}
+                            <span style="font-size:11px;color:var(--tx-muted);font-style:italic;">Calligraphy Default</span>
+                        {% endif %}
+                    </div>
+                    <a href="{{ url_for('auth.profile_page') }}" target="_blank" style="font-size:11px;color:var(--indigo-primary);text-decoration:none;font-weight:600;display:inline-flex;align-items:center;gap:4px;">
+                        📱 Sign on Phone / Blank Pad ↗
+                    </a>
+                </div>
             </div>
 
-            <div style="margin-top:20px;padding:12px;background:var(--bg);border-radius:8px;font-size:11.5px;color:var(--mu);">
-                🛡️ <b>Security Policy:</b> Your digital mark cannot be applied without PIN authentication. 5 incorrect entries locks your signoff desk for 15 minutes.
+            <div style="margin-top:18px;padding:14px;background:rgba(79,70,229,0.04);border-radius:12px;font-size:11.5px;color:var(--tx-muted);border:1px solid rgba(99,102,241,0.12);">
+                🛡️ <b>Security:</b> Digital mark requires PIN authentication. 5 incorrect entries locks signoff for 15 minutes.
             </div>
         </div>
 
-        <!-- Right: Document Viewer / Placement Preview -->
-        <div class="card" style="padding:16px;text-align:center;">
-            <div style="display:flex;justify-content:space-between;margin-bottom:10px;font-size:12px;color:var(--mu);">
-                <span>PDF Document Review</span>
-                <a href="{{ url_for('documents.preview_document', doc_id=document.id) }}" target="_blank" style="color:var(--teal);text-decoration:none;">Open in Full PDF Reader ↗</a>
+        <!-- Right: Document Viewer -->
+        <div class="card" style="padding:18px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:12px;font-size:12.5px;color:var(--tx-muted);">
+                <span style="font-weight:600;">PDF Document Review</span>
+                <a href="{{ url_for('documents.preview_document', doc_id=document.id) }}" target="_blank" style="color:var(--indigo-primary);text-decoration:none;font-weight:600;">Open Full Reader ↗</a>
             </div>
-
-            <div style="height:600px;border:1px solid var(--bd);border-radius:8px;overflow:hidden;background:#525659;">
+            <div style="height:600px;border:1.5px solid var(--bd);border-radius:14px;overflow:hidden;background:#F1F5F9;">
                 <iframe src="{{ url_for('documents.preview_document', doc_id=document.id) }}#toolbar=0" style="width:100%;height:100%;border:none;"></iframe>
             </div>
         </div>
     </div>
 </div>
 
-<!-- PIN Keypad Modal (Problem #6 Defense) -->
+<!-- PIN Keypad Modal -->
 <div class="modal-overlay" id="pinModal">
     <div class="modal-card">
-        <div style="font-size:28px;margin-bottom:6px;">🔐</div>
-        <h3 style="margin:0 0 4px;font-size:16px;">Enter Security PIN</h3>
-        <p style="color:var(--mu);margin:0 0 12px;font-size:12px;">Authenticate official signoff as {{ user.name }}</p>
+        <div style="font-size:32px;margin-bottom:8px;">🔐</div>
+        <h3 style="margin:0 0 4px;font-size:17px;font-weight:800;">Enter Security PIN</h3>
+        <p style="color:var(--tx-muted);margin:0 0 16px;font-size:12.5px;">Authenticate official signoff as {{ user.name }}</p>
 
         <div class="pin-dots">
             <div class="pin-dot"></div>
@@ -79,7 +109,7 @@
             <div class="pin-dot"></div>
         </div>
 
-        <div id="pinError" style="font-size:11.5px;color:var(--er);min-height:18px;margin-bottom:6px;"></div>
+        <div id="pinError" style="font-size:11.5px;color:var(--er);min-height:18px;margin-bottom:8px;"></div>
 
         <div class="pin-keypad">
             <button class="key-btn" onclick="pressKey('1')">1</button>
@@ -96,16 +126,16 @@
             <button class="key-btn" onclick="backspaceKey()">⌫</button>
         </div>
 
-        <div style="margin-top:14px;">
-            <button type="button" class="btn secondary full" onclick="closePinModal()" style="font-size:12px;">Cancel</button>
+        <div style="margin-top:16px;">
+            <button type="button" class="btn secondary full" onclick="closePinModal()" style="font-size:12.5px;">Cancel</button>
         </div>
     </div>
 </div>
 
-<!-- Action Modal (Pending / Compliance) -->
+<!-- Action Modal -->
 <div class="modal-overlay" id="actionModal">
-    <div class="modal-card" style="max-width:380px;">
-        <h3 style="margin:0 0 6px;font-size:16px;" id="actionModalTitle">Action Note</h3>
+    <div class="modal-card" style="max-width:400px;">
+        <h3 style="margin:0 0 10px;font-size:17px;font-weight:800;" id="actionModalTitle">Action Note</h3>
         <div class="form-group" id="reasonGroup" style="text-align:left;">
             <label>Reason Preset</label>
             <select id="actionReason">
@@ -120,7 +150,7 @@
             <label>Specific Instructions / Remarks</label>
             <textarea id="actionRemark" rows="3" placeholder="Provide details for the applicant..."></textarea>
         </div>
-        <div style="display:flex;gap:8px;margin-top:14px;">
+        <div style="display:flex;gap:10px;margin-top:16px;">
             <button type="button" class="btn secondary full" onclick="closeActionModal()">Cancel</button>
             <button type="button" class="btn full" id="actionConfirmBtn" onclick="submitCustomAction()">Confirm</button>
         </div>
@@ -172,7 +202,6 @@ async function submitCustomAction() {
 }
 
 function quickBiometricDemo() {
-    // Demo helper: enters default 1234 PIN immediately
     currentPin = "1234";
     updatePinDots();
     submitApprovalWithPin();

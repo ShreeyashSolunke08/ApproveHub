@@ -1,61 +1,69 @@
 {% extends "base.html" %}
 
-{% block title %}Manage People & Roles — ApproveHub{% endblock %}
+{% block title %}Manage People &amp; Roles — ApproveHub{% endblock %}
 
 {% block content %}
-<div style="max-width:1050px;margin:10px auto;">
-    <h2 style="margin:0 0 4px;">User Directory & Institutional Roles</h2>
-    <p style="color:var(--mu);margin:0 0 20px;font-size:13px;">Manage users, assign institutional authority roles, and toggle account access.</p>
+<div style="max-width:1060px;margin:16px auto;">
+    <div style="margin-bottom:22px;">
+        <h2 style="margin:0 0 4px;font-size:22px;font-weight:800;">User Directory &amp; Institutional Roles</h2>
+        <p style="color:var(--tx-muted);margin:0;font-size:13.5px;">Manage users, assign authority roles, and toggle account access.</p>
+    </div>
 
-    <!-- Search Bar -->
-    <div class="card" style="padding:14px 18px;margin-bottom:16px;">
-        <form method="GET" action="{{ url_for('admin.people_management') }}" style="display:flex;gap:10px;">
-            <input type="text" name="q" value="{{ search_q or '' }}" placeholder="🔍 Search users by name, email, or department..." style="flex:1;padding:10px 14px;border:1px solid var(--bd);border-radius:10px;font-size:13px;">
-            <button type="submit" class="btn secondary">Search</button>
+    <!-- Search -->
+    <div class="search-bar" style="margin-bottom:20px;">
+        <form method="GET" action="{{ url_for('admin.people_management') }}" style="display:flex;gap:10px;width:100%;align-items:center;">
+            <span style="font-size:16px;color:var(--tx-muted);">🔍</span>
+            <input type="text" name="q" value="{{ search_q or '' }}" placeholder="Search users by name, email, or department..." style="flex:1;border:none;background:transparent;font-size:14px;padding:8px 0;color:var(--tx);outline:none;">
+            <button type="submit" class="btn secondary" style="padding:8px 16px;font-size:12.5px;">Search</button>
             {% if search_q %}
-                <a href="{{ url_for('admin.people_management') }}" class="btn secondary" style="color:var(--er);">Clear</a>
+                <a href="{{ url_for('admin.people_management') }}" class="btn secondary" style="padding:8px 14px;font-size:12.5px;color:var(--rose);">Clear</a>
             {% endif %}
         </form>
     </div>
 
-    <div class="card" style="padding:16px;">
+    <div class="card" style="padding:20px;overflow-x:auto;">
         <table style="width:100%;border-collapse:collapse;font-size:13px;">
             <thead>
-                <tr style="text-align:left;border-bottom:2px solid var(--bd);color:var(--mu);font-size:11.5px;">
-                    <th style="padding:10px;">Name</th>
-                    <th style="padding:10px;">Email</th>
-                    <th style="padding:10px;">Role</th>
-                    <th style="padding:10px;">Department</th>
-                    <th style="padding:10px;">Designation</th>
-                    <th style="padding:10px;">Status</th>
-                    <th style="padding:10px;text-align:right;">Action</th>
+                <tr style="text-align:left;border-bottom:2px solid var(--bd);font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--tx-muted);">
+                    <th style="padding:12px 10px;">Name</th>
+                    <th style="padding:12px 10px;">Email</th>
+                    <th style="padding:12px 10px;">Role</th>
+                    <th style="padding:12px 10px;">Department</th>
+                    <th style="padding:12px 10px;">Designation</th>
+                    <th style="padding:12px 10px;">Status</th>
+                    <th style="padding:12px 10px;text-align:right;">Action</th>
                 </tr>
             </thead>
             <tbody>
                 {% for u in users %}
-                <tr style="border-bottom:1px solid var(--bd);">
-                    <td style="padding:12px 10px;font-weight:600;">
-                        {{ u.name }}
-                        {% if u.google_id %}
-                            <span style="font-size:10px;color:var(--teal);">[Google SSO]</span>
-                        {% endif %}
+                <tr style="border-bottom:1px solid var(--bd);transition:background 0.15s;" onmouseover="this.style.background='#F8FAFC'" onmouseout="this.style.background='transparent'">
+                    <td style="padding:14px 10px;font-weight:600;">
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--indigo-primary),var(--cyan-neon));color:#FFF;display:grid;place-items:center;font-size:11px;font-weight:800;">{{ u.name[0] }}</div>
+                            <div>
+                                {{ u.name }}
+                                {% if u.google_id %}
+                                    <span style="font-size:9px;color:var(--indigo-primary);font-weight:700;margin-left:4px;">SSO</span>
+                                {% endif %}
+                            </div>
+                        </div>
                     </td>
-                    <td style="padding:12px 10px;color:var(--mu);">{{ u.email }}</td>
-                    <td style="padding:12px 10px;"><span class="role-pill {{ u.role }}">{{ u.role }}</span></td>
-                    <td style="padding:12px 10px;">{{ u.department or '-' }}</td>
-                    <td style="padding:12px 10px;">{{ u.designation or '-' }}</td>
-                    <td style="padding:12px 10px;">
+                    <td style="padding:14px 10px;color:var(--tx-muted);font-size:12.5px;">{{ u.email }}</td>
+                    <td style="padding:14px 10px;"><span class="role-pill {{ u.role }}">{{ u.role }}</span></td>
+                    <td style="padding:14px 10px;font-size:12.5px;">{{ u.department or '-' }}</td>
+                    <td style="padding:14px 10px;font-size:12.5px;">{{ u.designation or '-' }}</td>
+                    <td style="padding:14px 10px;">
                         {% if u.is_active %}
-                            <span class="pill approved">Active</span>
+                            <span class="pill approved" style="font-size:10px;">Active</span>
                         {% else %}
-                            <span class="pill rejected">Disabled</span>
+                            <span class="pill rejected" style="font-size:10px;">Disabled</span>
                         {% endif %}
                     </td>
-                    <td style="padding:12px 10px;text-align:right;">
+                    <td style="padding:14px 10px;text-align:right;">
                         <form method="POST" action="{{ url_for('admin.people_management') }}" style="display:inline;">
                             <input type="hidden" name="user_id" value="{{ u.id }}">
                             <input type="hidden" name="action" value="toggle_active">
-                            <button type="submit" class="btn secondary" style="padding:4px 10px;font-size:11.5px;">
+                            <button type="submit" class="btn secondary" style="padding:5px 12px;font-size:11.5px;">
                                 {{ 'Disable' if u.is_active else 'Enable' }}
                             </button>
                         </form>

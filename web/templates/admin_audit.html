@@ -3,40 +3,40 @@
 {% block title %}System Audit Log — ApproveHub{% endblock %}
 
 {% block content %}
-<div style="max-width:980px;margin:10px auto;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+<div style="max-width:1000px;margin:16px auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;flex-wrap:wrap;gap:12px;">
         <div>
-            <h2 style="margin:0 0 4px;">Institutional Audit Log</h2>
-            <p style="color:var(--mu);margin:0;font-size:13px;">Append-only, immutable record of every document action and authorization event.</p>
+            <h2 style="margin:0 0 4px;font-size:22px;font-weight:800;">Institutional Audit Log</h2>
+            <p style="color:var(--tx-muted);margin:0;font-size:13.5px;">Append-only, immutable record of every document action and authorization event.</p>
         </div>
-        <a href="{{ url_for('admin.export_audit_csv') }}" class="btn secondary">
+        <a href="{{ url_for('admin.export_audit_csv') }}" class="btn secondary" style="font-size:12.5px;">
             📥 Export CSV
         </a>
     </div>
 
-    <div class="card" style="padding:16px;">
+    <div class="card" style="padding:20px;overflow-x:auto;">
         <table style="width:100%;border-collapse:collapse;font-size:12.5px;">
             <thead>
-                <tr style="text-align:left;border-bottom:2px solid var(--bd);color:var(--mu);font-size:11px;">
-                    <th style="padding:8px;">Timestamp (UTC)</th>
-                    <th style="padding:8px;">Document ID</th>
-                    <th style="padding:8px;">Actor</th>
-                    <th style="padding:8px;">Event Type</th>
-                    <th style="padding:8px;">Details</th>
+                <tr style="text-align:left;border-bottom:2px solid var(--bd);font-size:10.5px;text-transform:uppercase;letter-spacing:0.05em;color:var(--tx-muted);">
+                    <th style="padding:10px 8px;">Timestamp (UTC)</th>
+                    <th style="padding:10px 8px;">Doc ID</th>
+                    <th style="padding:10px 8px;">Actor</th>
+                    <th style="padding:10px 8px;">Event Type</th>
+                    <th style="padding:10px 8px;">Details</th>
                 </tr>
             </thead>
             <tbody>
                 {% for log in logs %}
-                <tr style="border-bottom:1px solid var(--bd);">
-                    <td style="padding:10px 8px;font-family:monospace;font-size:11px;color:var(--mu);">{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                    <td style="padding:10px 8px;"><b>#{{ log.document_id }}</b></td>
-                    <td style="padding:10px 8px;">{{ log.user.name if log.user else 'System' }}</td>
-                    <td style="padding:10px 8px;">
-                        <span class="pill {% if 'APPROVED' in log.event %}approved{% elif 'TAMPER' in log.event %}rejected{% else %}in_progress{% endif %}">
+                <tr style="border-bottom:1px solid var(--bd);transition:background 0.15s;" onmouseover="this.style.background='#F8FAFC'" onmouseout="this.style.background='transparent'">
+                    <td style="padding:12px 8px;font-family:monospace;font-size:11px;color:var(--tx-muted);">{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td style="padding:12px 8px;font-weight:700;color:var(--indigo-primary);">#{{ log.document_id }}</td>
+                    <td style="padding:12px 8px;">{{ log.user.name if log.user else 'System' }}</td>
+                    <td style="padding:12px 8px;">
+                        <span class="pill {% if 'APPROVED' in log.event %}approved{% elif 'TAMPER' in log.event %}rejected{% else %}in_progress{% endif %}" style="font-size:10px;">
                             {{ log.event }}
                         </span>
                     </td>
-                    <td style="padding:10px 8px;color:#444;">{{ log.details }}</td>
+                    <td style="padding:12px 8px;color:var(--tx-secondary);max-width:320px;">{{ log.details }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

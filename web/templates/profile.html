@@ -1,21 +1,22 @@
 {% extends "base.html" %}
 
-{% block title %}My Profile & Digital Credentials — ApproveHub{% endblock %}
+{% block title %}My Profile &amp; Digital Credentials — ApproveHub{% endblock %}
 
 {% block content %}
-<div style="max-width:780px;margin:15px auto;">
-    <!-- Profile Card Header -->
-    <div class="card" style="padding:26px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:18px;background:linear-gradient(135deg, rgba(15,118,110,0.06), rgba(245,158,11,0.04));border:1.5px solid var(--teal);">
-        <div style="display:flex;align-items:center;gap:18px;">
-            <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg, var(--teal), var(--aqua));color:#FFF;display:grid;place-items:center;font-size:30px;font-weight:900;box-shadow:0 6px 18px rgba(15,118,110,0.3);">
-                {{ user.name[0] }}
+<div style="max-width:920px;margin:20px auto;">
+    <!-- Profile Hero Card -->
+    <div class="card" style="padding:28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;border-left:4px solid var(--indigo-primary);">
+        <div style="display:flex;align-items:center;gap:20px;">
+            <div style="position:relative;">
+                <img src="{{ url_for('auth.get_user_avatar', user_id=user.id) }}" alt="{{ user.name }}" id="profileAvatarHeader" style="width:76px;height:76px;border-radius:50%;object-fit:cover;box-shadow:0 8px 24px rgba(79,70,229,0.25);border:2.5px solid #FFFFFF;background:var(--indigo-primary);">
+                <button type="button" onclick="document.getElementById('avatarFileInput').click();" style="position:absolute;bottom:-2px;right:-2px;width:26px;height:26px;border-radius:50%;background:var(--indigo-primary);color:#FFFFFF;border:2px solid #FFFFFF;display:grid;place-items:center;cursor:pointer;font-size:12px;box-shadow:0 2px 6px rgba(0,0,0,0.2);" title="Change Profile Picture">📷</button>
             </div>
             <div>
-                <h2 style="margin:0 0 4px;font-size:22px;">{{ user.name }}</h2>
-                <div style="font-size:13px;color:var(--mu);margin-bottom:6px;">
+                <h2 style="margin:0 0 4px;font-size:22px;font-weight:800;">{{ user.name }}</h2>
+                <div style="font-size:13px;color:var(--tx-muted);margin-bottom:8px;">
                     {{ user.designation or 'Institutional User' }} • {{ user.department or 'VIT Pune' }}
                 </div>
-                <div style="display:flex;gap:8px;">
+                <div style="display:flex;gap:8px;align-items:center;">
                     <span class="role-pill {{ user.role }}">{{ user.role }}</span>
                     {% if user.google_id %}
                         <span class="pill approved" style="font-size:10px;">Google SSO Connected</span>
@@ -24,48 +25,260 @@
             </div>
         </div>
 
-        <!-- Quick Activity Badges -->
         <div style="display:flex;gap:12px;">
-            <div style="text-align:center;padding:10px 16px;background:var(--card);border:1px solid var(--bd);border-radius:12px;">
-                <b style="font-size:18px;color:var(--teal);">{{ total_submitted }}</b>
-                <div style="font-size:11px;color:var(--mu);">Submitted</div>
+            <div style="text-align:center;padding:12px 18px;background:rgba(79,70,229,0.06);border:1px solid rgba(99,102,241,0.2);border-radius:14px;">
+                <b style="font-size:20px;color:var(--indigo-primary);">{{ total_submitted }}</b>
+                <div style="font-size:11px;color:var(--tx-muted);font-weight:600;">Submitted</div>
             </div>
-            <div style="text-align:center;padding:10px 16px;background:var(--card);border:1px solid var(--bd);border-radius:12px;">
-                <b style="font-size:18px;color:var(--ok);">{{ total_approved }}</b>
-                <div style="font-size:11px;color:var(--mu);">Approved</div>
+            <div style="text-align:center;padding:12px 18px;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);border-radius:14px;">
+                <b style="font-size:20px;color:var(--emerald);">{{ total_approved }}</b>
+                <div style="font-size:11px;color:var(--tx-muted);font-weight:600;">Approved</div>
             </div>
             {% if user.role in ['approver', 'admin'] %}
-            <div style="text-align:center;padding:10px 16px;background:var(--card);border:1px solid var(--bd);border-radius:12px;">
-                <b style="font-size:18px;color:var(--amb);">{{ total_acted_steps }}</b>
-                <div style="font-size:11px;color:var(--mu);">Signed Off</div>
+            <div style="text-align:center;padding:12px 18px;background:rgba(217,119,6,0.06);border:1px solid rgba(217,119,6,0.2);border-radius:14px;">
+                <b style="font-size:20px;color:var(--amber);">{{ total_acted_steps }}</b>
+                <div style="font-size:11px;color:var(--tx-muted);font-weight:600;">Signed Off</div>
             </div>
             {% endif %}
         </div>
     </div>
 
     {% if message %}
-    <div style="background:#ECFDF5;color:#065F46;padding:14px;border-radius:10px;margin-bottom:18px;font-size:13px;border:1px solid #A7F3D0;">
-        ✓ {{ message }}
+    <div id="statusAlert" style="background:rgba(16,185,129,0.08);color:#065F46;padding:14px 18px;border-radius:14px;margin-bottom:20px;font-size:13px;border:1px solid rgba(16,185,129,0.25);display:flex;align-items:center;gap:8px;">
+        <span style="font-size:16px;">✓</span> <span>{{ message }}</span>
     </div>
     {% endif %}
 
-    <!-- 1. Account Details Form -->
-    <div class="card" style="padding:22px;">
-        <h3 style="margin:0 0 14px;font-size:15px;">👤 Personal & Institutional Information</h3>
+    {% if error %}
+    <div style="background:rgba(225,29,72,0.08);color:#BE123C;padding:14px 18px;border-radius:14px;margin-bottom:20px;font-size:13px;border:1px solid rgba(225,29,72,0.25);display:flex;align-items:center;gap:8px;">
+        <span style="font-size:16px;">⚠</span> <span>{{ error }}</span>
+    </div>
+    {% endif %}
+
+    <!-- Approver Digital Assets: Dual-Mode Mobile QR & Blank Sketch Studio -->
+    {% if user.role in ['approver', 'admin'] %}
+    <div class="card" style="padding:28px;border-top:3px solid var(--indigo-primary);margin-bottom:24px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:18px;">
+            <div>
+                <h3 style="margin:0 0 4px;font-size:17px;font-weight:800;display:flex;align-items:center;gap:10px;color:var(--tx);">
+                    <span style="width:34px;height:34px;border-radius:10px;background:rgba(79,70,229,0.1);display:grid;place-items:center;font-size:18px;">✍️</span>
+                    Approver Official Signature Studio
+                </h3>
+                <p style="color:var(--tx-muted);margin:0;font-size:13px;">
+                    Scan the QR code with your phone camera to sign smoothly with your finger, or draw directly on the blank sketch pad.
+                </p>
+            </div>
+            <div style="display:flex;gap:8px;">
+                <button type="button" class="btn secondary" onclick="toggleUploadFallback()" style="font-size:12px;padding:6px 12px;">
+                    📁 Upload File Instead
+                </button>
+            </div>
+        </div>
+
+        <!-- 1. Live Signature Status & Preview Banner -->
+        <div style="background:#FFFFFF;border:1.5px solid var(--bd);border-radius:16px;padding:16px 20px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;box-shadow:var(--shadow-sm);">
+            <div style="display:flex;align-items:center;gap:16px;">
+                <div style="width:150px;height:55px;background:#FAFBFF;border:1px dashed var(--bd);border-radius:10px;display:grid;place-items:center;overflow:hidden;padding:4px;">
+                    {% if user.signature_path %}
+                        <img id="currentSigImg" src="{{ url_for('auth.get_user_signature', user_id=user.id) }}" alt="Saved Signature" style="max-height:48px;max-width:140px;object-fit:contain;">
+                    {% else %}
+                        <div id="currentSigImg" style="font-size:11px;color:var(--tx-muted);font-style:italic;">Calligraphy Default</div>
+                    {% endif %}
+                </div>
+                <div>
+                    <div style="font-size:13.5px;font-weight:700;color:var(--tx);">
+                        {% if user.signature_path %}
+                            <span style="color:var(--emerald);">✓ Custom Digital Signature Active</span>
+                        {% else %}
+                            <span style="color:var(--tx-secondary);">System Calligraphic Vector Stroke Active</span>
+                        {% endif %}
+                    </div>
+                    <div style="font-size:12px;color:var(--tx-muted);margin-top:2px;">
+                        Stamped on approved documents alongside: <b>{{ user.name }}</b>
+                    </div>
+                </div>
+            </div>
+
+            {% if user.signature_path %}
+            <form method="POST" action="{{ url_for('auth.profile_page') }}" style="margin:0;">
+                <input type="hidden" name="action" value="clear_signature">
+                <button type="submit" class="btn secondary" style="font-size:11.5px;padding:6px 12px;color:var(--rose);">
+                    Reset to Calligraphy
+                </button>
+            </form>
+            {% endif %}
+        </div>
+
+        <!-- 2. Dual Signing Grid: (A) Mobile QR Bridge + (B) Blank Sketch Studio -->
+        <div style="display:grid;grid-template-columns:300px 1fr;gap:20px;align-items:stretch;">
+            
+            <!-- (A) Mobile Phone Instant QR Signer -->
+            {% if mobile_session %}
+            <div style="background:#FFFFFF;border:1.5px solid rgba(99,102,241,0.25);border-radius:18px;padding:20px;display:flex;flex-direction:column;align-items:center;text-align:center;box-shadow:var(--shadow-sm);position:relative;">
+                <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(79,70,229,0.08);padding:3px 10px;border-radius:99px;font-size:11px;font-weight:800;color:var(--indigo-primary);margin-bottom:12px;">
+                    <span>📱</span> Recommended &amp; Easy
+                </div>
+                <h4 style="margin:0 0 6px;font-size:14.5px;font-weight:800;color:var(--tx);">Sign with Phone Camera</h4>
+                <p style="color:var(--tx-muted);font-size:12px;margin:0 0 14px;line-height:1.4;">
+                    Point your smartphone camera at this QR code. Open the mobile page to sign smoothly with your finger (no app needed!).
+                </p>
+
+                <!-- Dynamic QR Code -->
+                <div style="padding:10px;background:#FFFFFF;border:1.5px solid var(--bd);border-radius:16px;box-shadow:0 4px 12px rgba(15,23,42,0.06);margin-bottom:14px;">
+                    <img src="{{ mobile_session.qr_data_uri }}" alt="Scan with Phone to Sign" style="width:140px;height:140px;display:block;">
+                </div>
+
+                <div id="mobileSyncStatus" style="font-size:11.5px;font-weight:700;color:var(--indigo-primary);display:flex;align-items:center;gap:6px;">
+                    <span style="width:8px;height:8px;border-radius:50%;background:var(--indigo-primary);display:inline-block;animation:pulseGlow 2s infinite;"></span>
+                    <span>Waiting for mobile scan...</span>
+                </div>
+
+                <div style="margin-top:12px;padding-top:10px;border-top:1px dashed var(--bd);width:100%;">
+                    <a href="{{ mobile_session.local_url }}" target="_blank" style="font-size:11px;color:var(--indigo-primary);text-decoration:none;font-weight:600;">
+                        Open Mobile View in New Tab ↗
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- (B) Completely Blank Desktop Sketch Pad -->
+            <div style="background:#FFFFFF;border:1.5px solid var(--bd);border-radius:18px;padding:20px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:var(--shadow-sm);">
+                <div>
+                    <!-- Canvas Header & Toolbar -->
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
+                        <div>
+                            <h4 style="margin:0 0 2px;font-size:14.5px;font-weight:800;color:var(--tx);">Blank Sketch Pad</h4>
+                            <span style="font-size:11.5px;color:var(--tx-muted);">Draw signature with mouse, trackpad, or pen</span>
+                        </div>
+
+                        <!-- Clear Button -->
+                        <button type="button" class="btn secondary" onclick="clearSketchCanvas()" style="font-size:11.5px;padding:5px 12px;">
+                            🔄 Clear
+                        </button>
+                    </div>
+
+                    <!-- Ink & Thickness Controls -->
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#F8FAFC;border:1px solid var(--bd);border-radius:12px;margin-bottom:12px;">
+                        <div style="display:flex;align-items:center;gap:6px;">
+                            <span style="font-size:11px;font-weight:700;color:var(--tx-muted);text-transform:uppercase;">Ink:</span>
+                            <button type="button" class="color-btn active" data-color="#0F172A" style="width:20px;height:20px;border-radius:50%;background:#0F172A;border:2px solid #FFF;box-shadow:0 0 0 2px #0F172A;cursor:pointer;" title="Midnight Slate (Default)"></button>
+                            <button type="button" class="color-btn" data-color="#1E3A8A" style="width:20px;height:20px;border-radius:50%;background:#1E3A8A;border:2px solid #FFF;box-shadow:0 0 0 1px var(--bd);cursor:pointer;" title="Royal Blue"></button>
+                            <button type="button" class="color-btn" data-color="#312E81" style="width:20px;height:20px;border-radius:50%;background:#312E81;border:2px solid #FFF;box-shadow:0 0 0 1px var(--bd);cursor:pointer;" title="Indigo"></button>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:6px;">
+                            <span style="font-size:11px;font-weight:700;color:var(--tx-muted);text-transform:uppercase;">Stroke:</span>
+                            <button type="button" class="stroke-btn" data-width="1.8" style="padding:3px 8px;border-radius:6px;border:1px solid var(--bd);background:#FFF;font-size:10.5px;font-weight:600;cursor:pointer;">Fine</button>
+                            <button type="button" class="stroke-btn active" data-width="2.8" style="padding:3px 8px;border-radius:6px;border:1px solid var(--indigo-primary);background:rgba(79,70,229,0.1);color:var(--indigo-primary);font-size:10.5px;font-weight:700;cursor:pointer;">Normal</button>
+                            <button type="button" class="stroke-btn" data-width="4.2" style="padding:3px 8px;border-radius:6px;border:1px solid var(--bd);background:#FFF;font-size:10.5px;font-weight:600;cursor:pointer;">Bold</button>
+                        </div>
+                    </div>
+
+                    <!-- Pure Blank Canvas without Background -->
+                    <div style="background:#FFFFFF;border:2px solid #E2E8F0;border-radius:14px;overflow:hidden;box-shadow:inset 0 1px 4px rgba(15,23,42,0.03);">
+                        <canvas id="signatureCanvas" style="display:block;width:100%;height:165px;background:#FFFFFF;cursor:crosshair;"></canvas>
+                    </div>
+                </div>
+
+                <!-- Save Action -->
+                <div style="display:flex;justify-content:flex-end;align-items:center;margin-top:14px;">
+                    <button type="button" class="btn" id="saveSketchBtn" onclick="saveSignatureSketch()" style="padding:9px 22px;font-size:13px;">
+                        💾 Save Signature
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Hidden Form for Standard Post fallback -->
+        <form id="sketchForm" method="POST" action="{{ url_for('auth.profile_page') }}" style="display:none;">
+            <input type="hidden" name="action" value="save_sketch_signature">
+            <input type="hidden" name="signature_data" id="sketchDataInput">
+        </form>
+
+        <!-- 4. Optional PNG Upload Fallback (collapsible) -->
+        <div id="uploadFallbackSection" style="display:none;margin-top:20px;padding:20px;background:#F8FAFC;border:1.5px dashed var(--bd);border-radius:16px;">
+            <b style="font-size:13px;display:block;margin-bottom:6px;color:var(--tx);">Upload Transparent PNG Signature Image</b>
+            <p style="font-size:12px;color:var(--tx-muted);margin:0 0 12px;">If you already have a scanned signature file on your computer:</p>
+            <form method="POST" enctype="multipart/form-data" action="{{ url_for('auth.profile_page') }}" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+                <input type="hidden" name="action" value="upload_signature">
+                <input type="file" name="signature" accept=".png" required style="font-size:12px;">
+                <button type="submit" class="btn secondary" style="font-size:12px;padding:8px 16px;">Upload PNG</button>
+            </form>
+        </div>
+
+        <!-- 5. Department Stamp Upload -->
+        <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--bd);">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+                <div>
+                    <b style="font-size:14px;color:var(--tx);display:flex;align-items:center;gap:8px;">
+                        <span>🏢</span> Official Departmental Seal / Stamp (Optional)
+                    </b>
+                    <div style="font-size:12px;color:var(--tx-muted);margin-top:2px;">
+                        {% if user.stamp_path %}
+                            <span style="color:var(--emerald);">✓ Departmental stamp loaded</span>
+                        {% else %}
+                            No departmental stamp loaded yet
+                        {% endif %}
+                    </div>
+                </div>
+
+                <form method="POST" enctype="multipart/form-data" action="{{ url_for('auth.profile_page') }}" style="display:flex;gap:10px;align-items:center;margin:0;">
+                    <input type="hidden" name="action" value="upload_stamp">
+                    <input type="file" name="stamp" accept=".png" required style="font-size:11.5px;max-width:200px;">
+                    <button type="submit" class="btn secondary" style="font-size:11.5px;padding:6px 14px;">Upload Stamp</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Profile Picture & Avatar Section -->
+    <div class="card" style="padding:24px;margin-bottom:24px;">
+        <h3 style="margin:0 0 18px;font-size:16px;display:flex;align-items:center;gap:8px;color:var(--tx);">
+            <span style="width:32px;height:32px;border-radius:10px;background:rgba(79,70,229,0.08);display:grid;place-items:center;font-size:16px;">📸</span>
+            Profile Picture &amp; Institutional Avatar
+        </h3>
+        <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
+            <img src="{{ url_for('auth.get_user_avatar', user_id=user.id) }}" id="avatarPreview" alt="Profile Picture" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid var(--bd);box-shadow:var(--shadow-sm);">
+            
+            <div style="flex:1;min-width:260px;">
+                <form method="POST" enctype="multipart/form-data" action="{{ url_for('auth.profile_page') }}" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+                    <input type="hidden" name="action" value="upload_avatar">
+                    <input type="file" name="avatar" id="avatarFileInput" accept=".png,.jpg,.jpeg,.webp" required style="font-size:12.5px;">
+                    <button type="submit" class="btn" style="font-size:12.5px;padding:8px 18px;">Upload Avatar</button>
+                </form>
+                <div style="font-size:11.5px;color:var(--tx-muted);margin-top:8px;">
+                    Supports PNG, JPG, or WEBP. Automatically resized for header, documents, and notifications.
+                </div>
+            </div>
+
+            {% if user.avatar_path or user.avatar_url %}
+            <form method="POST" action="{{ url_for('auth.profile_page') }}" style="margin:0;">
+                <input type="hidden" name="action" value="remove_avatar">
+                <button type="submit" class="btn secondary" style="font-size:12px;color:var(--rose);">Remove Picture</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Personal Info Form -->
+    <div class="card" style="padding:24px;margin-bottom:24px;">
+        <h3 style="margin:0 0 18px;font-size:16px;display:flex;align-items:center;gap:8px;color:var(--tx);">
+            <span style="width:32px;height:32px;border-radius:10px;background:rgba(79,70,229,0.08);display:grid;place-items:center;font-size:16px;">👤</span>
+            Personal &amp; Institutional Information
+        </h3>
         <form method="POST" action="{{ url_for('auth.profile_page') }}">
             <input type="hidden" name="action" value="update_info">
-            
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 18px;">
                 <div class="form-group">
                     <label>Full Official Name</label>
                     <input type="text" name="name" value="{{ user.name }}" required>
                 </div>
                 <div class="form-group">
-                    <label>Registered Institutional Email</label>
-                    <input type="email" value="{{ user.email }}" disabled style="background:#F3F4F6;cursor:not-allowed;">
+                    <label>Registered Email</label>
+                    <input type="email" value="{{ user.email }}" disabled style="background:#F8FAFC;cursor:not-allowed;opacity:0.7;">
                 </div>
                 <div class="form-group">
-                    <label>Contact Mobile Number</label>
+                    <label>Contact Mobile</label>
                     <input type="text" name="mobile" value="{{ user.mobile or '' }}" placeholder="+91 98765 43210">
                 </div>
                 <div class="form-group">
@@ -73,27 +286,57 @@
                     <input type="text" name="department" value="{{ user.department or 'Information Technology' }}">
                 </div>
                 <div class="form-group">
-                    <label>Designation / Academic Standing</label>
+                    <label>Designation</label>
                     <input type="text" name="designation" value="{{ user.designation or '' }}">
                 </div>
                 <div class="form-group">
-                    <label>Institution / Affiliation</label>
-                    <input type="text" value="{{ user.institution.name if user.institution else 'VIT Pune' }}" disabled style="background:#F3F4F6;">
+                    <label>Institution</label>
+                    <input type="text" value="{{ user.institution.name if user.institution else 'VIT Pune' }}" disabled style="background:#F8FAFC;cursor:not-allowed;opacity:0.7;">
                 </div>
             </div>
-
-            <button type="submit" class="btn" style="margin-top:6px;">Update Information</button>
+            <button type="submit" class="btn" style="margin-top:4px;">Update Information</button>
         </form>
     </div>
 
-    <!-- 2. Security PIN Configuration -->
-    <div class="card" style="padding:22px;">
-        <h3 style="margin:0 0 6px;font-size:15px;">🔐 Digital Signoff Security PIN</h3>
-        <p style="color:var(--mu);margin:0 0 16px;font-size:12.5px;">
-            Your 4-6 digit PIN is required to authorize and stamp official approvals. Failed attempts trigger brute-force lockout.
+    <!-- Change Password Form -->
+    <div class="card" style="padding:24px;margin-bottom:24px;">
+        <h3 style="margin:0 0 6px;font-size:16px;display:flex;align-items:center;gap:8px;color:var(--tx);">
+            <span style="width:32px;height:32px;border-radius:10px;background:rgba(79,70,229,0.08);display:grid;place-items:center;font-size:16px;">🔑</span>
+            Change Account Password
+        </h3>
+        <p style="color:var(--tx-muted);margin:0 0 18px;font-size:12.5px;">
+            Update your account login password. Must be at least 6 characters.
         </p>
+        <form method="POST" action="{{ url_for('auth.profile_page') }}">
+            <input type="hidden" name="action" value="change_password">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 16px;">
+                <div class="form-group">
+                    <label>Current Password</label>
+                    <input type="password" name="current_password" required placeholder="••••••••" autocomplete="current-password">
+                </div>
+                <div class="form-group">
+                    <label>New Password</label>
+                    <input type="password" name="new_password" required placeholder="Min. 6 chars" autocomplete="new-password">
+                </div>
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" name="confirm_password" required placeholder="Re-type new pwd" autocomplete="new-password">
+                </div>
+            </div>
+            <button type="submit" class="btn secondary">Update Password</button>
+        </form>
+    </div>
 
-        <form method="POST" action="{{ url_for('auth.profile_page') }}" style="display:flex;gap:12px;align-items:flex-end;">
+    <!-- Security PIN -->
+    <div class="card" style="padding:24px;">
+        <h3 style="margin:0 0 6px;font-size:16px;display:flex;align-items:center;gap:8px;color:var(--tx);">
+            <span style="width:32px;height:32px;border-radius:10px;background:rgba(217,119,6,0.08);display:grid;place-items:center;font-size:16px;">🔐</span>
+            Digital Signoff Security PIN
+        </h3>
+        <p style="color:var(--tx-muted);margin:0 0 18px;font-size:12.5px;">
+            Your 4-6 digit PIN is required to authorize official approvals. Failed attempts trigger brute-force lockout.
+        </p>
+        <form method="POST" action="{{ url_for('auth.profile_page') }}" style="display:flex;gap:14px;align-items:flex-end;">
             <input type="hidden" name="action" value="update_pin">
             <div class="form-group" style="max-width:220px;margin:0;">
                 <label>New Security PIN</label>
@@ -102,55 +345,210 @@
             <button type="submit" class="btn secondary">Set New PIN</button>
         </form>
     </div>
-
-    <!-- 3. Approver Official Assets (Signatures & Stamps) -->
-    {% if user.role in ['approver', 'admin'] %}
-    <div class="card" style="padding:22px;">
-        <h3 style="margin:0 0 6px;font-size:15px;">✍️ Approver Digital Assets (Transparent PNGs)</h3>
-        <p style="color:var(--mu);margin:0 0 16px;font-size:12.5px;">
-            Upload your personal transparent signature and departmental stamp. They are automatically composited onto approved documents.
-        </p>
-
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
-            <!-- Signature Upload -->
-            <div style="border:1px solid var(--bd);border-radius:12px;padding:16px;text-align:center;">
-                <b style="font-size:13px;display:block;margin-bottom:8px;">Personal Signature</b>
-                {% if user.signature_path %}
-                    <div style="height:60px;margin-bottom:10px;display:grid;place-items:center;background:#F9FAFB;border-radius:6px;">
-                        <span style="font-size:11px;color:var(--teal);">✓ Signature file loaded</span>
-                    </div>
-                {% else %}
-                    <div style="height:60px;margin-bottom:10px;display:grid;place-items:center;background:#F9FAFB;border-radius:6px;color:var(--mu);font-size:12px;">
-                        No signature image yet
-                    </div>
-                {% endif %}
-                <form method="POST" enctype="multipart/form-data" action="{{ url_for('auth.profile_page') }}">
-                    <input type="hidden" name="action" value="upload_signature">
-                    <input type="file" name="signature" accept=".png" required style="font-size:11px;margin-bottom:8px;width:100%;">
-                    <button type="submit" class="btn secondary" style="width:100%;font-size:11.5px;padding:6px;">Upload PNG</button>
-                </form>
-            </div>
-
-            <!-- Department Stamp Upload -->
-            <div style="border:1px solid var(--bd);border-radius:12px;padding:16px;text-align:center;">
-                <b style="font-size:13px;display:block;margin-bottom:8px;">Department Stamp</b>
-                {% if user.stamp_path %}
-                    <div style="height:60px;margin-bottom:10px;display:grid;place-items:center;background:#F9FAFB;border-radius:6px;">
-                        <span style="font-size:11px;color:var(--teal);">✓ Stamp asset loaded</span>
-                    </div>
-                {% else %}
-                    <div style="height:60px;margin-bottom:10px;display:grid;place-items:center;background:#F9FAFB;border-radius:6px;color:var(--mu);font-size:12px;">
-                        No departmental stamp yet
-                    </div>
-                {% endif %}
-                <form method="POST" enctype="multipart/form-data" action="{{ url_for('auth.profile_page') }}">
-                    <input type="hidden" name="action" value="upload_stamp">
-                    <input type="file" name="stamp" accept=".png" required style="font-size:11px;margin-bottom:8px;width:100%;">
-                    <button type="submit" class="btn secondary" style="width:100%;font-size:11.5px;padding:6px;">Upload PNG</button>
-                </form>
-            </div>
-        </div>
-    </div>
-    {% endif %}
 </div>
+
+<script>
+// ============================================================================
+// Interactive Blank Sketch Pad Engine
+// ============================================================================
+let canvas, ctx;
+let isDrawing = false;
+let hasDrawn = false;
+let currentColor = "#0F172A";
+let currentWidth = 2.8;
+let lastX = 0;
+let lastY = 0;
+
+function initSignatureCanvas() {
+    canvas = document.getElementById("signatureCanvas");
+    if (!canvas) return;
+    ctx = canvas.getContext("2d");
+
+    // High DPI Retina sharpness
+    const ratio = Math.max(window.devicePixelRatio || 2, 2);
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * ratio;
+    canvas.height = rect.height * ratio;
+    ctx.scale(ratio, ratio);
+
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.strokeStyle = currentColor;
+    ctx.lineWidth = currentWidth;
+
+    // Mouse events
+    canvas.addEventListener("mousedown", startDrawing);
+    canvas.addEventListener("mousemove", draw);
+    window.addEventListener("mouseup", stopDrawing);
+
+    // Touch events
+    canvas.addEventListener("touchstart", function(e) {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        startDrawing({
+            offsetX: touch.clientX - rect.left,
+            offsetY: touch.clientY - rect.top
+        });
+    }, { passive: false });
+
+    canvas.addEventListener("touchmove", function(e) {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        draw({
+            offsetX: touch.clientX - rect.left,
+            offsetY: touch.clientY - rect.top
+        });
+    }, { passive: false });
+
+    window.addEventListener("touchend", stopDrawing);
+
+    // Color buttons
+    document.querySelectorAll(".color-btn").forEach(btn => {
+        btn.addEventListener("click", function() {
+            document.querySelectorAll(".color-btn").forEach(b => {
+                b.classList.remove("active");
+                b.style.boxShadow = "0 0 0 1px var(--bd)";
+            });
+            this.classList.add("active");
+            currentColor = this.getAttribute("data-color");
+            this.style.boxShadow = `0 0 0 2px ${currentColor}`;
+            ctx.strokeStyle = currentColor;
+        });
+    });
+
+    // Stroke width buttons
+    document.querySelectorAll(".stroke-btn").forEach(btn => {
+        btn.addEventListener("click", function() {
+            document.querySelectorAll(".stroke-btn").forEach(b => {
+                b.classList.remove("active");
+                b.style.borderColor = "var(--bd)";
+                b.style.background = "#FFF";
+                b.style.color = "inherit";
+            });
+            this.classList.add("active");
+            currentWidth = parseFloat(this.getAttribute("data-width"));
+            this.style.borderColor = "var(--indigo-primary)";
+            this.style.background = "rgba(79,70,229,0.1)";
+            this.style.color = "var(--indigo-primary)";
+            ctx.lineWidth = currentWidth;
+        });
+    });
+
+    // Start polling for mobile signature if mobile session exists
+    {% if mobile_session %}
+    startMobileSessionPolling("{{ mobile_session.token }}");
+    {% endif %}
+}
+
+function startDrawing(e) {
+    isDrawing = true;
+    lastX = e.offsetX;
+    lastY = e.offsetY;
+}
+
+function draw(e) {
+    if (!isDrawing) return;
+    hasDrawn = true;
+
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    const midX = (lastX + e.offsetX) / 2;
+    const midY = (lastY + e.offsetY) / 2;
+    ctx.quadraticCurveTo(lastX, lastY, midX, midY);
+    ctx.stroke();
+
+    lastX = e.offsetX;
+    lastY = e.offsetY;
+}
+
+function stopDrawing() {
+    isDrawing = false;
+}
+
+function clearSketchCanvas() {
+    if (!canvas || !ctx) return;
+    const ratio = Math.max(window.devicePixelRatio || 2, 2);
+    ctx.clearRect(0, 0, canvas.width / ratio, canvas.height / ratio);
+    hasDrawn = false;
+}
+
+async function saveSignatureSketch() {
+    if (!hasDrawn) {
+        alert("Please draw your signature on the sketch pad before saving.");
+        return;
+    }
+
+    const saveBtn = document.getElementById("saveSketchBtn");
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = "⏳ Saving Signature...";
+
+    const dataUrl = canvas.toDataURL("image/png");
+
+    try {
+        const resp = await fetch("/api/profile/save-signature", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ signature_data: dataUrl })
+        });
+        const result = await resp.json();
+
+        if (resp.ok && result.success) {
+            saveBtn.innerHTML = "✓ Signature Saved!";
+            saveBtn.style.background = "var(--emerald)";
+            setTimeout(() => {
+                window.location.reload();
+            }, 600);
+        } else {
+            document.getElementById("sketchDataInput").value = dataUrl;
+            document.getElementById("sketchForm").submit();
+        }
+    } catch (err) {
+        document.getElementById("sketchDataInput").value = dataUrl;
+        document.getElementById("sketchForm").submit();
+    }
+}
+
+// Real-time mobile signature polling
+let pollTimer = null;
+function startMobileSessionPolling(token) {
+    if (!token) return;
+    pollTimer = setInterval(async () => {
+        try {
+            const resp = await fetch(`/api/signature-session/${token}/status`);
+            if (!resp.ok) return;
+            const data = await resp.json();
+            
+            if (data.status === "completed") {
+                clearInterval(pollTimer);
+                const statusElem = document.getElementById("mobileSyncStatus");
+                if (statusElem) {
+                    statusElem.innerHTML = '<span style="color:var(--emerald);">✓ Mobile signature received &amp; synced!</span>';
+                }
+                const currentImg = document.getElementById("currentSigImg");
+                if (currentImg && data.signature_url) {
+                    currentImg.src = data.signature_url + "?t=" + Date.now();
+                }
+                setTimeout(() => {
+                    window.location.reload();
+                }, 800);
+            }
+        } catch (e) {
+            // ignore network jitter during polling
+        }
+    }, 1500);
+}
+
+function toggleUploadFallback() {
+    const sec = document.getElementById("uploadFallbackSection");
+    if (sec.style.display === "none") {
+        sec.style.display = "block";
+    } else {
+        sec.style.display = "none";
+    }
+}
+
+window.addEventListener("DOMContentLoaded", initSignatureCanvas);
+</script>
 {% endblock %}

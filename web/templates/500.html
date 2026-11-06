@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 {% block title %}Internal Server Error — ApproveHub{% endblock %}
 {% block content %}
-<div style="text-align:center;padding:60px 20px;">
-    <div style="font-size:54px;margin-bottom:12px;">⚠️</div>
-    <h2>500 — Internal Server Error</h2>
-    <p style="color:var(--mu);margin-bottom:20px;">An unexpected error occurred. Please contact the administrator.</p>
+<div style="text-align:center;padding:80px 20px;max-width:500px;margin:0 auto;">
+    <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#F59E0B,#D97706);color:#FFF;display:grid;place-items:center;font-size:36px;margin:0 auto 18px;box-shadow:0 10px 30px rgba(217,119,6,0.3);animation:floatGentle 3s ease-in-out infinite;">⚠️</div>
+    <h2 style="margin:0 0 8px;font-size:20px;font-weight:800;color:var(--tx);">500 — Internal Server Error</h2>
+    <p style="color:var(--tx-muted);margin:0 0 20px;font-size:14px;">An unexpected error occurred. Please contact the administrator.</p>
     {% if error %}
-    <pre style="background:#FEE2E2;color:#991B1B;padding:12px;border-radius:8px;max-width:500px;margin:0 auto 20px;text-align:left;font-size:12px;">{{ error }}</pre>
+    <pre style="background:rgba(225,29,72,0.06);color:#BE123C;padding:16px;border-radius:14px;max-width:480px;margin:0 auto 24px;text-align:left;font-size:12px;border:1px solid rgba(225,29,72,0.2);overflow-x:auto;">{{ error }}</pre>
     {% endif %}
-    <a href="/" class="btn">Return to Dashboard</a>
+    <a href="/" class="btn" style="padding:13px 28px;font-size:14px;border-radius:14px;">Return to Dashboard</a>
 </div>
 {% endblock %}

@@ -3,53 +3,54 @@
 {% block title %}Approval History — ApproveHub{% endblock %}
 
 {% block content %}
-<div style="max-width:960px;margin:10px auto;">
-    <h2 style="margin:0 0 4px;">Authority Action History</h2>
-    <p style="color:var(--mu);margin:0 0 20px;font-size:13px;">Past documents you have signed off, kept pending, or flagged for compliance.</p>
+<div style="max-width:960px;margin:16px auto;">
+    <div style="margin-bottom:22px;">
+        <h2 style="margin:0 0 4px;font-size:22px;font-weight:800;">Authority Action History</h2>
+        <p style="color:var(--tx-muted);margin:0;font-size:13.5px;">Past documents you have signed off, kept pending, or flagged for compliance.</p>
+    </div>
 
     <!-- Search Bar -->
-    <div class="card" style="padding:14px 18px;margin-bottom:16px;">
-        <form method="GET" action="{{ url_for('approvals.approver_history') }}" style="display:flex;gap:10px;">
-            <input type="text" name="q" value="{{ search_q or '' }}" placeholder="🔍 Search past actions by document title or approval code..." style="flex:1;padding:10px 14px;border:1px solid var(--bd);border-radius:10px;font-size:13px;">
-            <button type="submit" class="btn secondary">Search</button>
+    <div class="search-bar" style="margin-bottom:22px;">
+        <form method="GET" action="{{ url_for('approvals.approver_history') }}" style="display:flex;gap:10px;width:100%;align-items:center;">
+            <span style="font-size:16px;color:var(--tx-muted);">🔍</span>
+            <input type="text" name="q" value="{{ search_q or '' }}" placeholder="Search by document title or approval code..." style="flex:1;border:none;background:transparent;font-size:14px;padding:8px 0;color:var(--tx);outline:none;">
+            <button type="submit" class="btn secondary" style="padding:8px 16px;font-size:12.5px;">Search</button>
             {% if search_q %}
-                <a href="{{ url_for('approvals.approver_history') }}" class="btn secondary" style="color:var(--er);">Clear</a>
+                <a href="{{ url_for('approvals.approver_history') }}" class="btn secondary" style="padding:8px 16px;font-size:12.5px;color:var(--rose);">Clear</a>
             {% endif %}
         </form>
     </div>
 
-    <div class="card" style="padding:18px;">
-        {% if not history_steps %}
-        <div style="text-align:center;padding:40px;color:var(--mu);">
-            <div style="font-size:36px;margin-bottom:8px;">📜</div>
-            <p style="margin:0;">No past records found.</p>
-        </div>
-        {% else %}
-        <div style="display:flex;flex-direction:column;gap:12px;">
-            {% for step in history_steps %}
-            {% set doc = step.document %}
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:14px;border:1px solid var(--bd);border-radius:10px;background:var(--card);">
-                <div>
-                    <div style="font-weight:700;font-size:14px;">{{ doc.title }}</div>
-                    <div style="font-size:12px;color:var(--mu);margin-top:2px;">
-                        Applicant: <b>{{ doc.applicant.name }}</b> • Code: <span style="font-family:monospace;color:var(--teal);">{{ step.approval_no }}</span>
-                    </div>
-                    {% if step.remark %}
-                        <div style="font-size:11.5px;color:#666;margin-top:4px;"><i>Remark: {{ step.remark }}</i></div>
-                    {% endif %}
-                </div>
-
-                <div style="display:flex;gap:12px;align-items:center;">
-                    <span class="pill {{ step.status }}">{{ step.status.capitalize() }}</span>
-                    <span style="font-size:11.5px;color:var(--mu);">{{ step.acted_at.strftime('%d %b %Y, %H:%M') if step.acted_at else '' }}</span>
-                    <a href="{{ url_for('documents.document_detail', doc_id=doc.id) }}" class="btn secondary" style="padding:6px 12px;font-size:12px;">
-                        View
-                    </a>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
+    {% if not history_steps %}
+    <div class="card" style="text-align:center;padding:50px 20px;">
+        <div style="font-size:48px;margin-bottom:10px;">📜</div>
+        <p style="margin:0;color:var(--tx-muted);font-size:14px;">No past records found.</p>
     </div>
+    {% else %}
+    <div style="display:flex;flex-direction:column;gap:14px;">
+        {% for step in history_steps %}
+        {% set doc = step.document %}
+        <div class="card" style="padding:18px 22px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;">
+            <div style="flex:1;min-width:200px;">
+                <div style="font-weight:700;font-size:15px;color:var(--tx);margin-bottom:4px;">{{ doc.title }}</div>
+                <div style="font-size:12.5px;color:var(--tx-muted);">
+                    Applicant: <b style="color:var(--tx-secondary);">{{ doc.applicant.name }}</b> • Code: <span style="font-family:monospace;color:var(--indigo-primary);font-weight:600;">{{ step.approval_no }}</span>
+                </div>
+                {% if step.remark %}
+                <div style="font-size:12px;color:var(--tx-muted);margin-top:4px;font-style:italic;">💬 {{ step.remark }}</div>
+                {% endif %}
+            </div>
+
+            <div style="display:flex;gap:12px;align-items:center;">
+                <span class="pill {{ step.status }}">{{ step.status.capitalize() }}</span>
+                <span style="font-size:11.5px;color:var(--tx-muted);white-space:nowrap;">{{ step.acted_at.strftime('%d %b %Y, %H:%M') if step.acted_at else '' }}</span>
+                <a href="{{ url_for('documents.document_detail', doc_id=doc.id) }}" class="btn secondary" style="padding:7px 14px;font-size:12px;">
+                    View →
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

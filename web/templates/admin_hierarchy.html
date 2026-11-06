@@ -3,25 +3,32 @@
 {% block title %}Institutional Hierarchy — ApproveHub{% endblock %}
 
 {% block content %}
-<div style="max-width:880px;margin:10px auto;">
-    <h2 style="margin:0 0 4px;">Institutional Hierarchy Builder</h2>
-    <p style="color:var(--mu);margin:0 0 20px;font-size:13px;">Manage departments, designations, and authorized signatories for {{ user.institution.name if user.institution else "VIT Pune" }}.</p>
+<div style="max-width:900px;margin:16px auto;">
+    <div style="margin-bottom:22px;">
+        <h2 style="margin:0 0 4px;font-size:22px;font-weight:800;">Institutional Hierarchy Builder</h2>
+        <p style="color:var(--tx-muted);margin:0;font-size:13.5px;">Departments, designations, and authorized signatories for {{ user.institution.name if user.institution else "VIT Pune" }}.</p>
+    </div>
 
-    <div style="display:flex;flex-direction:column;gap:16px;">
+    <div style="display:flex;flex-direction:column;gap:18px;">
         {% for dept, designations in departments.items() %}
-        <div class="card" style="padding:18px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--bd);padding-bottom:10px;margin-bottom:12px;">
-                <b style="font-size:15px;color:var(--teal);">🏢 Department: {{ dept }}</b>
-                <span class="pill in_progress">{{ designations|length }} Designation Levels</span>
+        <div class="card" style="padding:24px;border-left:4px solid var(--indigo-primary);">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:14px;margin-bottom:16px;border-bottom:1px solid var(--bd);">
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <div style="width:36px;height:36px;border-radius:10px;background:rgba(79,70,229,0.08);display:grid;place-items:center;font-size:18px;">🏢</div>
+                    <b style="font-size:16px;color:var(--tx);">{{ dept }}</b>
+                </div>
+                <span class="pill in_progress" style="font-size:10.5px;">{{ designations|length }} Levels</span>
             </div>
 
             {% for desig, people in designations.items() %}
-            <div style="margin-bottom:12px;padding:10px;background:var(--bg);border-radius:8px;">
-                <b style="font-size:12.5px;color:var(--navy);">Role / Post: {{ desig }}</b>
-                <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;">
+            <div style="margin-bottom:14px;padding:14px 16px;background:#F8FAFC;border-radius:12px;border:1px solid var(--bd);">
+                <div style="font-size:12px;font-weight:700;color:var(--tx-secondary);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:10px;">{{ desig }}</div>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;">
                     {% for p in people %}
-                    <span style="background:var(--card);border:1px solid var(--bd);padding:4px 10px;border-radius:6px;font-size:12px;display:flex;align-items:center;gap:6px;">
-                        👤 {{ p.name }} <small style="color:var(--mu);">({{ p.email }})</small>
+                    <span style="background:#FFFFFF;border:1px solid var(--bd);padding:6px 14px;border-radius:10px;font-size:12.5px;display:flex;align-items:center;gap:8px;box-shadow:0 1px 3px rgba(15,23,42,0.04);">
+                        <span style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--indigo-primary),var(--cyan-neon));color:#FFF;display:grid;place-items:center;font-size:9px;font-weight:800;">{{ p.name[0] }}</span>
+                        <span style="font-weight:600;">{{ p.name }}</span>
+                        <small style="color:var(--tx-muted);">({{ p.email }})</small>
                     </span>
                     {% endfor %}
                 </div>

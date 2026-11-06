@@ -8,7 +8,6 @@ from backend.utils.stamping import stamp_final_document
 
 approvals_bp = Blueprint("approvals", __name__)
 
-@approvals_bp.route("/auth")
 @approvals_bp.route("/approver/inbox")
 @login_required
 @role_required("approver", "admin")

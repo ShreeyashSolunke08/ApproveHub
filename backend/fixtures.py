@@ -1,5 +1,6 @@
 import os
 import pymupdf
+from PIL import Image, ImageDraw
 from datetime import datetime, timezone, timedelta
 from backend.models import db, Institution, User, Document, ApprovalStep, Timeline
 from backend.utils.hashing import sha256_file, generate_record_hash
@@ -59,6 +60,27 @@ def create_sample_pdf(filepath):
     doc.save(filepath)
     doc.close()
     return filepath
+
+def ensure_default_signature(user):
+    """
+    Creates an authentic, crisp transparent signature asset for seed approvers if not present.
+    """
+    upload_dir = os.path.join("uploads", "assets")
+    os.makedirs(upload_dir, exist_ok=True)
+    target_path = os.path.join(upload_dir, f"sig_{user.id}_default.png")
+    
+    if not os.path.exists(target_path):
+        img = Image.new("RGBA", (260, 80), (255, 255, 255, 0))
+        d = ImageDraw.Draw(img)
+        # Smooth authentic signature stroke
+        points1 = [(25, 45), (45, 22), (65, 52), (90, 26), (115, 48), (145, 24), (175, 50), (210, 32), (240, 44)]
+        points2 = [(35, 58), (95, 60), (165, 59), (245, 56)]
+        d.line(points1, fill=(15, 23, 42, 245), width=3, joint="curve")
+        d.line(points2, fill=(15, 23, 42, 220), width=2, joint="curve")
+        img.save(target_path, format="PNG")
+        
+    if not user.signature_path or not os.path.exists(user.signature_path):
+        user.signature_path = target_path
 
 def seed_database(app):
     """
@@ -143,6 +165,11 @@ def seed_database(app):
                 created_users[u["email"]] = user_obj
                 
             db.session.commit()
+
+        # Ensure all approvers have default signature files assigned
+        for appr in User.query.filter(User.role.in_(["approver", "admin"])).all():
+            ensure_default_signature(appr)
+        db.session.commit()
             
         # 3. Create sample document if none exists
         if Document.query.count() == 0:
