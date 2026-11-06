@@ -11,7 +11,8 @@
     <meta name="author" content="Shreeyash Solunke">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="{{ request.base_url }}">
-    {% if google_site_verification %}
+    <meta name="google-site-verification" content="83709c7858aa8713">
+    {% if google_site_verification and google_site_verification != '83709c7858aa8713' %}
     <meta name="google-site-verification" content="{{ google_site_verification }}">
     {% endif %}
     {% block google_verification %}{% endblock %}

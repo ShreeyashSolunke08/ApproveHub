@@ -95,6 +95,12 @@ def create_app():
         """Serve XML sitemap for search engine indexing."""
         return send_from_directory(app.static_folder, "sitemap.xml", mimetype="application/xml")
 
+    @app.route("/google<token>.html")
+    def google_verification_file(token):
+        """Serve Google Search Console HTML verification file."""
+        filename = f"google{token}.html"
+        return send_from_directory(app.static_folder, filename, mimetype="text/html")
+
     # Custom error handlers with professional error pages
     @app.errorhandler(403)
     def forbidden(e):
