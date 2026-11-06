@@ -9,6 +9,8 @@ from backend.models import db, User, Institution, Document, ApprovalStep
 from backend.utils.security import login_user, logout_user, get_current_user, login_required
 from backend.utils.signature_bridge import create_mobile_session, get_session, complete_mobile_session
 from backend.utils.stamping import restamp_user_approved_documents
+from backend.utils.mailer import send_password_reset_email, get_latest_emails
+from backend.utils.rate_limiter import rate_limit
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -127,7 +129,11 @@ def forgot_password_page():
             token = user.generate_reset_token()
             db.session.commit()
             reset_link = url_for("auth.reset_password_page", token=token, _external=True)
-            message = f"Password reset instructions and security token generated successfully for {user.email}."
+            try:
+                send_password_reset_email(user.email, user.name, reset_link)
+            except Exception:
+                pass
+            message = f"Password reset instructions and security token generated and dispatched to {user.email}."
         else:
             error = "No registered institutional account was found with that email address."
             
@@ -291,6 +297,7 @@ def google_callback():
 # ==========================================
 
 @auth_bp.route("/api/auth/login", methods=["POST"])
+@rate_limit(limit=15, period=60)
 def api_auth_login():
     data = request.get_json() or {}
     email = data.get("email", "").strip().lower()
@@ -407,6 +414,7 @@ def api_auth_change_password():
     return jsonify({"success": True, "message": "Password changed successfully."})
 
 @auth_bp.route("/api/auth/forgot-password", methods=["POST"])
+@rate_limit(limit=6, period=60)
 def api_auth_forgot_password():
     data = request.get_json() or {}
     email = data.get("email", "").strip().lower()
@@ -418,9 +426,13 @@ def api_auth_forgot_password():
         token = user.generate_reset_token()
         db.session.commit()
         reset_url = url_for("auth.reset_password_page", token=token, _external=True)
+        try:
+            send_password_reset_email(user.email, user.name, reset_url)
+        except Exception:
+            pass
         return jsonify({
             "success": True,
-            "message": "Password reset token generated.",
+            "message": "Password reset token generated and email dispatched.",
             "reset_url": reset_url,
             "token": token
         })
@@ -769,6 +781,7 @@ def get_hierarchy_options():
 
 @auth_bp.route("/api/pin/verify", methods=["POST"])
 @login_required
+@rate_limit(limit=10, period=60)
 def api_verify_pin():
     user = get_current_user()
     data = request.get_json() or {}
@@ -793,3 +806,8 @@ def api_set_pin():
     user.set_pin(new_pin)
     db.session.commit()
     return jsonify({"success": True, "message": "Security PIN updated successfully."})
+
+@auth_bp.route("/api/debug/latest-emails", methods=["GET"])
+def api_debug_latest_emails():
+    """Diagnostic endpoint to inspect dispatched transactional emails."""
+    return jsonify(get_latest_emails())

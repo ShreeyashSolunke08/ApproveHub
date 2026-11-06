@@ -1,10 +1,11 @@
 import os
 from datetime import datetime, timezone
-from flask import Blueprint, render_template, request, redirect, url_for, jsonify, current_app, abort
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify, abort, current_app
 from backend.models import db, Document, ApprovalStep, Timeline, User
 from backend.utils.security import login_required, role_required, get_current_user
 from backend.utils.hashing import verify_file, generate_record_hash
 from backend.utils.stamping import stamp_final_document
+from backend.utils.mailer import send_approval_status_email, send_pending_review_email
 
 approvals_bp = Blueprint("approvals", __name__)
 
@@ -134,6 +135,20 @@ def take_approval_action(step_id):
             doc.current_step = next_step.step_order
             doc.status = "in_progress"
             event_text = f"Approved by {user.name} ({user.designation}). Forwarded to Step {next_step.step_order} ({next_step.approver.name})."
+            
+            # Send notification email to the next approver in hierarchy
+            try:
+                review_url = url_for("approvals.review_step", step_id=next_step.id, _external=True)
+                send_pending_review_email(
+                    next_step.approver.email,
+                    next_step.approver.name,
+                    doc.title,
+                    doc.applicant.name,
+                    next_step.step_order,
+                    review_url=review_url
+                )
+            except Exception:
+                pass
         else:
             # Final approval in chain: trigger PyMuPDF stamping engine!
             doc.status = "approved"
@@ -142,6 +157,22 @@ def take_approval_action(step_id):
             doc.final_path = final_path
             doc.final_hash = final_hash
             event_text = f"Final institutional approval granted by {user.name}. Official marks & QR verification stamped."
+            
+            # Send notification email to the applicant with final stamped PDF attached!
+            try:
+                view_url = url_for("documents.document_detail", doc_id=doc.id, _external=True)
+                send_approval_status_email(
+                    doc.applicant.email,
+                    doc.applicant.name,
+                    doc.title,
+                    "approved",
+                    user.name,
+                    notes=step.remark,
+                    view_url=view_url,
+                    attachment_path=doc.final_path
+                )
+            except Exception:
+                pass
 
         tl = Timeline(
             document_id=doc.id,
@@ -176,6 +207,21 @@ def take_approval_action(step_id):
         
         doc.status = "compliance" if action == "compliance" else "rejected"
         
+        # Email applicant about compliance or rejection
+        try:
+            view_url = url_for("documents.document_detail", doc_id=doc.id, _external=True)
+            send_approval_status_email(
+                doc.applicant.email,
+                doc.applicant.name,
+                doc.title,
+                doc.status,
+                user.name,
+                notes=f"{step.reject_reason}. {step.remark}".strip(),
+                view_url=view_url
+            )
+        except Exception:
+            pass
+        
         tl = Timeline(
             document_id=doc.id,
             user_id=user.id,
@@ -188,6 +234,107 @@ def take_approval_action(step_id):
         return jsonify({"success": True, "status": doc.status, "message": f"Document marked as {doc.status}."})
 
     return jsonify({"error": "Unknown action"}), 400
+
+@approvals_bp.route("/api/steps/batch-action", methods=["POST"])
+@login_required
+@role_required("approver", "admin")
+def batch_approval_action():
+    """
+    High-volume institutional batch signing. Approves multiple selected documents with a single PIN verification.
+    """
+    user = get_current_user()
+    data = request.get_json() or {}
+    step_ids = data.get("step_ids", [])
+    action = data.get("action", "approve")
+    pin = data.get("pin", "")
+    remark = data.get("remark", "").strip() or "Batch approved with institutional authority PIN."
+
+    if not step_ids or not isinstance(step_ids, list):
+        return jsonify({"success": False, "error": "No documents selected for batch action."}), 400
+
+    if action == "approve":
+        pin_valid, pin_msg = user.check_pin(pin)
+        db.session.commit()
+        if not pin_valid:
+            return jsonify({"success": False, "error": pin_msg}), 400
+
+    processed = 0
+    errors = []
+    now = datetime.now(timezone.utc)
+    base_url = request.host_url.rstrip("/")
+
+    for step_id in step_ids:
+        step = ApprovalStep.query.get(step_id)
+        if not step or (step.approver_id != user.id and user.role != "admin"):
+            continue
+        if step.status != "pending":
+            continue
+
+        doc = step.document
+        if not verify_file(doc.file_path, doc.original_hash):
+            errors.append(f"Document #{doc.id} ({doc.title}) failed hash verification.")
+            continue
+
+        if action == "approve":
+            step.status = "approved"
+            step.remark = remark
+            step.acted_at = now
+            step.record_hash = generate_record_hash(doc.id, step.step_order, user.id, step.approval_no, now.isoformat())
+
+            next_step = ApprovalStep.query.filter_by(document_id=doc.id, step_order=step.step_order + 1).first()
+            if next_step:
+                next_step.status = "pending"
+                doc.current_step = next_step.step_order
+                doc.status = "in_progress"
+                try:
+                    review_url = url_for("approvals.review_step", step_id=next_step.id, _external=True)
+                    send_pending_review_email(
+                        next_step.approver.email,
+                        next_step.approver.name,
+                        doc.title,
+                        doc.applicant.name,
+                        next_step.step_order,
+                        review_url=review_url
+                    )
+                except Exception:
+                    pass
+            else:
+                doc.status = "approved"
+                final_path, final_hash = stamp_final_document(doc, base_url=base_url)
+                doc.final_path = final_path
+                doc.final_hash = final_hash
+                try:
+                    view_url = url_for("documents.document_detail", doc_id=doc.id, _external=True)
+                    send_approval_status_email(
+                        doc.applicant.email,
+                        doc.applicant.name,
+                        doc.title,
+                        "approved",
+                        user.name,
+                        notes=step.remark,
+                        view_url=view_url,
+                        attachment_path=doc.final_path
+                    )
+                except Exception:
+                    pass
+
+            tl = Timeline(
+                document_id=doc.id,
+                user_id=user.id,
+                event="STEP_APPROVED",
+                details=f"Batch approved by {user.name} ({user.designation}).",
+                ip_address=request.remote_addr
+            )
+            db.session.add(tl)
+            processed += 1
+
+    db.session.commit()
+    return jsonify({
+        "success": True,
+        "processed_count": processed,
+        "errors": errors,
+        "message": f"Successfully processed {processed} document(s) in batch."
+    })
 
 @approvals_bp.route("/api/documents/<int:doc_id>/fulfil", methods=["POST"])
 @login_required

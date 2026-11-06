@@ -3,7 +3,7 @@
 {% block title %}Approval Desk — ApproveHub{% endblock %}
 
 {% block content %}
-<div style="max-width:1020px;margin:10px auto;">
+<div style="max-width:1020px;margin:10px auto;position:relative;">
     <!-- Modern Authority Hero Banner -->
     <div style="background:linear-gradient(135deg, rgba(255,255,255,0.95), rgba(241,245,249,0.9));border:1px solid var(--bd);border-radius:20px;padding:26px 30px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px;box-shadow:var(--shadow-sm);position:relative;overflow:hidden;">
         <div style="position:absolute;right:-40px;top:-40px;width:180px;height:180px;background:radial-gradient(circle, rgba(245,158,11,0.08) 0%, transparent 70%);border-radius:50%;pointer-events:none;"></div>
@@ -46,9 +46,17 @@
         </form>
     </div>
 
-    <div class="card" style="padding:26px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-            <h3 style="margin:0;font-size:17px;font-weight:800;color:var(--tx);">Requests Awaiting Your Action</h3>
+    <div class="card" style="padding:26px;margin-bottom:70px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+            <div style="display:flex;align-items:center;gap:12px;">
+                {% if pending_steps %}
+                <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--tx);cursor:pointer;user-select:none;">
+                    <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this)" style="width:18px;height:18px;accent-color:var(--indigo-primary);cursor:pointer;">
+                    <span>Select All</span>
+                </label>
+                {% endif %}
+                <h3 style="margin:0;font-size:17px;font-weight:800;color:var(--tx);">Requests Awaiting Your Action</h3>
+            </div>
             <span style="font-size:12.5px;color:var(--tx-muted);">Showing {{ pending_steps|length }} document(s)</span>
         </div>
 
@@ -62,9 +70,11 @@
         <div style="display:flex;flex-direction:column;gap:14px;">
             {% for step in pending_steps %}
             {% set doc = step.document %}
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 22px;border:1px solid var(--bd);border-radius:16px;background:#FFFFFF;transition:all 0.25s cubic-bezier(0.16, 1, 0.3, 1);box-shadow:var(--shadow-sm);" onmouseover="this.style.borderColor='rgba(99,102,241,0.35)';this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 20px rgba(99,102,241,0.08)';" onmouseout="this.style.borderColor='var(--bd)';this.style.transform='translateY(0)';this.style.boxShadow='var(--shadow-sm)';">
-                <div style="display:flex;align-items:center;gap:16px;">
-                    <div style="width:46px;height:46px;border-radius:12px;background:rgba(245,158,11,0.12);color:var(--amber);display:grid;place-items:center;font-size:22px;flex:none;box-shadow:0 2px 8px rgba(245,158,11,0.15);">
+            <div class="step-row" id="row_{{ step.id }}" style="display:flex;justify-content:space-between;align-items:center;padding:18px 22px;border:1px solid var(--bd);border-radius:16px;background:#FFFFFF;transition:all 0.2s ease;box-shadow:var(--shadow-sm);">
+                <div style="display:flex;align-items:center;gap:14px;">
+                    <input type="checkbox" class="step-select-checkbox" value="{{ step.id }}" onchange="updateBatchBar()" style="width:18px;height:18px;accent-color:var(--indigo-primary);cursor:pointer;">
+                    
+                    <div style="width:44px;height:44px;border-radius:12px;background:rgba(245,158,11,0.12);color:var(--amber);display:grid;place-items:center;font-size:20px;flex:none;box-shadow:0 2px 8px rgba(245,158,11,0.15);">
                         ⏳
                     </div>
                     <div>
@@ -82,8 +92,8 @@
 
                 <div style="display:flex;gap:14px;align-items:center;">
                     <span class="pill in_progress">Step {{ step.step_order }} of {{ doc.total_steps }}</span>
-                    <a href="{{ url_for('approvals.review_step', step_id=step.id) }}" class="btn" style="padding:10px 20px;font-size:13.5px;">
-                        Review & Sign →
+                    <a href="{{ url_for('approvals.review_step', step_id=step.id) }}" class="btn" style="padding:9px 18px;font-size:13px;">
+                        Review &amp; Sign →
                     </a>
                 </div>
             </div>
@@ -91,5 +101,101 @@
         </div>
         {% endif %}
     </div>
+
+    <!-- Floating Batch Action Bar -->
+    <div id="batchActionBar" style="display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#0F172A;color:#FFFFFF;padding:14px 24px;border-radius:20px;box-shadow:0 20px 40px rgba(0,0,0,0.3);z-index:9999;align-items:center;gap:18px;border:1px solid rgba(255,255,255,0.15);">
+        <div style="display:flex;align-items:center;gap:10px;">
+            <span style="width:10px;height:10px;border-radius:50%;background:var(--emerald);display:inline-block;"></span>
+            <b id="selectedCountText" style="font-size:13.5px;">0 Selected</b>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:10px;">
+            <input type="password" id="batchPinInput" maxlength="6" placeholder="Enter PIN (4-6 digits)" style="padding:9px 14px;border-radius:10px;border:none;background:#1E293B;color:#FFF;font-size:13px;width:170px;outline:none;">
+            <button type="button" class="btn" id="batchApproveBtn" onclick="submitBatchApproval()" style="background:var(--indigo-primary);padding:9px 20px;font-size:13px;border-radius:10px;font-weight:700;">
+                ✓ Batch Approve
+            </button>
+        </div>
+    </div>
 </div>
+
+<script>
+function toggleSelectAll(master) {
+    const checkboxes = document.querySelectorAll(".step-select-checkbox");
+    checkboxes.forEach(cb => cb.checked = master.checked);
+    updateBatchBar();
+}
+
+function updateBatchBar() {
+    const checked = Array.from(document.querySelectorAll(".step-select-checkbox:checked"));
+    const bar = document.getElementById("batchActionBar");
+    const countText = document.getElementById("selectedCountText");
+    
+    // Highlight rows
+    document.querySelectorAll(".step-select-checkbox").forEach(cb => {
+        const row = document.getElementById("row_" + cb.value);
+        if (row) {
+            row.style.borderColor = cb.checked ? "var(--indigo-primary)" : "var(--bd)";
+            row.style.background = cb.checked ? "rgba(79,70,229,0.03)" : "#FFFFFF";
+        }
+    });
+
+    if (checked.length > 0) {
+        bar.style.display = "flex";
+        countText.textContent = `${checked.length} Document(s) Selected`;
+    } else {
+        bar.style.display = "none";
+    }
+}
+
+async function submitBatchApproval() {
+    const checked = Array.from(document.querySelectorAll(".step-select-checkbox:checked")).map(cb => parseInt(cb.value));
+    const pin = document.getElementById("batchPinInput").value.trim();
+    const btn = document.getElementById("batchApproveBtn");
+
+    if (checked.length === 0) {
+        alert("Please select at least one document.");
+        return;
+    }
+
+    if (!pin || pin.length < 4) {
+        alert("Please enter your 4-6 digit Security PIN to authorize batch approval.");
+        document.getElementById("batchPinInput").focus();
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = "⏳ Authorizing Batch...";
+
+    try {
+        const resp = await fetch("/api/steps/batch-action", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                step_ids: checked,
+                action: "approve",
+                pin: pin,
+                remark: "Batch approved with verified digital credentials."
+            })
+        });
+
+        const data = await resp.json();
+
+        if (resp.ok && data.success) {
+            btn.innerHTML = `✓ ${data.processed_count} Approved!`;
+            btn.style.background = "var(--emerald)";
+            setTimeout(() => {
+                window.location.reload();
+            }, 800);
+        } else {
+            alert(data.error || "Failed to process batch approval.");
+            btn.disabled = false;
+            btn.innerHTML = "✓ Batch Approve";
+        }
+    } catch (err) {
+        alert("Network or connection error during batch processing.");
+        btn.disabled = false;
+        btn.innerHTML = "✓ Batch Approve";
+    }
+}
+</script>
 {% endblock %}
