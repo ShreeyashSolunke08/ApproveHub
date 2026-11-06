@@ -63,11 +63,19 @@ class ApproveHubSystemTest(unittest.TestCase):
     def test_04_full_approval_and_stamping_flow(self):
         """Test complete workflow: Approver 2 signs off and PyMuPDF stamps final document"""
         with self.app.app_context():
-            # Find the sample document where Step 2 (HOD) is pending
             doc = Document.query.filter_by(title="Bonafide Certificate Request").first()
             self.assertIsNotNone(doc)
+            
+            # Normalize path for local runner
+            local_doc_path = os.path.join("uploads", "docs", "bonafide_request.pdf")
+            if os.path.exists(local_doc_path):
+                doc.file_path = os.path.abspath(local_doc_path)
+                doc.original_hash = sha256_file(doc.file_path)
+                
             step2 = ApprovalStep.query.filter_by(document_id=doc.id, step_order=2).first()
             self.assertIsNotNone(step2)
+            step2.status = "pending"
+            db.session.commit()
 
             hod = User.query.get(step2.approver_id)
 
