@@ -35,7 +35,7 @@ def public_verify_page(approval_no=None):
 @verification_bp.route("/api/verify/check", methods=["POST"])
 def api_verify_check():
     data = request.get_json() or {}
-    number = data.get("number", "").strip()
+    number = (data.get("number") or data.get("approval_no") or data.get("code") or "").strip()
     
     step = ApprovalStep.query.filter_by(approval_no=number).first()
     if not step or not step.document:

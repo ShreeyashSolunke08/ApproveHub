@@ -57,9 +57,12 @@ def _send_email_worker(to_email, subject, html_content, text_content=None, attac
                     part["Content-Disposition"] = f'attachment; filename="{filename}"'
                     msg.attach(part)
 
-            server = smtplib.SMTP(smtp_host, smtp_port, timeout=10)
-            if use_tls:
-                server.starttls()
+            if smtp_port == 465:
+                server = smtplib.SMTP_SSL(smtp_host, smtp_port, timeout=10)
+            else:
+                server = smtplib.SMTP(smtp_host, smtp_port, timeout=10)
+                if use_tls:
+                    server.starttls()
             server.login(smtp_user, smtp_pass)
             server.sendmail(smtp_sender, [to_email], msg.as_string())
             server.quit()
