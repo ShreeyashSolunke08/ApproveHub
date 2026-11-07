@@ -971,10 +971,10 @@ body.mobile-mode .content-area {
 
 /* Brand Logo High-Definition Rendering */
 .brand img {
-  height: 48px;
+  height: 52px;
   width: auto;
   display: block;
-  max-width: 260px;
+  max-width: 280px;
   object-fit: contain;
   transition: transform 0.2s ease;
 }
@@ -987,6 +987,10 @@ body.mobile-mode .content-area {
    Responsive Mobile & Tablet Viewport Rules
    ========================================================================== */
 @media (max-width: 860px) {
+  .desktop-only {
+    display: none !important;
+  }
+
   .app-bottom-nav {
     display: block !important;
   }

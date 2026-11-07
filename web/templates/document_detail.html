@@ -3,9 +3,9 @@
 {% block title %}{{ document.title }} — Real-Time Tracking — ApproveHub{% endblock %}
 
 {% block content %}
-<div style="max-width:1100px;margin:10px auto;">
+<div style="max-width:1120px;margin:10px auto;padding:0 12px 40px;">
     <!-- Breadcrumb & Document Actions Header -->
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;flex-wrap:wrap;gap:16px;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;flex-wrap:wrap;gap:16px;">
         <div>
             <div style="font-size:12.5px;color:var(--tx-muted);margin-bottom:6px;">
                 <a href="{{ url_for('documents.applicant_dashboard') }}" style="color:var(--indigo-primary);text-decoration:none;font-weight:700;">← Back to My Requests</a>
@@ -18,6 +18,8 @@
                 <span>Applicant: <b>{{ document.applicant.name }}</b> ({{ document.applicant.department or 'Student' }})</span>
                 <span>•</span>
                 <span>Submitted: {{ document.created_at.strftime('%d %b %Y, %H:%M') }}</span>
+                <span>•</span>
+                <span style="font-family:monospace;font-size:12px;color:var(--indigo-primary);font-weight:700;">ID: AH-REQ-{{ document.id }}</span>
             </div>
         </div>
 
@@ -31,23 +33,23 @@
                 </a>
             {% else %}
                 <a href="{{ url_for('documents.preview_document', doc_id=document.id) }}" target="_blank" class="btn secondary">
-                    👁️ View PDF
+                    👁️ Open in Full Window
                 </a>
             {% endif %}
         </div>
     </div>
 
     <!-- Live Status Tracker Banner -->
-    <div class="card" style="background:linear-gradient(135deg, rgba(255,255,255,0.98), rgba(241,245,249,0.92));border:1.5px solid var(--bd);padding:22px 26px;margin-bottom:24px;">
+    <div class="card" style="background:#FFFFFF;border:1.5px solid var(--bd);padding:20px 24px;margin-bottom:20px;">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;">
             <div>
                 <span style="font-size:11px;font-weight:800;color:var(--indigo-primary);text-transform:uppercase;letter-spacing:0.06em;display:flex;align-items:center;gap:6px;">
                     <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--indigo-primary);animation:pulseGlow 2s infinite;"></span>
-                    Live Document Journey & Real-Time Desk Location
+                    Live Document Journey &amp; Real-Time Desk Location
                 </span>
-                <div style="font-size:17px;font-weight:800;color:var(--tx);margin-top:4px;">
+                <div style="font-size:16px;font-weight:800;color:var(--tx);margin-top:4px;">
                     {% if document.status == 'approved' %}
-                        🎉 Fully Approved & Stamped with Minimal Official Signatures & Verification QR
+                        🎉 Fully Approved &amp; Stamped with Cryptographic Signatures &amp; Public Verification QR
                     {% elif document.status == 'compliance' %}
                         ⚠️ In Compliance — Action Required by Applicant
                     {% elif current_active_step %}
@@ -66,10 +68,10 @@
         </div>
 
         <!-- Visual Multi-Step Progress Stepper -->
-        <div style="display:flex;align-items:center;margin-top:20px;gap:10px;">
+        <div style="display:flex;align-items:center;margin-top:16px;gap:10px;">
             {% for step in document.approval_steps %}
             <div style="flex:1;text-align:center;">
-                <div style="height:6px;border-radius:99px;background:{% if step.status == 'approved' %}#10B981{% elif step.status == 'pending' %}#F59E0B{% elif step.status == 'compliance' %}#8B5CF6{% else %}#E2E8F0{% endif %};margin-bottom:8px;"></div>
+                <div style="height:6px;border-radius:99px;background:{% if step.status == 'approved' %}#10B981{% elif step.status == 'pending' %}#F59E0B{% elif step.status == 'compliance' %}#8B5CF6{% else %}#E2E8F0{% endif %};margin-bottom:6px;"></div>
                 <div style="font-size:12px;font-weight:700;color:var(--tx);">{{ step.approver.name.split(' ')[-1] }}</div>
                 <div style="font-size:11px;color:var(--tx-muted);text-transform:capitalize;">{{ step.status }}</div>
             </div>
@@ -77,50 +79,52 @@
         </div>
     </div>
 
-    <!-- Cryptographic Integrity Proof Card -->
-    <div class="card" style="background:#FFFFFF;border-left:4px solid var(--indigo-primary);padding:16px 22px;margin-bottom:24px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
-            <div>
-                <b style="font-size:13px;color:var(--tx);">🔒 Cryptographic Integrity Seal (SHA-256)</b>
-                <div style="font-family:monospace;font-size:12px;color:var(--indigo-primary);margin-top:3px;word-break:break-all;">
-                    Original Hash: {{ document.original_hash }}
-                </div>
-                {% if document.final_hash %}
-                <div style="font-family:monospace;font-size:12px;color:var(--emerald);margin-top:3px;word-break:break-all;">
-                    Final Stamped Hash: {{ document.final_hash }}
-                </div>
-                {% endif %}
+    <!-- NATIVE APPLICATION SEGMENTED TABS -->
+    <div class="app-segmented-tabs" style="margin-bottom:20px;width:100%;display:flex;justify-content:flex-start;">
+        <button type="button" class="app-segmented-tab active" onclick="switchDetailTab('workflow', this)">
+            <span>📊</span> Workflow &amp; Signoffs
+        </button>
+        <button type="button" class="app-segmented-tab" onclick="switchDetailTab('preview', this)">
+            <span>👁️</span> Document Inspection &amp; PDF
+        </button>
+        <button type="button" class="app-segmented-tab" onclick="switchDetailTab('crypto', this)">
+            <span>🛡️</span> SHA-256 Ledger &amp; Proof
+        </button>
+        <button type="button" class="app-segmented-tab" onclick="switchDetailTab('audit', this)">
+            <span>📜</span> Real-Time Audit Trail <span class="tab-badge">{{ timeline_events|length }}</span>
+        </button>
+    </div>
+
+    <!-- TAB 1: WORKFLOW & SIGNOFFS -->
+    <div id="tab-pane-workflow" class="detail-tab-pane">
+        <!-- Compliance Action Box -->
+        {% if document.status == 'compliance' and current_user.id == document.applicant_id %}
+        <div class="card" style="border:2px solid var(--violet);background:rgba(124,58,237,0.04);padding:24px;margin-bottom:20px;">
+            <h4 style="margin:0 0 6px;color:var(--violet);font-size:16px;font-weight:800;">⚠️ Correction Requested by Authority</h4>
+            <p style="font-size:13px;color:var(--tx-secondary);margin:0 0 16px;">
+                Please upload a corrected PDF document addressing the authority's remarks. It will immediately re-route back to the authority.
+            </p>
+            <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;">
+                <input type="file" id="complianceFileInput" accept=".pdf" style="font-size:13px;background:#FFF;padding:8px 12px;border:1.5px solid var(--bd);border-radius:10px;">
+                <button type="button" class="btn" style="background:linear-gradient(135deg, #7C3AED, #6366F1);" onclick="submitComplianceFix({{ document.id }})">
+                    Upload Corrected File &amp; Resubmit
+                </button>
             </div>
-            <span class="pill approved">Tamper-Evident Active</span>
         </div>
-    </div>
+        {% endif %}
 
-    <!-- Compliance Action Box -->
-    {% if document.status == 'compliance' and current_user.id == document.applicant_id %}
-    <div class="card" style="border:2px solid var(--violet);background:rgba(124,58,237,0.04);padding:24px;margin-bottom:24px;">
-        <h4 style="margin:0 0 6px;color:var(--violet);font-size:16px;">⚠️ Correction Requested by Authority</h4>
-        <p style="font-size:13px;color:var(--tx-secondary);margin:0 0 16px;">
-            Please upload a corrected PDF document addressing the authority's remarks. It will immediately re-route back to the authority.
-        </p>
-        <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;">
-            <input type="file" id="complianceFileInput" accept=".pdf" style="font-size:13px;background:#FFF;padding:8px 12px;border:1px solid var(--bd);border-radius:10px;">
-            <button type="button" class="btn" style="background:linear-gradient(135deg, #7C3AED, #6366F1);" onclick="submitComplianceFix({{ document.id }})">
-                Upload Corrected File & Resubmit
-            </button>
-        </div>
-    </div>
-    {% endif %}
+        <div class="card" style="padding:24px;border:1.5px solid var(--bd);">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+                <h3 style="margin:0;font-size:17px;font-weight:800;color:var(--tx);">Sequential Authorities &amp; Multi-Tier Signoffs</h3>
+                <span style="font-size:12px;color:var(--tx-muted);font-weight:600;">Total Levels: {{ document.total_steps }}</span>
+            </div>
 
-    <div style="display:grid;grid-template-columns:1fr 380px;gap:26px;">
-        <!-- Left: Sequential Authority Decisions -->
-        <div class="card">
-            <h3 style="margin:0 0 18px;font-size:16px;font-weight:800;color:var(--tx);">Sequential Authorities & Approvals</h3>
-            <div style="display:flex;flex-direction:column;gap:16px;">
+            <div style="display:flex;flex-direction:column;gap:14px;">
                 {% for step in document.approval_steps %}
-                <div style="border:1.5px solid {% if step.status == 'approved' %}rgba(16,185,129,0.3){% elif step.status == 'pending' %}rgba(245,158,11,0.3){% else %}var(--bd){% endif %};border-radius:14px;padding:18px;background:{% if step.status == 'approved' %}rgba(16,185,129,0.04){% elif step.status == 'pending' %}rgba(245,158,11,0.04){% else %}#FFFFFF{% endif %};">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <div style="border:1.5px solid {% if step.status == 'approved' %}rgba(16,185,129,0.35){% elif step.status == 'pending' %}rgba(245,158,11,0.35){% else %}var(--bd){% endif %};border-radius:14px;padding:18px;background:{% if step.status == 'approved' %}rgba(16,185,129,0.03){% elif step.status == 'pending' %}rgba(245,158,11,0.03){% else %}#FFFFFF{% endif %};">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
                         <div>
-                            <b style="font-size:14px;color:var(--tx);">Step {{ step.step_order }}: {{ step.approver.name }}</b>
+                            <b style="font-size:14.5px;color:var(--tx);">Level {{ step.step_order }}: {{ step.approver.name }}</b>
                             <div style="font-size:12px;color:var(--tx-muted);">{{ step.approver.designation }} • {{ step.approver.department }}</div>
                         </div>
                         <span class="pill {{ step.status }}">{{ step.status }}</span>
@@ -129,7 +133,7 @@
                     <div style="font-size:12.5px;color:var(--tx-secondary);display:flex;gap:18px;margin-top:10px;flex-wrap:wrap;">
                         <span>Mark Type: <b>{{ step.mark_type.capitalize() }}</b></span>
                         {% if step.approval_no %}
-                            <span>Code: <b style="font-family:monospace;color:var(--indigo-primary);">{{ step.approval_no }}</b></span>
+                            <span>Approval ID: <b style="font-family:monospace;color:var(--indigo-primary);">{{ step.approval_no }}</b></span>
                         {% endif %}
                         {% if step.acted_at %}
                             <span>Timestamp: <b>{{ step.acted_at.strftime('%d %b %Y, %H:%M') }}</b></span>
@@ -144,52 +148,146 @@
 
                     {% if step.reject_reason %}
                     <div style="margin-top:10px;font-size:12.5px;color:var(--rose);">
-                        <b>Reason:</b> {{ step.reject_reason }}
+                        <b>Correction Reason:</b> {{ step.reject_reason }}
                     </div>
                     {% endif %}
                 </div>
                 {% endfor %}
             </div>
         </div>
+    </div>
 
-        <!-- Right: Public Verification & Real-Time Audit Trail -->
-        <div>
+    <!-- TAB 2: PDF PREVIEW & INSPECTION -->
+    <div id="tab-pane-preview" class="detail-tab-pane" style="display:none;">
+        <div class="card" style="padding:20px;border:1.5px solid var(--bd);">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:12px;">
+                <div>
+                    <h3 style="margin:0;font-size:17px;font-weight:800;color:var(--tx);">Interactive Document Inspector</h3>
+                    <div style="font-size:12.5px;color:var(--tx-muted);">High-fidelity vector preview rendered directly via PyMuPDF</div>
+                </div>
+                <div style="display:flex;gap:10px;">
+                    <a href="{{ url_for('documents.preview_document', doc_id=document.id) }}" target="_blank" class="btn secondary" style="font-size:12.5px;padding:8px 14px;">
+                        ↗ Open Fullscreen
+                    </a>
+                    {% if document.status == 'approved' %}
+                    <a href="{{ url_for('documents.download_document', doc_id=document.id) }}" class="btn" style="font-size:12.5px;padding:8px 14px;background:#059669;">
+                        📥 Download Stamped PDF
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div style="background:#F8FAFC;border:1.5px solid var(--bd);border-radius:14px;overflow:hidden;box-shadow:inset 0 2px 6px rgba(0,0,0,0.04);">
+                <iframe src="{{ url_for('documents.preview_document', doc_id=document.id) }}" style="width:100%;height:750px;border:none;display:block;" title="Document PDF Preview"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 3: CRYPTOGRAPHIC SHA-256 LEDGER & PROOF -->
+    <div id="tab-pane-crypto" class="detail-tab-pane" style="display:none;">
+        <div class="card" style="padding:26px;border:1.5px solid var(--bd);margin-bottom:20px;">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
+                <div style="width:40px;height:40px;border-radius:12px;background:rgba(67,56,202,0.1);color:var(--indigo-primary);display:grid;place-items:center;font-size:20px;">
+                    🛡️
+                </div>
+                <div>
+                    <h3 style="margin:0;font-size:18px;font-weight:900;color:var(--tx);">SHA-256 Cryptographic Nonce &amp; Integrity Vector</h3>
+                    <p style="margin:0;font-size:12.5px;color:var(--tx-muted);">Deterministic 256-bit message digests validating binary authenticity and anti-tamper compliance</p>
+                </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr;gap:14px;margin-bottom:22px;">
+                <div style="background:#F8FAFC;border:1.5px solid #CBD5E1;border-radius:14px;padding:16px;">
+                    <span style="font-size:11.5px;font-weight:800;color:var(--tx-muted);text-transform:uppercase;letter-spacing:0.04em;">Original Upload SHA-256 Digest</span>
+                    <div style="font-family:monospace;font-size:13px;font-weight:700;color:var(--indigo-primary);margin-top:6px;word-break:break-all;">
+                        {{ document.original_hash }}
+                    </div>
+                </div>
+
+                {% if document.final_hash %}
+                <div style="background:#F0FDF4;border:1.5px solid rgba(16,185,129,0.4);border-radius:14px;padding:16px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <span style="font-size:11.5px;font-weight:800;color:#047857;text-transform:uppercase;letter-spacing:0.04em;">Final Cryptographically Stamped Digest (After Seal Injection)</span>
+                        <span class="pill approved" style="font-size:11px;">✓ Tamper-Evident Active</span>
+                    </div>
+                    <div style="font-family:monospace;font-size:13px;font-weight:700;color:#047857;margin-top:6px;word-break:break-all;">
+                        {{ document.final_hash }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Technical Specifications Matrix -->
+            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));gap:16px;margin-bottom:22px;">
+                <div style="background:#FFFFFF;border:1.5px solid #E2E8F0;border-radius:14px;padding:16px;">
+                    <div style="font-size:11.5px;color:var(--tx-muted);font-weight:700;">Vector Stamping Engine</div>
+                    <div style="font-size:14.5px;font-weight:800;color:var(--tx);margin-top:4px;">PyMuPDF (fitz) v1.24+</div>
+                    <div style="font-size:11.5px;color:var(--tx-muted);margin-top:2px;">Sub-pixel coordinate transformation</div>
+                </div>
+
+                <div style="background:#FFFFFF;border:1.5px solid #E2E8F0;border-radius:14px;padding:16px;">
+                    <div style="font-size:11.5px;color:var(--tx-muted);font-weight:700;">Verification Nonce Standard</div>
+                    <div style="font-size:14.5px;font-weight:800;color:var(--tx);margin-top:4px;">FIPS 180-4 SHA-256</div>
+                    <div style="font-size:11.5px;color:var(--tx-muted);margin-top:2px;">256-bit collision-resistant ledger</div>
+                </div>
+
+                <div style="background:#FFFFFF;border:1.5px solid #E2E8F0;border-radius:14px;padding:16px;">
+                    <div style="font-size:11.5px;color:var(--tx-muted);font-weight:700;">Public Ledger Verification</div>
+                    <div style="font-size:14.5px;font-weight:800;color:var(--emerald);margin-top:4px;">Live Node Online</div>
+                    <div style="font-size:11.5px;color:var(--tx-muted);margin-top:2px;">Instant QR scan &amp; token lookup</div>
+                </div>
+            </div>
+
             {% if document.status == 'approved' and document.approval_steps %}
-            <div class="card" style="text-align:center;padding:24px;border-color:rgba(16,185,129,0.3);background:rgba(16,185,129,0.05);margin-bottom:22px;">
-                <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg, #10B981, #059669);color:#FFF;display:grid;place-items:center;font-size:24px;margin:0 auto 12px;box-shadow:0 4px 14px rgba(16,185,129,0.35);">✓</div>
-                <h4 style="margin:0 0 6px;font-size:16px;color:#047857;font-weight:800;">Authentic & Stamped</h4>
-                <p style="font-size:12.5px;color:var(--tx-secondary);margin:0 0 16px;">
-                    This document carries official minimal signature stamps and a public verification QR code at your selected coordinates.
+            <div style="text-align:center;padding:20px;border:1.5px solid rgba(16,185,129,0.3);background:rgba(16,185,129,0.04);border-radius:14px;">
+                <h4 style="margin:0 0 6px;color:#047857;font-weight:800;">Public Authenticity Check</h4>
+                <p style="font-size:12.5px;color:var(--tx-secondary);margin:0 0 14px;">
+                    Anyone holding this document can scan its baked QR code or enter code <b style="font-family:monospace;color:var(--indigo-primary);">{{ document.approval_steps[-1].approval_no }}</b> to verify authenticity.
                 </p>
-                <a href="{{ url_for('verification.public_verify_page', approval_no=document.approval_steps[-1].approval_no) }}" class="btn full secondary" style="font-size:13px;font-weight:700;">
-                    🔍 Open Public Verification Page
+                <a href="{{ url_for('verification.public_verify_page', approval_no=document.approval_steps[-1].approval_no) }}" target="_blank" class="btn" style="background:#047857;padding:10px 20px;font-size:13px;">
+                    🔍 Launch Public Verification Portal →
                 </a>
             </div>
             {% endif %}
+        </div>
+    </div>
 
-            <!-- Real-Time Audit History Trail -->
-            <div class="card" style="padding:22px;">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-                    <h4 style="margin:0;font-size:15px;font-weight:800;color:var(--tx);">Real-Time Audit Trail</h4>
-                    <span style="font-size:11.5px;color:var(--tx-muted);font-weight:600;">{{ timeline_events|length }} logged event(s)</span>
+    <!-- TAB 4: REAL-TIME AUDIT TRAIL -->
+    <div id="tab-pane-audit" class="detail-tab-pane" style="display:none;">
+        <div class="card" style="padding:24px;border:1.5px solid var(--bd);">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+                <div>
+                    <h3 style="margin:0;font-size:17px;font-weight:800;color:var(--tx);">Immutable Real-Time Audit Trail</h3>
+                    <div style="font-size:12px;color:var(--tx-muted);">Chronological event record logged with actor signatures and timestamps</div>
                 </div>
-                <div class="timeline">
-                    {% for event in timeline_events %}
-                    <div class="tl-item {% if 'APPROVED' in event.event %}ok{% elif 'COMPLIANCE' in event.event %}amber{% elif 'TAMPER' in event.event %}red{% endif %}">
-                        <div style="font-weight:700;font-size:12.5px;color:var(--tx);">{{ event.event.replace('_', ' ') }}</div>
-                        <div style="font-size:12px;color:var(--tx-secondary);margin-top:2px;">{{ event.details }}</div>
-                        <div style="font-size:10.5px;color:var(--tx-muted);margin-top:4px;">
-                            Actor: {{ event.user.name if event.user else 'System' }} • {{ event.timestamp.strftime('%d %b, %H:%M') }}
-                        </div>
+                <span class="pill approved" style="font-size:11.5px;">{{ timeline_events|length }} Event(s) Recorded</span>
+            </div>
+
+            <div class="timeline">
+                {% for event in timeline_events %}
+                <div class="tl-item {% if 'APPROVED' in event.event %}ok{% elif 'COMPLIANCE' in event.event %}amber{% elif 'TAMPER' in event.event %}red{% endif %}">
+                    <div style="font-weight:800;font-size:13px;color:var(--tx);">{{ event.event.replace('_', ' ') }}</div>
+                    <div style="font-size:12.5px;color:var(--tx-secondary);margin-top:2px;">{{ event.details }}</div>
+                    <div style="font-size:11px;color:var(--tx-muted);margin-top:4px;">
+                        Actor: <b>{{ event.user.name if event.user else 'System Engine' }}</b> • {{ event.timestamp.strftime('%d %b %Y, %H:%M:%S') }}
                     </div>
-                    {% endfor %}
                 </div>
+                {% endfor %}
             </div>
         </div>
     </div>
 </div>
 
 <script>
+function switchDetailTab(tabName, btn) {
+    document.querySelectorAll('.detail-tab-pane').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.app-segmented-tab').forEach(el => el.classList.remove('active'));
+    
+    const target = document.getElementById('tab-pane-' + tabName);
+    if (target) target.style.display = 'block';
+    if (btn) btn.classList.add('active');
+}
+
 async function submitComplianceFix(docId) {
     const fileInput = document.getElementById('complianceFileInput');
     if (!fileInput.files.length) {

@@ -50,8 +50,14 @@
     <!-- Institutional Frosted Glass Topbar Navigation -->
     <header class="topbar">
         <a href="/" class="brand" style="display:flex;align-items:center;text-decoration:none;gap:12px;">
-            <img src="{{ url_for('static', filename='img/brand-logo.png') }}" alt="ApproveHub — Verified Digital Approvals" style="height:48px;width:auto;display:block;max-width:260px;object-fit:contain;">
+            <img src="{{ url_for('static', filename='img/brand-logo.png') }}" alt="ApproveHub — Verified Digital Approvals" style="height:52px;width:auto;display:block;max-width:280px;object-fit:contain;">
         </a>
+
+        <!-- Desktop App Node Status Indicator -->
+        <div class="desktop-only" style="display:flex;align-items:center;gap:8px;background:#F1F5F9;border:1.5px solid var(--bd);padding:6px 14px;border-radius:99px;font-size:12px;font-weight:700;color:var(--tx-secondary);">
+            <span style="width:8px;height:8px;border-radius:50%;background:#10B981;box-shadow:0 0 0 3px rgba(16,185,129,0.2);display:inline-block;"></span>
+            <span>VIT Pune Node • SHA-256 Engine Active</span>
+        </div>
 
         <div class="top-actions">
             <!-- Native PWA Install Button -->

@@ -121,7 +121,7 @@
             <button class="key-btn" onclick="pressKey('7')">7</button>
             <button class="key-btn" onclick="pressKey('8')">8</button>
             <button class="key-btn" onclick="pressKey('9')">9</button>
-            <button class="key-btn" onclick="quickBiometricDemo()" title="Simulate Biometric Fast Unlock">👆</button>
+            <button class="key-btn" onclick="clearPin()" title="Clear PIN Entry" style="font-size:14px;font-weight:700;color:var(--tx-muted);">C</button>
             <button class="key-btn" onclick="pressKey('0')">0</button>
             <button class="key-btn" onclick="backspaceKey()">⌫</button>
         </div>
@@ -201,10 +201,9 @@ async function submitCustomAction() {
     }
 }
 
-function quickBiometricDemo() {
-    currentPin = "1234";
+function clearPin() {
+    currentPin = "";
     updatePinDots();
-    submitApprovalWithPin();
 }
 </script>
 {% endblock %}
