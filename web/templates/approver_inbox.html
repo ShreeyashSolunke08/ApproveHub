@@ -27,6 +27,20 @@
         </div>
     </div>
 
+    <!-- Native App Segmented Tab Control Bar -->
+    <div class="app-segmented-tabs" role="tablist">
+        <a href="{{ url_for('approvals.approver_inbox') }}" class="app-segmented-tab active">
+            <span>📥 Pending Review</span>
+            <span class="tab-badge">{{ pending_steps|length }}</span>
+        </a>
+        <a href="{{ url_for('approvals.approver_history') }}" class="app-segmented-tab">
+            <span>📋 Action History</span>
+        </a>
+        <a href="{{ url_for('documents.upload_document') }}" class="app-segmented-tab">
+            <span>➕ Submit Staff Request</span>
+        </a>
+    </div>
+
     <!-- Search Bar & Filters -->
     <div class="card" style="padding:16px 20px;margin-bottom:20px;">
         <form method="GET" action="{{ url_for('approvals.approver_inbox') }}" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">

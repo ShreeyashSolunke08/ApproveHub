@@ -49,8 +49,8 @@
 <body>
     <!-- Institutional Frosted Glass Topbar Navigation -->
     <header class="topbar">
-        <a href="/" class="brand" style="display:flex;align-items:center;text-decoration:none;gap:10px;">
-            <img src="{{ url_for('static', filename='img/brand-logo.png') }}" alt="ApproveHub — Verified Digital Approvals" style="height:38px;width:auto;display:block;max-width:200px;object-fit:contain;">
+        <a href="/" class="brand" style="display:flex;align-items:center;text-decoration:none;gap:12px;">
+            <img src="{{ url_for('static', filename='img/brand-logo.png') }}" alt="ApproveHub — Verified Digital Approvals" style="height:48px;width:auto;display:block;max-width:260px;object-fit:contain;">
         </a>
 
         <div class="top-actions">
@@ -143,6 +143,99 @@
             {% block content %}{% endblock %}
         </main>
     </div>
+
+    <!-- Native Mobile App Docked Bottom Tab Navigation -->
+    <nav class="app-bottom-nav">
+        <div class="app-bottom-nav-inner">
+            {% if current_user %}
+                {% if current_user.role == 'applicant' %}
+                    <a href="{{ url_for('documents.home') }}" class="app-tab-item {% if request.endpoint == 'documents.home' %}active{% endif %}">
+                        <span class="tab-icon">🏠</span>
+                        <span>Home</span>
+                    </a>
+                    <a href="{{ url_for('documents.applicant_dashboard') }}" class="app-tab-item {% if request.endpoint == 'documents.applicant_dashboard' %}active{% endif %}">
+                        <span class="tab-icon">📂</span>
+                        <span>Vault</span>
+                    </a>
+                    <a href="{{ url_for('documents.upload_document') }}" class="app-tab-item {% if request.endpoint == 'documents.upload_document' %}active{% endif %}">
+                        <span class="tab-icon">➕</span>
+                        <span>Request</span>
+                    </a>
+                    <a href="{{ url_for('verification.public_verify_page') }}" class="app-tab-item {% if request.endpoint == 'verification.public_verify_page' %}active{% endif %}">
+                        <span class="tab-icon">🛡️</span>
+                        <span>Verify</span>
+                    </a>
+                    <a href="{{ url_for('auth.profile_page') }}" class="app-tab-item {% if request.endpoint == 'auth.profile_page' %}active{% endif %}">
+                        <span class="tab-icon">👤</span>
+                        <span>Profile</span>
+                    </a>
+                {% elif current_user.role == 'approver' %}
+                    <a href="{{ url_for('documents.home') }}" class="app-tab-item {% if request.endpoint == 'documents.home' %}active{% endif %}">
+                        <span class="tab-icon">🏠</span>
+                        <span>Home</span>
+                    </a>
+                    <a href="{{ url_for('approvals.approver_inbox') }}" class="app-tab-item {% if request.endpoint == 'approvals.approver_inbox' %}active{% endif %}">
+                        <span class="tab-icon">📥</span>
+                        <span>Desk</span>
+                    </a>
+                    <a href="{{ url_for('approvals.approver_history') }}" class="app-tab-item {% if request.endpoint == 'approvals.approver_history' %}active{% endif %}">
+                        <span class="tab-icon">📋</span>
+                        <span>History</span>
+                    </a>
+                    <a href="{{ url_for('verification.scan_qr_page') }}" class="app-tab-item {% if request.endpoint == 'verification.scan_qr_page' %}active{% endif %}">
+                        <span class="tab-icon">📷</span>
+                        <span>Scan QR</span>
+                    </a>
+                    <a href="{{ url_for('auth.profile_page') }}" class="app-tab-item {% if request.endpoint == 'auth.profile_page' %}active{% endif %}">
+                        <span class="tab-icon">👤</span>
+                        <span>Profile</span>
+                    </a>
+                {% elif current_user.role == 'admin' %}
+                    <a href="{{ url_for('admin.admin_dashboard') }}" class="app-tab-item {% if request.endpoint == 'admin.admin_dashboard' %}active{% endif %}">
+                        <span class="tab-icon">📊</span>
+                        <span>Overview</span>
+                    </a>
+                    <a href="{{ url_for('admin.admin_documents') }}" class="app-tab-item {% if request.endpoint == 'admin.admin_documents' %}active{% endif %}">
+                        <span class="tab-icon">📑</span>
+                        <span>Docs</span>
+                    </a>
+                    <a href="{{ url_for('admin.audit_log') }}" class="app-tab-item {% if request.endpoint == 'admin.audit_log' %}active{% endif %}">
+                        <span class="tab-icon">📜</span>
+                        <span>Audit</span>
+                    </a>
+                    <a href="{{ url_for('admin.institution_settings') }}" class="app-tab-item {% if request.endpoint == 'admin.institution_settings' %}active{% endif %}">
+                        <span class="tab-icon">⚙️</span>
+                        <span>Rules</span>
+                    </a>
+                    <a href="{{ url_for('auth.profile_page') }}" class="app-tab-item {% if request.endpoint == 'auth.profile_page' %}active{% endif %}">
+                        <span class="tab-icon">👤</span>
+                        <span>Profile</span>
+                    </a>
+                {% endif %}
+            {% else %}
+                <a href="{{ url_for('documents.home') }}" class="app-tab-item {% if request.endpoint == 'documents.home' %}active{% endif %}">
+                    <span class="tab-icon">🏠</span>
+                    <span>Home</span>
+                </a>
+                <a href="{{ url_for('verification.public_verify_page') }}" class="app-tab-item {% if request.endpoint == 'verification.public_verify_page' %}active{% endif %}">
+                    <span class="tab-icon">🔍</span>
+                    <span>Verify</span>
+                </a>
+                <a href="{{ url_for('verification.scan_qr_page') }}" class="app-tab-item {% if request.endpoint == 'verification.scan_qr_page' %}active{% endif %}">
+                    <span class="tab-icon">📷</span>
+                    <span>Scan QR</span>
+                </a>
+                <a href="{{ url_for('auth.login_page') }}" class="app-tab-item {% if request.endpoint == 'auth.login_page' %}active{% endif %}">
+                    <span class="tab-icon">🔐</span>
+                    <span>Sign In</span>
+                </a>
+                <a href="{{ url_for('auth.register_page') }}" class="app-tab-item {% if request.endpoint == 'auth.register_page' %}active{% endif %}">
+                    <span class="tab-icon">📝</span>
+                    <span>Register</span>
+                </a>
+            {% endif %}
+        </div>
+    </nav>
 
     <!-- PWA Installation & Service Worker Script -->
     <script>

@@ -9,6 +9,20 @@
         <p style="color:var(--tx-muted);margin:0;font-size:13.5px;">Past documents you have signed off, kept pending, or flagged for compliance.</p>
     </div>
 
+    <!-- Native App Segmented Tab Control Bar -->
+    <div class="app-segmented-tabs" role="tablist">
+        <a href="{{ url_for('approvals.approver_inbox') }}" class="app-segmented-tab">
+            <span>📥 Pending Review</span>
+        </a>
+        <a href="{{ url_for('approvals.approver_history') }}" class="app-segmented-tab active">
+            <span>📋 Action History</span>
+            <span class="tab-badge">{{ history_steps|length }}</span>
+        </a>
+        <a href="{{ url_for('documents.upload_document') }}" class="app-segmented-tab">
+            <span>➕ Submit Staff Request</span>
+        </a>
+    </div>
+
     <!-- Search Bar -->
     <div class="search-bar" style="margin-bottom:22px;">
         <form method="GET" action="{{ url_for('approvals.approver_history') }}" style="display:flex;gap:10px;width:100%;align-items:center;">

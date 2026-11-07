@@ -72,6 +72,32 @@
     </form>
 </div>
 
+<!-- Native App Segmented Tab Control Bar -->
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:14px;">
+    <div class="app-segmented-tabs" role="tablist">
+        <button type="button" class="app-segmented-tab active" onclick="switchDashboardTab('all', this)">
+            <span>📂 All Requisitions</span>
+            <span class="tab-badge">{{ documents|length }}</span>
+        </button>
+        <button type="button" class="app-segmented-tab" onclick="switchDashboardTab('in_progress', this)">
+            <span>⏳ In Progress</span>
+            <span class="tab-badge">{{ active_count }}</span>
+        </button>
+        <button type="button" class="app-segmented-tab" onclick="switchDashboardTab('approved', this)">
+            <span>🛡️ Sealed &amp; Stamped</span>
+            <span class="tab-badge">{{ approved_count }}</span>
+        </button>
+        <button type="button" class="app-segmented-tab" onclick="switchDashboardTab('rejected', this)">
+            <span>⚠️ Action Needed</span>
+            <span class="tab-badge">{{ rejected_count }}</span>
+        </button>
+    </div>
+
+    <a href="{{ url_for('documents.upload_document') }}" class="btn" style="padding:9px 18px;font-size:13px;border-radius:12px;display:inline-flex;align-items:center;gap:6px;">
+        <span>➕</span> New Requisition
+    </a>
+</div>
+
 <!-- Requests Cards Stream -->
 <div class="card" style="padding:26px;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
@@ -91,7 +117,7 @@
     {% else %}
         <div style="display:flex;flex-direction:column;gap:14px;">
             {% for doc in documents %}
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 22px;border:1px solid var(--bd);border-radius:16px;background:#FFFFFF;transition:all 0.25s cubic-bezier(0.16, 1, 0.3, 1);box-shadow:var(--shadow-sm);" onmouseover="this.style.borderColor='rgba(99,102,241,0.35)';this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 20px rgba(99,102,241,0.08)';" onmouseout="this.style.borderColor='var(--bd)';this.style.transform='translateY(0)';this.style.boxShadow='var(--shadow-sm)';">
+            <div class="document-row-card" data-status="{{ doc.status }}" style="display:flex;justify-content:space-between;align-items:center;padding:18px 22px;border:1px solid var(--bd);border-radius:16px;background:#FFFFFF;transition:all 0.25s cubic-bezier(0.16, 1, 0.3, 1);box-shadow:var(--shadow-sm);" onmouseover="this.style.borderColor='rgba(67,56,202,0.4)';this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 20px rgba(67,56,202,0.08)';" onmouseout="this.style.borderColor='var(--bd)';this.style.transform='translateY(0)';this.style.boxShadow='var(--shadow-sm)';">
                 <div style="display:flex;align-items:center;gap:16px;">
                     <div style="width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg, rgba(99,102,241,0.1), rgba(6,182,212,0.15));color:var(--indigo-primary);display:grid;place-items:center;font-size:22px;flex:none;box-shadow:0 2px 8px rgba(99,102,241,0.1);">
                         📄
@@ -132,4 +158,22 @@
         </div>
     {% endif %}
 </div>
+
+<script>
+function switchDashboardTab(status, btn) {
+    document.querySelectorAll('.app-segmented-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const cards = document.querySelectorAll('.document-row-card');
+    cards.forEach(card => {
+        if (status === 'all') {
+            card.style.display = 'flex';
+        } else if (status === 'in_progress') {
+            const s = card.getAttribute('data-status');
+            card.style.display = (s === 'pending' || s === 'in_progress') ? 'flex' : 'none';
+        } else {
+            card.style.display = (card.getAttribute('data-status') === status) ? 'flex' : 'none';
+        }
+    });
+}
+</script>
 {% endblock %}

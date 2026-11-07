@@ -95,8 +95,8 @@
                 <span>🏛️</span> Vishwakarma Institute of Technology, Pune • EDI Capstone
             </div>
 
-            <div style="margin-bottom:16px;">
-                <img src="{{ url_for('static', filename='img/brand-logo.png') }}" alt="ApproveHub — Verified Digital Approvals" style="max-height:56px;width:auto;display:block;">
+            <div style="margin-bottom:20px;">
+                <img src="{{ url_for('static', filename='img/brand-logo.png') }}" alt="ApproveHub — Verified Digital Approvals" style="max-height:76px;width:auto;display:block;">
             </div>
 
             <h1 style="font-size:36px;line-height:1.25;font-weight:900;color:#0F172A;letter-spacing:-0.03em;margin:0 0 16px;">
@@ -223,30 +223,10 @@
                     </button>
                 </form>
 
-                <!-- 1-Click Fast Demo Credentials Switcher -->
-                <div style="margin-top:16px;padding-top:14px;border-top:1px dashed #E2E8F0;">
-                    <div style="font-size:11px;font-weight:700;color:#64748B;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.04em;">
-                        ⚡ 1-Click Demo Profiles for Evaluators:
-                    </div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
-                        <button type="button" onclick="fillDemo('student_it', 'Student@123')" style="background:#F1F5F9;border:1px solid #CBD5E1;padding:5px 8px;border-radius:8px;font-size:11px;font-weight:700;color:#334155;cursor:pointer;text-align:left;">
-                            👨‍🎓 Student
-                        </button>
-                        <button type="button" onclick="fillDemo('faculty_guide', 'Faculty@123')" style="background:#F1F5F9;border:1px solid #CBD5E1;padding:5px 8px;border-radius:8px;font-size:11px;font-weight:700;color:#334155;cursor:pointer;text-align:left;">
-                            👩‍🏫 Faculty
-                        </button>
-                        <button type="button" onclick="fillDemo('hod_it', 'Hod@123')" style="background:#F1F5F9;border:1px solid #CBD5E1;padding:5px 8px;border-radius:8px;font-size:11px;font-weight:700;color:#334155;cursor:pointer;text-align:left;">
-                            🏢 HOD IT
-                        </button>
-                        <button type="button" onclick="fillDemo('principal_vit', 'Principal@123')" style="background:#F1F5F9;border:1px solid #CBD5E1;padding:5px 8px;border-radius:8px;font-size:11px;font-weight:700;color:#334155;cursor:pointer;text-align:left;">
-                            🏛️ Principal
-                        </button>
-                    </div>
-                    <div style="margin-top:8px;text-align:center;">
-                        <a href="{{ url_for('auth.register_page') }}" style="font-size:12px;color:var(--indigo-primary);text-decoration:none;font-weight:700;">
-                            New student or faculty? Create Account &rarr;
-                        </a>
-                    </div>
+                <div style="margin-top:18px;padding-top:14px;border-top:1.5px solid #CBD5E1;text-align:center;">
+                    <a href="{{ url_for('auth.register_page') }}" style="font-size:12.5px;color:var(--indigo-primary);text-decoration:none;font-weight:700;">
+                        New student or faculty member? Create Account &rarr;
+                    </a>
                 </div>
             </div>
             {% endif %}
@@ -257,7 +237,7 @@
     <div class="card" style="padding:32px 36px;margin-bottom:36px;border:2px solid rgba(79,70,229,0.25);background:linear-gradient(135deg, #FFFFFF 0%, #F5F7FF 100%);border-radius:24px;">
         <div class="mobile-app-showcase-grid" style="display:grid;grid-template-columns:auto 1fr auto;gap:28px;align-items:center;">
             <div style="flex:none;">
-                <img src="{{ url_for('static', filename='img/app-logo.png') }}" alt="ApproveHub Mobile App" style="width:96px;height:96px;border-radius:22px;box-shadow:0 12px 28px rgba(79,70,229,0.25);display:block;">
+                <img src="{{ url_for('static', filename='img/app-logo.png') }}" alt="ApproveHub Mobile App" style="width:120px;height:120px;border-radius:26px;box-shadow:0 16px 36px rgba(15,23,42,0.14);border:2.5px solid #CBD5E1;display:block;">
             </div>
 
             <div>
@@ -309,94 +289,100 @@
         </div>
     </div>
 
-    <!-- 3. FOUR CORE ARCHITECTURAL PILLARS -->
+    <!-- 3. WORKFLOW PIPELINE: HOW APPROVEHUB WORKS (PLACED BEFORE ARCHITECTURAL PILLARS) -->
+    <div class="card" style="padding:34px;margin-bottom:44px;border:1.5px solid #CBD5E1;box-shadow:0 10px 30px rgba(15,23,42,0.06);">
+        <div style="text-align:center;margin-bottom:28px;">
+            <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(67,56,202,0.1);padding:4px 12px;border-radius:99px;font-size:11.5px;font-weight:800;color:var(--indigo-primary);margin-bottom:8px;">
+                <span>⚡</span> End-to-End Verification Lifecycle
+            </div>
+            <h3 style="font-size:24px;font-weight:900;color:#0F172A;margin:0 0 6px;">How ApproveHub Works</h3>
+            <p style="font-size:13.5px;color:#475569;margin:0;">From applicant requisition submission to cryptographically sealed certificate in 4 deterministic stages</p>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:20px;position:relative;">
+            <div style="background:#F1F5F9;border:1.5px solid #CBD5E1;border-radius:18px;padding:22px;text-align:center;">
+                <div style="width:38px;height:38px;border-radius:50%;background:var(--indigo-primary);color:#FFF;display:grid;place-items:center;font-weight:800;font-size:15px;margin:0 auto 12px;box-shadow:0 4px 12px rgba(67,56,202,0.3);">1</div>
+                <h5 style="margin:0 0 6px;font-size:15px;font-weight:800;color:#0F172A;">Submit &amp; Place Marks</h5>
+                <p style="font-size:12.5px;color:#475569;margin:0;line-height:1.5;">Applicant uploads PDF, chooses approval chain, and positions mark placeholders.</p>
+            </div>
+
+            <div style="background:#F1F5F9;border:1.5px solid #CBD5E1;border-radius:18px;padding:22px;text-align:center;">
+                <div style="width:38px;height:38px;border-radius:50%;background:#0284C7;color:#FFF;display:grid;place-items:center;font-weight:800;font-size:15px;margin:0 auto 12px;box-shadow:0 4px 12px rgba(2,132,199,0.3);">2</div>
+                <h5 style="margin:0 0 6px;font-size:15px;font-weight:800;color:#0F172A;">Review &amp; Authority Sign</h5>
+                <p style="font-size:12.5px;color:#475569;margin:0;line-height:1.5;">Approver signs via smartphone QR touch canvas or sketch pad with secure authorization.</p>
+            </div>
+
+            <div style="background:#F1F5F9;border:1.5px solid #CBD5E1;border-radius:18px;padding:22px;text-align:center;">
+                <div style="width:38px;height:38px;border-radius:50%;background:#059669;color:#FFF;display:grid;place-items:center;font-weight:800;font-size:15px;margin:0 auto 12px;box-shadow:0 4px 12px rgba(5,150,105,0.3);">3</div>
+                <h5 style="margin:0 0 6px;font-size:15px;font-weight:800;color:#0F172A;">PyMuPDF Stamping</h5>
+                <p style="font-size:12.5px;color:#475569;margin:0;line-height:1.5;">Engine dynamically bakes signatures, seals, and QR verification codes onto original PDF pages.</p>
+            </div>
+
+            <div style="background:#F1F5F9;border:1.5px solid #CBD5E1;border-radius:18px;padding:22px;text-align:center;">
+                <div style="width:38px;height:38px;border-radius:50%;background:#D97706;color:#FFF;display:grid;place-items:center;font-weight:800;font-size:15px;margin:0 auto 12px;box-shadow:0 4px 12px rgba(217,119,6,0.3);">4</div>
+                <h5 style="margin:0 0 6px;font-size:15px;font-weight:800;color:#0F172A;">Instant Verification</h5>
+                <p style="font-size:12.5px;color:#475569;margin:0;line-height:1.5;">Embassies, employers, or colleges scan the QR code to verify authenticity in real-time.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. FOUR CORE ARCHITECTURAL PILLARS (ENGINEERING INNOVATION FOR ACADEMIC GOVERNANCE) -->
     <div style="margin-bottom:44px;">
         <div style="text-align:center;margin-bottom:28px;">
+            <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(67,56,202,0.1);padding:4px 12px;border-radius:99px;font-size:11.5px;font-weight:800;color:var(--indigo-primary);margin-bottom:8px;">
+                <span>🏛️</span> Institutional Engineering Core
+            </div>
             <h2 style="font-size:26px;font-weight:900;color:#0F172A;margin:0 0 8px;letter-spacing:-0.02em;">
                 Engineering Innovation for Academic Governance
             </h2>
-            <p style="font-size:14.5px;color:#64748B;margin:0;">
-                Designed specifically to solve real challenges faced by higher education institutions
+            <p style="font-size:14px;color:#475569;margin:0;">
+                Designed specifically to solve real administrative bottlenecks in higher education institutions
             </p>
         </div>
 
         <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));gap:22px;">
             <!-- Pillar 1 -->
-            <div class="card" style="padding:26px;border-radius:20px;transition:all 0.25s ease;" onmouseover="this.style.transform='translateY(-4px)';" onmouseout="this.style.transform='translateY(0)';">
-                <div style="width:48px;height:48px;border-radius:14px;background:rgba(79,70,229,0.1);color:var(--indigo-primary);display:grid;place-items:center;font-size:22px;margin-bottom:16px;">
+            <div class="card" style="padding:26px;border-radius:20px;border:1.5px solid #CBD5E1;transition:all 0.25s ease;" onmouseover="this.style.transform='translateY(-4px)';" onmouseout="this.style.transform='translateY(0)';">
+                <div style="width:48px;height:48px;border-radius:14px;background:rgba(67,56,202,0.1);color:var(--indigo-primary);display:grid;place-items:center;font-size:22px;margin-bottom:16px;">
                     📱
                 </div>
                 <h4 style="margin:0 0 8px;font-size:17px;font-weight:800;color:#0F172A;">Smartphone QR Signing</h4>
-                <p style="font-size:13px;line-height:1.6;color:#64748B;margin:0;">
-                    Approvers can scan a dynamic QR code on their laptop with their smartphone camera to sign on a smooth touch canvas with their finger. No app installation needed.
+                <p style="font-size:13px;line-height:1.6;color:#475569;margin:0;">
+                    Approvers can scan a dynamic QR code on their laptop with their smartphone camera to sign on a smooth touch canvas with their finger. Zero app installation needed on the signing device.
                 </p>
             </div>
 
             <!-- Pillar 2 -->
-            <div class="card" style="padding:26px;border-radius:20px;transition:all 0.25s ease;" onmouseover="this.style.transform='translateY(-4px)';" onmouseout="this.style.transform='translateY(0)';">
-                <div style="width:48px;height:48px;border-radius:14px;background:rgba(6,182,212,0.1);color:#0891B2;display:grid;place-items:center;font-size:22px;margin-bottom:16px;">
+            <div class="card" style="padding:26px;border-radius:20px;border:1.5px solid #CBD5E1;transition:all 0.25s ease;" onmouseover="this.style.transform='translateY(-4px)';" onmouseout="this.style.transform='translateY(0)';">
+                <div style="width:48px;height:48px;border-radius:14px;background:rgba(2,132,199,0.1);color:#0284C7;display:grid;place-items:center;font-size:22px;margin-bottom:16px;">
                     ⚡
                 </div>
                 <h4 style="margin:0 0 8px;font-size:17px;font-weight:800;color:#0F172A;">High-Volume Batch Sign</h4>
-                <p style="font-size:13px;line-height:1.6;color:#64748B;margin:0;">
-                    During exam peaks or end-of-semester rushes, faculty can select 20+ bonafide or leave requests and approve them all simultaneously with a single PIN verification.
+                <p style="font-size:13px;line-height:1.6;color:#475569;margin:0;">
+                    During peak examination or end-of-term rushes, faculty can batch-select 20+ applications and authorize them simultaneously with verified cryptographic nonces.
                 </p>
             </div>
 
             <!-- Pillar 3 -->
-            <div class="card" style="padding:26px;border-radius:20px;transition:all 0.25s ease;" onmouseover="this.style.transform='translateY(-4px)';" onmouseout="this.style.transform='translateY(0)';">
-                <div style="width:48px;height:48px;border-radius:14px;background:rgba(16,185,129,0.1);color:#047857;display:grid;place-items:center;font-size:22px;margin-bottom:16px;">
+            <div class="card" style="padding:26px;border-radius:20px;border:1.5px solid #CBD5E1;transition:all 0.25s ease;" onmouseover="this.style.transform='translateY(-4px)';" onmouseout="this.style.transform='translateY(0)';">
+                <div style="width:48px;height:48px;border-radius:14px;background:rgba(5,150,105,0.1);color:#059669;display:grid;place-items:center;font-size:22px;margin-bottom:16px;">
                     🔏
                 </div>
                 <h4 style="margin:0 0 8px;font-size:17px;font-weight:800;color:#0F172A;">PyMuPDF Vector Stamping</h4>
-                <p style="font-size:13px;line-height:1.6;color:#64748B;margin:0;">
-                    Digitally embeds signatures, department seals, and verification QR codes right onto original PDF pages with sub-pixel resolution and tamper-evident SHA-256 hashes.
+                <p style="font-size:13px;line-height:1.6;color:#475569;margin:0;">
+                    Digitally bakes vector signatures, departmental seals, and verification QR slips directly onto original PDF pages with sub-pixel resolution and zero fidelity loss.
                 </p>
             </div>
 
-            <!-- Pillar 4 -->
-            <div class="card" style="padding:26px;border-radius:20px;transition:all 0.25s ease;" onmouseover="this.style.transform='translateY(-4px)';" onmouseout="this.style.transform='translateY(0)';">
-                <div style="width:48px;height:48px;border-radius:14px;background:rgba(245,158,11,0.1);color:#D97706;display:grid;place-items:center;font-size:22px;margin-bottom:16px;">
-                    🔐
+            <!-- Pillar 4: Cryptographic SHA-256 Nonce & Tamper Detection -->
+            <div class="card" style="padding:26px;border-radius:20px;border:1.5px solid #CBD5E1;transition:all 0.25s ease;" onmouseover="this.style.transform='translateY(-4px)';" onmouseout="this.style.transform='translateY(0)';">
+                <div style="width:48px;height:48px;border-radius:14px;background:rgba(67,56,202,0.1);color:var(--indigo-primary);display:grid;place-items:center;font-size:22px;margin-bottom:16px;">
+                    🛡️
                 </div>
-                <h4 style="margin:0 0 8px;font-size:17px;font-weight:800;color:#0F172A;">Bank-Grade PIN Security</h4>
-                <p style="font-size:13px;line-height:1.6;color:#64748B;margin:0;">
-                    Brute-force protection automatically triggers temporary account lockouts after 5 consecutive incorrect PIN attempts, combined with strict IP rate limiting.
+                <h4 style="margin:0 0 8px;font-size:17px;font-weight:800;color:#0F172A;">SHA-256 Cryptographic Proof</h4>
+                <p style="font-size:13px;line-height:1.6;color:#475569;margin:0;">
+                    Calculates immutable 256-bit cryptographic message digests across document binary streams, authorization nonces, and timestamp vectors to guarantee mathematical tamper detection upon public scan.
                 </p>
-            </div>
-        </div>
-    </div>
-
-    <!-- 4. WORKFLOW PIPELINE -->
-    <div class="card" style="padding:34px;margin-bottom:44px;">
-        <div style="text-align:center;margin-bottom:28px;">
-            <h3 style="font-size:22px;font-weight:900;color:#0F172A;margin:0 0 6px;">How ApproveHub Works</h3>
-            <p style="font-size:13.5px;color:#64748B;margin:0;">From student submission to globally verifiable signed certificate in 4 steps</p>
-        </div>
-
-        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:20px;position:relative;">
-            <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:16px;padding:20px;text-align:center;">
-                <div style="width:36px;height:36px;border-radius:50%;background:var(--indigo-primary);color:#FFF;display:grid;place-items:center;font-weight:800;font-size:15px;margin:0 auto 12px;">1</div>
-                <h5 style="margin:0 0 6px;font-size:15px;font-weight:800;color:#0F172A;">Submit &amp; Place Marks</h5>
-                <p style="font-size:12.5px;color:#64748B;margin:0;line-height:1.5;">Applicant uploads PDF, chooses approval chain, and positions mark placeholders.</p>
-            </div>
-
-            <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:16px;padding:20px;text-align:center;">
-                <div style="width:36px;height:36px;border-radius:50%;background:#0891B2;color:#FFF;display:grid;place-items:center;font-weight:800;font-size:15px;margin:0 auto 12px;">2</div>
-                <h5 style="margin:0 0 6px;font-size:15px;font-weight:800;color:#0F172A;">Review &amp; Authority Sign</h5>
-                <p style="font-size:12.5px;color:#64748B;margin:0;line-height:1.5;">Approver signs via phone QR or sketch pad and authorizes with their secure PIN.</p>
-            </div>
-
-            <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:16px;padding:20px;text-align:center;">
-                <div style="width:36px;height:36px;border-radius:50%;background:#047857;color:#FFF;display:grid;place-items:center;font-weight:800;font-size:15px;margin:0 auto 12px;">3</div>
-                <h5 style="margin:0 0 6px;font-size:15px;font-weight:800;color:#0F172A;">PyMuPDF Stamping</h5>
-                <p style="font-size:12.5px;color:#64748B;margin:0;line-height:1.5;">Engine dynamically bakes signatures, seals, and QR verification codes onto the PDF.</p>
-            </div>
-
-            <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:16px;padding:20px;text-align:center;">
-                <div style="width:36px;height:36px;border-radius:50%;background:#D97706;color:#FFF;display:grid;place-items:center;font-weight:800;font-size:15px;margin:0 auto 12px;">4</div>
-                <h5 style="margin:0 0 6px;font-size:15px;font-weight:800;color:#0F172A;">Instant Verification</h5>
-                <p style="font-size:12.5px;color:#64748B;margin:0;line-height:1.5;">Embassies, employers, or colleges scan the QR code to verify authenticity in real-time.</p>
             </div>
         </div>
     </div>
@@ -485,31 +471,21 @@
     </div>
 
     <!-- 7. FOOTER -->
-    <div style="text-align:center;padding-top:24px;border-top:1px solid #E2E8F0;font-size:13px;color:#64748B;">
-        <div style="display:flex;justify-content:center;margin-bottom:12px;">
-            <img src="{{ url_for('static', filename='img/brand-logo.png') }}" alt="ApproveHub" style="max-height:38px;width:auto;display:block;">
+    <div style="text-align:center;padding-top:24px;border-top:1.5px solid #CBD5E1;font-size:13px;color:#475569;">
+        <div style="display:flex;justify-content:center;margin-bottom:14px;">
+            <img src="{{ url_for('static', filename='img/brand-logo.png') }}" alt="ApproveHub" style="max-height:48px;width:auto;display:block;">
         </div>
-        <p style="margin:0 0 8px;">
+        <p style="margin:0 0 8px;font-weight:600;">
             ApproveHub — Verified Institutional Document Approvals &amp; Tamper-Evident Verification Platform.
         </p>
-        <p style="margin:0;font-size:12px;color:#94A3B8;">
-            Developed by <strong>Shreeyash Solunke</strong> • Vishwakarma Institute of Technology (VIT), Pune. All rights reserved.
+        <p style="margin:0;font-size:12px;color:#64748B;">
+            Designed &amp; Engineered by <strong>Shreeyash Solunke</strong> • Vishwakarma Institute of Technology (VIT), Pune. All rights reserved.
         </p>
     </div>
 
 </div>
 
 <script>
-function fillDemo(username, password) {
-    const userInput = document.getElementById("homeLoginUser");
-    const passInput = document.getElementById("homeLoginPass");
-    if (userInput && passInput) {
-        userInput.value = username;
-        passInput.value = password;
-        userInput.focus();
-    }
-}
-
 function handleDirectVerify(e, form) {
     e.preventDefault();
     const code = document.getElementById("directApprovalInput").value.trim();

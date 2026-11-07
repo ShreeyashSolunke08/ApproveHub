@@ -13,6 +13,30 @@
         <p style="margin:0;opacity:0.9;font-size:13.5px;">{{ user.institution.name if user.institution else "VIT Pune" }} — System Overview &amp; Real-Time Monitoring</p>
     </div>
 
+    <!-- Native App Segmented Tab Control Bar -->
+    <div class="app-segmented-tabs" role="tablist" style="margin-top:18px;">
+        <a href="{{ url_for('admin.admin_dashboard') }}" class="app-segmented-tab active">
+            <span>📊 Overview</span>
+        </a>
+        <a href="{{ url_for('admin.admin_documents') }}" class="app-segmented-tab">
+            <span>📑 All Documents</span>
+            <span class="tab-badge">{{ total_requests }}</span>
+        </a>
+        <a href="{{ url_for('admin.hierarchy_builder') }}" class="app-segmented-tab">
+            <span>🏛️ Hierarchy</span>
+        </a>
+        <a href="{{ url_for('admin.people_management') }}" class="app-segmented-tab">
+            <span>👥 People</span>
+            <span class="tab-badge">{{ total_people }}</span>
+        </a>
+        <a href="{{ url_for('admin.audit_log') }}" class="app-segmented-tab">
+            <span>📜 Audit Trail</span>
+        </a>
+        <a href="{{ url_for('admin.institution_settings') }}" class="app-segmented-tab">
+            <span>⚙️ Rules</span>
+        </a>
+    </div>
+
     <!-- Metrics -->
     <div class="stat-grid">
         <div class="stat-tile">
