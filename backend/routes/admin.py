@@ -24,6 +24,7 @@ def admin_dashboard():
     return render_template(
         "admin_dashboard.html",
         user=user,
+        institution=(user.institution or Institution.query.first()),
         total_requests=total_requests,
         pending_count=pending_count,
         compliance_count=compliance_count,

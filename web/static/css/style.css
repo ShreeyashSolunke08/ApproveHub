@@ -714,39 +714,101 @@ body.mobile-mode .content-area {
   pointer-events: none;
 }
 
-/* Minimalist Clean Signature Stamp (Signature + Approver Name Only) */
+/* Resizable & Draggable Signature & Authority Marks */
 .stamp-mark {
   position: absolute;
-  width: 155px;
-  height: 48px;
+  min-width: 100px;
+  min-height: 38px;
   background: rgba(255, 255, 255, 0.95);
-  border: 1px dashed rgba(99, 102, 241, 0.5);
-  border-radius: 6px;
-  padding: 4px 8px;
+  backdrop-filter: blur(8px);
+  border: 1.5px solid var(--indigo-primary);
+  border-radius: 8px;
+  padding: 5px 8px;
   font-size: 11px;
-  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.12);
   cursor: grab;
   z-index: 10;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   touch-action: none;
   color: var(--tx);
+  user-select: none;
+  box-sizing: border-box;
 }
 
 .stamp-mark:active {
   cursor: grabbing;
-  border-color: var(--indigo-primary);
-  transform: scale(1.02);
+}
+
+.stamp-mark .mark-controls,
+.qr-stamp-mark .mark-controls {
+  position: absolute;
+  top: -24px;
+  right: 0;
+  display: flex;
+  gap: 3px;
+  background: #0F172A;
+  border-radius: 6px;
+  padding: 2px 4px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: auto;
+  z-index: 30;
+}
+
+.stamp-mark:hover .mark-controls,
+.stamp-mark:focus-within .mark-controls,
+.stamp-mark.resizing .mark-controls,
+.qr-stamp-mark:hover .mark-controls,
+.qr-stamp-mark.resizing .mark-controls {
+  opacity: 1;
+}
+
+.mark-ctrl-btn {
+  background: #1E293B;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 4px;
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s ease;
+}
+
+.mark-ctrl-btn:hover {
+  background: var(--indigo-primary);
+}
+
+.resize-grip {
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  width: 16px;
+  height: 16px;
+  background: var(--indigo-primary);
+  color: #FFF;
+  border-radius: 4px 0 6px 0;
+  display: grid;
+  place-items: center;
+  font-size: 10px;
+  cursor: nwse-resize;
+  touch-action: none;
+  z-index: 25;
 }
 
 .qr-stamp-mark {
   position: absolute;
-  width: 68px;
-  height: 68px;
+  min-width: 48px;
+  min-height: 48px;
   background: #FFFFFF;
-  border: 2px dashed var(--indigo-primary);
-  border-radius: 8px;
+  border: 2px solid var(--emerald);
+  border-radius: 10px;
   padding: 4px;
   display: flex;
   flex-direction: column;
@@ -754,15 +816,15 @@ body.mobile-mode .content-area {
   justify-content: center;
   font-size: 8px;
   color: var(--tx);
-  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.1);
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.14);
   cursor: grab;
   z-index: 15;
   touch-action: none;
+  box-sizing: border-box;
 }
 
-.qr-stamp-mark:active {
-  cursor: grabbing;
-  border-color: var(--amber);
+.qr-stamp-mark .resize-grip {
+  background: var(--emerald);
 }
 
 /* ==========================================================================

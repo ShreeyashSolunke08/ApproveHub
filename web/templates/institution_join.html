@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Join Institutional Node — ApproveHub{% endblock %}
+
+{% block content %}
+<div style="min-height:85vh;display:flex;align-items:center;justify-content:center;padding:24px 16px;">
+    <div style="max-width:520px;width:100%;">
+        <div style="text-align:center;margin-bottom:24px;">
+            <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(15,23,42,0.06);border:1.5px solid var(--bd);padding:5px 14px;border-radius:99px;font-size:12px;font-weight:800;color:var(--tx-secondary);margin-bottom:12px;">
+                <span>🔗</span> Institutional Membership Portal
+            </div>
+            <h2 style="margin:0 0 6px;font-size:26px;font-weight:900;color:var(--tx);letter-spacing:-0.025em;">Join Institutional Node</h2>
+            <p style="color:var(--tx-muted);margin:0;font-size:13.5px;">
+                Connect your account to your college or university using an invite code or QR link.
+            </p>
+        </div>
+
+        <div class="card" style="padding:32px 28px;border:1.5px solid var(--bd);background:#FFFFFF;box-shadow:0 12px 36px rgba(15,23,42,0.07);">
+            {% if error %}
+            <div style="background:#FFF1F2;color:#9F1239;padding:12px 16px;border-radius:12px;margin-bottom:20px;font-size:13px;border:1.5px solid rgba(225,29,72,0.3);display:flex;align-items:center;gap:8px;">
+                <span>⚠</span> {{ error }}
+            </div>
+            {% endif %}
+
+            {% if not institution %}
+            <!-- Step 1: Input Code -->
+            <form method="GET" action="{{ url_for('auth.join_institution') }}" style="display:flex;flex-direction:column;gap:16px;">
+                <div>
+                    <label style="display:block;font-size:12px;font-weight:800;color:var(--tx);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.04em;">
+                        Institution Invite Code
+                    </label>
+                    <input type="text" name="code" value="{{ code or '' }}" required placeholder="e.g. VITP-A7E3 or VITP" style="width:100%;padding:13px 14px;border:1.5px solid var(--bd);border-radius:10px;font-size:15px;box-sizing:border-box;background:#FFFFFF;font-family:monospace;font-weight:700;text-transform:uppercase;outline:none;">
+                    <div style="font-size:12px;color:var(--tx-muted);margin-top:6px;">
+                        Provided by your department administrator or displayed on orientation QR slides.
+                    </div>
+                </div>
+
+                <button type="submit" class="btn full" style="padding:13px;font-size:14px;font-weight:800;border-radius:12px;">
+                    Look Up Institution &rarr;
+                </button>
+            </form>
+
+            <div style="margin-top:24px;padding-top:18px;border-top:1px solid var(--bd);text-align:center;">
+                <span style="font-size:12.5px;color:var(--tx-muted);">Need to establish a new institution?</span>
+                <a href="{{ url_for('auth.create_institution') }}" style="font-size:12.5px;color:var(--indigo-primary);text-decoration:none;font-weight:800;margin-left:6px;">Create Institution Node &rarr;</a>
+            </div>
+
+            {% else %}
+            <!-- Step 2: Institution Found, Register / Join -->
+            <div style="background:#F0FDF4;border:1.5px solid rgba(16,185,129,0.4);border-radius:14px;padding:16px;margin-bottom:20px;display:flex;align-items:center;gap:14px;">
+                <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg, #059669, #10B981);color:#FFF;display:grid;place-items:center;font-size:22px;flex:none;">
+                    🏛️
+                </div>
+                <div>
+                    <span style="font-size:11px;font-weight:800;color:#047857;text-transform:uppercase;letter-spacing:0.05em;">Identified Institutional Node</span>
+                    <h4 style="margin:2px 0 0;font-size:16px;font-weight:900;color:#064E3B;">{{ institution.name }}</h4>
+                    <span style="font-size:12px;font-family:monospace;color:#047857;font-weight:700;">Node ID: {{ institution.code }} • Code: {{ institution.invite_code or institution.code }}</span>
+                </div>
+            </div>
+
+            {% if current_user %}
+            <div style="text-align:center;padding:16px 0;">
+                <p style="font-size:13.5px;color:var(--tx);margin:0 0 16px;">
+                    You are signed in as <b>{{ current_user.name }}</b> ({{ current_user.email }}).
+                </p>
+                <form method="POST" action="{{ url_for('auth.join_institution') }}">
+                    <input type="hidden" name="code" value="{{ institution.invite_code or institution.code }}">
+                    <button type="submit" class="btn full" style="padding:13px;font-size:14px;font-weight:800;border-radius:12px;">
+                        Confirm Link to {{ institution.name }} &rarr;
+                    </button>
+                </form>
+            </div>
+            {% else %}
+            <form method="POST" action="{{ url_for('auth.join_institution') }}" style="display:flex;flex-direction:column;gap:14px;">
+                <input type="hidden" name="code" value="{{ institution.invite_code or institution.code }}">
+
+                <div>
+                    <label style="display:block;font-size:12px;font-weight:700;color:var(--tx);margin-bottom:4px;">Full Name</label>
+                    <input type="text" name="name" required placeholder="e.g. Shreeyash Solunke" style="width:100%;padding:11px 13px;border:1.5px solid var(--bd);border-radius:10px;font-size:13.5px;box-sizing:border-box;background:#FFFFFF;outline:none;">
+                </div>
+
+                <div>
+                    <label style="display:block;font-size:12px;font-weight:700;color:var(--tx);margin-bottom:4px;">Institutional Email</label>
+                    <input type="email" name="email" required placeholder="your.name@vit.edu" style="width:100%;padding:11px 13px;border:1.5px solid var(--bd);border-radius:10px;font-size:13.5px;box-sizing:border-box;background:#FFFFFF;outline:none;">
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div>
+                        <label style="display:block;font-size:12px;font-weight:700;color:var(--tx);margin-bottom:4px;">Role</label>
+                        <select name="role" style="width:100%;padding:11px 13px;border:1.5px solid var(--bd);border-radius:10px;font-size:13px;box-sizing:border-box;background:#FFFFFF;outline:none;">
+                            <option value="applicant">Student (Applicant)</option>
+                            <option value="approver">Faculty (Approver)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display:block;font-size:12px;font-weight:700;color:var(--tx);margin-bottom:4px;">Department</label>
+                        <input type="text" name="department" value="Information Technology" required style="width:100%;padding:11px 13px;border:1.5px solid var(--bd);border-radius:10px;font-size:13px;box-sizing:border-box;background:#FFFFFF;outline:none;">
+                    </div>
+                </div>
+
+                <div>
+                    <label style="display:block;font-size:12px;font-weight:700;color:var(--tx);margin-bottom:4px;">Password</label>
+                    <input type="password" name="password" required placeholder="••••••••" style="width:100%;padding:11px 13px;border:1.5px solid var(--bd);border-radius:10px;font-size:13.5px;box-sizing:border-box;background:#FFFFFF;outline:none;">
+                </div>
+
+                <button type="submit" class="btn full" style="padding:13px;font-size:14px;font-weight:800;border-radius:12px;margin-top:6px;">
+                    Join {{ institution.code }} Node &rarr;
+                </button>
+            </form>
+            {% endif %}
+
+            <div style="margin-top:18px;text-align:center;">
+                <a href="{{ url_for('auth.join_institution') }}" style="font-size:12px;color:var(--tx-muted);text-decoration:none;">← Enter different code</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

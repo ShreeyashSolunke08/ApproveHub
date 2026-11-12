@@ -1,7 +1,8 @@
 import os
 import uuid
+import pymupdf
 from datetime import datetime, timezone
-from flask import Blueprint, render_template, request, redirect, url_for, jsonify, send_file, current_app, abort
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify, send_file, current_app, abort, Response
 from werkzeug.utils import secure_filename
 from backend.models import db, Document, ApprovalStep, Timeline, User
 from backend.utils.security import login_required, get_current_user, generate_random_approval_no
@@ -177,6 +178,8 @@ def place_marks(doc_id):
             page_no = int(step_info.get("page_no", 1))
             pos_x = float(step_info.get("pos_x", 0.08 + (idx * 0.45)))
             pos_y = float(step_info.get("pos_y", 0.75))
+            width_pts = float(step_info.get("width_pts", 140.0))
+            height_pts = float(step_info.get("height_pts", 50.0))
             mark_type = step_info.get("mark_type", "signature")
             
             step_status = "pending" if idx == 0 else "waiting"
@@ -190,16 +193,19 @@ def place_marks(doc_id):
                 page_no=page_no,
                 pos_x=pos_x,
                 pos_y=pos_y,
+                width_pts=width_pts,
+                height_pts=height_pts,
                 status=step_status,
                 approval_no=app_no
             )
             db.session.add(step)
             
-        # QR Code position chosen by applicant
+        # QR Code position and size chosen by applicant
         qr_info = data.get("qr_position", {})
         document.qr_pos_x = float(qr_info.get("pos_x", 0.78))
         document.qr_pos_y = float(qr_info.get("pos_y", 0.03))
         document.qr_page_no = int(qr_info.get("page_no", 1))
+        document.qr_size = float(qr_info.get("qr_size", 54.0))
         
         document.total_steps = len(steps_data)
         document.current_step = 1
@@ -219,6 +225,68 @@ def place_marks(doc_id):
         return jsonify({"success": True, "redirect_url": url_for("documents.document_detail", doc_id=document.id)})
         
     return render_template("place_marks.html", user=user, document=document, approvers=approvers)
+
+def _resolve_doc_path(file_path):
+    if not file_path:
+        return None
+    if os.path.exists(file_path):
+        return file_path
+    candidate = os.path.join(current_app.config.get("DOCS_FOLDER", "uploads/docs"), os.path.basename(file_path))
+    if os.path.exists(candidate):
+        return candidate
+    fallback = os.path.join(current_app.config.get("DOCS_FOLDER", "uploads/docs"), "bonafide_request.pdf")
+    if os.path.exists(fallback):
+        return fallback
+    return None
+
+@documents_bp.route("/api/documents/<int:doc_id>/pages-info")
+@login_required
+def get_document_pages_info(doc_id):
+    user = get_current_user()
+    document = Document.query.get_or_404(doc_id)
+    if document.applicant_id != user.id and user.role not in ["admin", "approver"]:
+        abort(403)
+        
+    resolved_path = _resolve_doc_path(document.file_path)
+    if not resolved_path or not os.path.exists(resolved_path):
+        return jsonify({"error": "Document file not found on disk"}), 404
+        
+    doc = pymupdf.open(resolved_path)
+    total_pages = len(doc)
+    pages = []
+    for i in range(total_pages):
+        p = doc[i]
+        pages.append({
+            "page_num": i + 1,
+            "width": p.rect.width,
+            "height": p.rect.height
+        })
+    doc.close()
+    return jsonify({
+        "total_pages": total_pages,
+        "pages": pages
+    })
+
+@documents_bp.route("/api/documents/<int:doc_id>/page/<int:page_num>/render")
+@login_required
+def render_document_page(doc_id, page_num):
+    user = get_current_user()
+    document = Document.query.get_or_404(doc_id)
+    if document.applicant_id != user.id and user.role not in ["admin", "approver"]:
+        abort(403)
+        
+    resolved_path = _resolve_doc_path(document.file_path)
+    if not resolved_path or not os.path.exists(resolved_path):
+        abort(404)
+        
+    doc = pymupdf.open(resolved_path)
+    total_pages = len(doc)
+    idx = min(max(0, page_num - 1), total_pages - 1)
+    page = doc[idx]
+    pix = page.get_pixmap(dpi=150)
+    png_bytes = pix.tobytes("png")
+    doc.close()
+    return Response(png_bytes, mimetype="image/png")
 
 @documents_bp.route("/documents/<int:doc_id>")
 @login_required

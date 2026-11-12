@@ -100,6 +100,24 @@ def seed_database(app):
     """
     with app.app_context():
         db.create_all()
+
+        # Automatic schema sync for SQLite and PostgreSQL
+        from sqlalchemy import text
+        for table, col, col_type in [
+            ('institutions', 'invite_code', 'VARCHAR(32)'),
+            ('institutions', 'creator_id', 'INTEGER'),
+            ('users', 'email_verified', 'BOOLEAN DEFAULT 0'),
+            ('users', 'email_verification_token', 'VARCHAR(100)'),
+            ('users', 'google_email', 'VARCHAR(120)'),
+            ('documents', 'qr_size', 'FLOAT DEFAULT 54.0'),
+            ('approval_steps', 'width_pts', 'FLOAT DEFAULT 140.0'),
+            ('approval_steps', 'height_pts', 'FLOAT DEFAULT 50.0'),
+        ]:
+            try:
+                db.session.execute(text(f"ALTER TABLE {table} ADD COLUMN {col} {col_type}"))
+                db.session.commit()
+            except Exception:
+                db.session.rollback()
         
         # 1. Institution
         inst = Institution.query.first()
@@ -107,11 +125,15 @@ def seed_database(app):
             inst = Institution(
                 name="Vishwakarma Institute of Technology, Pune",
                 code="VITP",
+                invite_code="VITP-2026",
                 sequential_enforced=True,
                 require_pin=True,
                 auto_expire_days=14
             )
             db.session.add(inst)
+            db.session.commit()
+        elif not inst.invite_code:
+            inst.invite_code = "VITP-2026"
             db.session.commit()
             
         # 2. Users
@@ -182,12 +204,27 @@ def seed_database(app):
         for appr in User.query.filter(User.role.in_(["approver", "admin"])).all():
             ensure_default_signature(appr)
         db.session.commit()
+
+        sample_pdf_path = os.path.join(app.config["DOCS_FOLDER"], "bonafide_request.pdf")
+        if not os.path.exists(sample_pdf_path):
+            create_sample_pdf(sample_pdf_path)
+        valid_sample_hash = sha256_file(sample_pdf_path)
+
+        # Heal stale or cross-directory document file paths if files moved/mirrored
+        for d in Document.query.all():
+            if not d.file_path or not os.path.exists(d.file_path):
+                bname = os.path.basename(d.file_path) if d.file_path else "bonafide_request.pdf"
+                cand = os.path.join(app.config["DOCS_FOLDER"], bname)
+                if os.path.exists(cand):
+                    d.file_path = cand
+                else:
+                    d.file_path = sample_pdf_path
+                    d.original_hash = valid_sample_hash
+        db.session.commit()
             
         # 3. Create sample document if none exists
         if Document.query.count() == 0:
-            sample_pdf_path = os.path.join(app.config["DOCS_FOLDER"], "bonafide_request.pdf")
-            create_sample_pdf(sample_pdf_path)
-            orig_hash = sha256_file(sample_pdf_path)
+            orig_hash = valid_sample_hash
             
             shreeyash = User.query.filter_by(email="shreeyash@vit.edu").first()
             prof = User.query.filter_by(email="prof.kulkarni@vit.edu").first()

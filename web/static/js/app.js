@@ -165,21 +165,36 @@ function addApproverTier() {
     newMark.id = `mark_${stepCounter}`;
     newMark.dataset.step = stepCounter;
     
-    const topOffset = Math.min(500, 360 + (stepCounter - 1) * 45);
-    newMark.style.cssText = `left:35px;top:${topOffset}px;border-color:var(--vio);`;
-    newMark.dataset.posX = "0.08";
-    newMark.dataset.posY = (topOffset / 640).toFixed(4);
+    const topOffset = Math.min(580, 420 + (stepCounter - 1) * 45);
+    newMark.style.cssText = `left:35px;top:${topOffset}px;width:150px;height:55px;border-color:var(--violet);z-index:15;`;
+    newMark.dataset.posX = "0.07";
+    newMark.dataset.posY = (topOffset / 707).toFixed(4);
+    newMark.dataset.widthPts = "140";
+    newMark.dataset.heightPts = "50";
 
     newMark.innerHTML = `
-        <div class="badge-icon" style="background:var(--vio);">✓</div>
-        <div style="text-align:left;line-height:1.2;">
-            <b style="font-size:10.5px;color:var(--vio);">Step ${stepCounter} Mark</b>
-            <div class="mark-name" style="font-size:9.5px;color:var(--mu);">Authority</div>
-            <div style="font-size:8px;color:#888;">Drag to position</div>
+        <div class="mark-controls">
+            <button type="button" class="mark-ctrl-btn" onclick="resizeMark(${stepCounter}, -15, -5)" title="Make Smaller">−</button>
+            <button type="button" class="mark-ctrl-btn" onclick="resizeMark(${stepCounter}, 15, 5)" title="Make Larger">+</button>
         </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span class="mark-type-label" style="font-size:8px;font-weight:800;color:var(--violet);text-transform:uppercase;">Step ${stepCounter} Mark</span>
+            <span class="dim-badge" id="dim_${stepCounter}" style="font-size:7.5px;color:var(--tx-muted);font-family:monospace;">140×50 pt</span>
+        </div>
+        <div style="font-family:'Segoe Script', 'Brush Script MT', cursive, sans-serif;font-size:15px;color:#0F172A;font-style:italic;line-height:1;margin:2px 0;text-align:left;">
+            ✍️ <span class="mark-sig">Authority</span>
+        </div>
+        <div class="mark-name" style="font-size:9px;font-weight:800;color:#0F172A;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+            Authority ${stepCounter}
+        </div>
+        <div class="resize-grip" title="Drag corner to resize">⤡</div>
     `;
     canvas.appendChild(newMark);
-    attachDragHandler(newMark, canvas);
+    if (typeof setupElementDragAndResize === "function") {
+        setupElementDragAndResize(newMark, canvas);
+    } else if (typeof attachDragHandler === "function") {
+        attachDragHandler(newMark, canvas);
+    }
 }
 
 function removeApproverTier(stepNum) {

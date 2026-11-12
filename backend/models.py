@@ -33,6 +33,8 @@ class Institution(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(150), nullable=False)
     code = db.Column(db.String(20), unique=True, nullable=False)
+    invite_code = db.Column(db.String(32), unique=True, nullable=True)
+    creator_id = db.Column(db.Integer, nullable=True)
     logo_path = db.Column(db.String(255), nullable=True)
     sequential_enforced = db.Column(db.Boolean, default=True)
     require_pin = db.Column(db.Boolean, default=True)
@@ -42,11 +44,18 @@ class Institution(db.Model):
     users = db.relationship("User", backref="institution", lazy=True)
     documents = db.relationship("Document", backref="institution", lazy=True)
 
+    def generate_invite_code(self):
+        clean_code = (self.code or "INST").upper()[:8].replace(" ", "")
+        token = secrets.token_hex(3).upper()
+        self.invite_code = f"{clean_code}-{token}"
+        return self.invite_code
+
     def to_dict(self):
         return {
             "id": self.id,
             "name": self.name,
             "code": self.code,
+            "invite_code": self.invite_code,
             "sequential_enforced": self.sequential_enforced,
             "require_pin": self.require_pin,
             "auto_expire_days": self.auto_expire_days
@@ -71,6 +80,9 @@ class User(db.Model):
     failed_pin_attempts = db.Column(db.Integer, default=0)
     locked_until = db.Column(db.DateTime, nullable=True)
     google_id = db.Column(db.String(100), nullable=True)
+    google_email = db.Column(db.String(120), nullable=True)
+    email_verified = db.Column(db.Boolean, default=False)
+    email_verification_token = db.Column(db.String(100), nullable=True)
     avatar_url = db.Column(db.String(255), nullable=True)
     avatar_path = db.Column(db.String(255), nullable=True)
     reset_token = db.Column(db.String(100), nullable=True)
@@ -145,6 +157,8 @@ class User(db.Model):
             "designation": self.designation,
             "avatar_url": self.avatar_url or f"/user/avatar/{self.id}",
             "has_pin": bool(self.pin_hash),
+            "email_verified": bool(self.email_verified),
+            "google_linked": bool(self.google_id or self.google_email),
             "is_active": self.is_active,
             "institution_id": self.institution_id
         }
@@ -167,6 +181,7 @@ class Document(db.Model):
     qr_pos_x = db.Column(db.Float, default=0.78, nullable=False)
     qr_pos_y = db.Column(db.Float, default=0.03, nullable=False)
     qr_page_no = db.Column(db.Integer, default=1, nullable=False)
+    qr_size = db.Column(db.Float, default=54.0, nullable=True)
     expires_at = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, default=utc_now)
     updated_at = db.Column(db.DateTime, default=utc_now, onupdate=utc_now)
@@ -202,6 +217,8 @@ class ApprovalStep(db.Model):
     page_no = db.Column(db.Integer, default=1, nullable=False)
     pos_x = db.Column(db.Float, nullable=False, default=0.1)  # 0.0 to 1.0 fraction
     pos_y = db.Column(db.Float, nullable=False, default=0.8)  # 0.0 to 1.0 fraction
+    width_pts = db.Column(db.Float, default=140.0, nullable=True)  # custom resize width
+    height_pts = db.Column(db.Float, default=50.0, nullable=True)  # custom resize height
     status = db.Column(db.String(20), default="waiting", nullable=False)  # waiting | pending | approved | compliance | rejected
     approval_no = db.Column(db.String(30), unique=True, nullable=True)  # AH-2026-XXXXX
     record_hash = db.Column(db.String(64), nullable=True)  # Audit signature hash
@@ -222,6 +239,8 @@ class ApprovalStep(db.Model):
             "page_no": self.page_no,
             "pos_x": self.pos_x,
             "pos_y": self.pos_y,
+            "width_pts": self.width_pts or 140.0,
+            "height_pts": self.height_pts or 50.0,
             "status": self.status,
             "approval_no": self.approval_no,
             "record_hash": self.record_hash,

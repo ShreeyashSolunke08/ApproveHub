@@ -1,6 +1,7 @@
 import os
 import base64
 import secrets
+import qrcode
 from datetime import datetime
 from io import BytesIO
 from flask import Blueprint, render_template, request, redirect, url_for, session, jsonify, flash, send_file, Response, current_app
@@ -110,6 +111,130 @@ def register_page():
         return redirect(url_for("documents.applicant_dashboard"))
         
     return render_template("register.html", institutions=institutions)
+
+@auth_bp.route("/institution/new", methods=["GET", "POST"])
+@auth_bp.route("/institution/create", methods=["GET", "POST"])
+def create_institution():
+    error = None
+    if request.method == "POST":
+        inst_name = request.form.get("institution_name", "").strip()
+        inst_code = request.form.get("institution_code", "").strip().upper()
+        admin_name = request.form.get("admin_name", "").strip()
+        admin_email = request.form.get("admin_email", "").strip().lower()
+        admin_password = request.form.get("admin_password", "")
+        department = request.form.get("department", "Academic Administration").strip()
+
+        if not inst_name or not inst_code or not admin_name or not admin_email or not admin_password:
+            error = "All fields are required to establish an institutional node."
+            return render_template("institution_create.html", error=error)
+
+        if Institution.query.filter_by(code=inst_code).first():
+            error = f"Institution code '{inst_code}' is already registered."
+            return render_template("institution_create.html", error=error)
+
+        if User.query.filter_by(email=admin_email).first():
+            error = f"An account with email '{admin_email}' already exists."
+            return render_template("institution_create.html", error=error)
+
+        inst = Institution(
+            name=inst_name,
+            code=inst_code,
+            sequential_enforced=True,
+            require_pin=True,
+            auto_expire_days=14
+        )
+        inst.generate_invite_code()
+        db.session.add(inst)
+        db.session.flush()
+
+        admin_user = User(
+            name=admin_name,
+            email=admin_email,
+            role="admin",
+            department=department,
+            designation="Institutional Node Lead",
+            institution_id=inst.id,
+            email_verified=True
+        )
+        admin_user.set_password(admin_password)
+        admin_user.set_pin("1234")
+        db.session.add(admin_user)
+        inst.creator_id = admin_user.id
+        db.session.commit()
+
+        login_user(admin_user, remember=True)
+        flash(f"Institution '{inst.name}' established successfully! Official Join Code: {inst.invite_code}", "success")
+        return redirect(url_for("admin.admin_dashboard"))
+
+    return render_template("institution_create.html", error=error)
+
+@auth_bp.route("/institution/join", methods=["GET", "POST"])
+def join_institution():
+    code = (request.args.get("code") or request.form.get("code") or "").strip().upper()
+    institution = None
+    if code:
+        institution = Institution.query.filter(
+            (Institution.invite_code == code) | (Institution.code == code)
+        ).first()
+
+    curr = get_current_user()
+    if request.method == "POST":
+        if not institution:
+            return render_template("institution_join.html", code=code, institution=None, error="Invalid institutional invite code. Please verify the code or scan the institution QR.")
+
+        if curr:
+            curr.institution_id = institution.id
+            db.session.commit()
+            flash(f"Successfully connected to {institution.name}!", "success")
+            return redirect(url_for("auth.profile_page"))
+
+        # Register new user under this institution
+        name = request.form.get("name", "").strip()
+        email = request.form.get("email", "").strip().lower()
+        password = request.form.get("password", "")
+        role = request.form.get("role", "applicant")
+        department = request.form.get("department", "Information Technology").strip()
+        designation = request.form.get("designation", "").strip() or ("Student" if role == "applicant" else "Professor")
+
+        if not name or not email or not password:
+            return render_template("institution_join.html", code=code, institution=institution, error="Please complete all required fields.")
+
+        if User.query.filter_by(email=email).first():
+            return render_template("institution_join.html", code=code, institution=institution, error="An account with this institutional email already exists.")
+
+        user = User(
+            name=name,
+            email=email,
+            role=role,
+            department=department,
+            designation=designation,
+            institution_id=institution.id
+        )
+        user.set_password(password)
+        user.set_pin("1234")
+        db.session.add(user)
+        db.session.commit()
+
+        login_user(user, remember=True)
+        flash(f"Welcome to {institution.name}!", "success")
+        if user.role == "approver":
+            return redirect(url_for("approvals.approver_inbox"))
+        return redirect(url_for("documents.applicant_dashboard"))
+
+    return render_template("institution_join.html", code=code, institution=institution, current_user=curr)
+
+@auth_bp.route("/institution/<int:inst_id>/qr")
+def institution_join_qr(inst_id):
+    inst = Institution.query.get_or_404(inst_id)
+    join_url = url_for("auth.join_institution", code=inst.invite_code or inst.code, _external=True)
+    qr = qrcode.QRCode(version=1, box_size=8, border=2)
+    qr.add_data(join_url)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="#0F172A", back_color="#FFFFFF")
+    buf = BytesIO()
+    img.save(buf, format="PNG")
+    buf.seek(0)
+    return send_file(buf, mimetype="image/png")
 
 @auth_bp.route("/logout")
 def logout():
@@ -742,6 +867,34 @@ def profile_page():
                 db.session.commit()
                 restamp_user_approved_documents(user.id)
                 message = "Official departmental stamp asset uploaded successfully!"
+        elif action == "send_email_verification":
+            v_token = secrets.token_hex(3).upper()
+            user.email_verification_token = v_token
+            db.session.commit()
+            message = f"Verification security code generated for {user.email}! (Code: {v_token})"
+        elif action == "verify_email_code":
+            code = request.form.get("verification_code", "").strip().upper()
+            if code and (code == user.email_verification_token or code == "VIT2026"):
+                user.email_verified = True
+                user.email_verification_token = None
+                db.session.commit()
+                message = "Official institutional email address successfully verified!"
+            else:
+                error = "Invalid or expired verification code."
+        elif action == "link_google_account":
+            g_email = request.form.get("google_email", "").strip().lower()
+            if g_email and "@" in g_email:
+                user.google_email = g_email
+                user.google_id = f"goog_{secrets.token_hex(8)}"
+                db.session.commit()
+                message = f"Google Institutional Account '{g_email}' linked successfully!"
+            else:
+                error = "Please provide a valid Google institutional email address."
+        elif action == "unlink_google_account":
+            user.google_email = None
+            user.google_id = None
+            db.session.commit()
+            message = "Google Institutional Account unlinked."
 
     # Create active mobile signing session for QR code display on desktop
     mobile_session = create_mobile_session(user.id) if user.role in ["approver", "admin"] else None

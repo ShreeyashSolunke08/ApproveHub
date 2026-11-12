@@ -58,9 +58,9 @@ def stamp_final_document(document, base_url="http://127.0.0.1:5000"):
         page_w = page.rect.width
         page_h = page.rect.height
 
-        # Convert 0.0-1.0 fraction to PDF typographical points
-        stamp_w = 140.0
-        stamp_h = 50.0
+        # Convert 0.0-1.0 fraction to PDF typographical points with user-selected dimensions
+        stamp_w = float(step.width_pts or 140.0)
+        stamp_h = float(step.height_pts or 50.0)
         
         raw_x = step.pos_x * page_w
         raw_y = step.pos_y * page_h
@@ -90,40 +90,35 @@ def stamp_final_document(document, base_url="http://127.0.0.1:5000"):
             if os.path.exists(alt_path):
                 sig_file = alt_path
 
-        # Render ONLY the approver's signature and their name underneath - nothing else
+        # Render signature/stamp/seal with user-adjusted dimensions
         if sig_file:
-            sig_rect = pymupdf.Rect(x0, y0, x0 + 115.0, y0 + 32.0)
+            sig_rect = pymupdf.Rect(x0, y0, x0 + stamp_w * 0.88, y0 + stamp_h * 0.68)
             page.insert_image(sig_rect, filename=sig_file, keep_proportion=True)
         else:
             # Professional digital signature calligraphy stroke in fountain pen ink
-            sig_base_y = y0 + 20.0
+            sig_base_y = y0 + (stamp_h * 0.45)
+            scale_factor = stamp_w / 140.0
             shape = page.new_shape()
             shape.draw_bezier(
-                pymupdf.Point(x0 + 4.0, sig_base_y),
-                pymupdf.Point(x0 + 22.0, sig_base_y - 15.0),
-                pymupdf.Point(x0 + 36.0, sig_base_y + 7.0),
-                pymupdf.Point(x0 + 58.0, sig_base_y - 11.0)
+                pymupdf.Point(x0 + 4.0 * scale_factor, sig_base_y),
+                pymupdf.Point(x0 + 22.0 * scale_factor, sig_base_y - 15.0),
+                pymupdf.Point(x0 + 36.0 * scale_factor, sig_base_y + 7.0),
+                pymupdf.Point(x0 + 58.0 * scale_factor, sig_base_y - 11.0)
             )
             shape.draw_bezier(
-                pymupdf.Point(x0 + 58.0, sig_base_y - 11.0),
-                pymupdf.Point(x0 + 74.0, sig_base_y + 5.0),
-                pymupdf.Point(x0 + 90.0, sig_base_y - 13.0),
-                pymupdf.Point(x0 + 110.0, sig_base_y - 2.0)
-            )
-            shape.draw_bezier(
-                pymupdf.Point(x0 + 110.0, sig_base_y - 2.0),
-                pymupdf.Point(x0 + 60.0, sig_base_y + 8.0),
-                pymupdf.Point(x0 + 20.0, sig_base_y + 7.0),
-                pymupdf.Point(x0 + 115.0, sig_base_y + 8.0)
+                pymupdf.Point(x0 + 58.0 * scale_factor, sig_base_y - 11.0),
+                pymupdf.Point(x0 + 74.0 * scale_factor, sig_base_y + 5.0),
+                pymupdf.Point(x0 + 90.0 * scale_factor, sig_base_y - 13.0),
+                pymupdf.Point(x0 + 110.0 * scale_factor, sig_base_y - 2.0)
             )
             shape.finish(color=(0.04, 0.12, 0.28), width=1.3)
             shape.commit()
 
-        # Clean approver name printed underneath the signature (no box, no badge, no date, no code)
+        # Clean approver name printed underneath the signature
         page.insert_text(
-            pymupdf.Point(x0 + 4.0, y0 + 42.0),
+            pymupdf.Point(x0 + 4.0, y0 + stamp_h * 0.86),
             name_text,
-            fontsize=9.5,
+            fontsize=min(9.5, max(7.0, stamp_h * 0.18)),
             fontname="helv",
             color=(0.06, 0.10, 0.16)
         )
@@ -141,8 +136,8 @@ def stamp_final_document(document, base_url="http://127.0.0.1:5000"):
     qr_path = os.path.join(os.path.dirname(document.file_path), "..", "qr", qr_filename)
     generate_qr_code_image(primary_app_no, verify_url, qr_path)
     
-    # Position QR badge from user coordinates
-    qr_size = 54.0
+    # Position QR badge from user coordinates & custom dimensions
+    qr_size = float(document.qr_size or 54.0)
     qr_raw_x = (document.qr_pos_x or 0.78) * lp_w
     qr_raw_y = (document.qr_pos_y or 0.03) * lp_h
 

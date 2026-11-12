@@ -3,7 +3,7 @@
 {% block title %}Admin Dashboard — ApproveHub{% endblock %}
 
 {% block content %}
-<div style="max-width:1000px;margin:16px auto;">
+<div style="max-width:1000px;margin:16px auto;padding:0 12px 40px;">
     <!-- Hero Banner -->
     <div class="card" style="background:linear-gradient(135deg,var(--indigo-primary),var(--cyan-neon));color:#FFF;padding:28px 32px;border:none;box-shadow:0 12px 36px rgba(79,70,229,0.25);">
         <div style="display:flex;align-items:center;gap:14px;margin-bottom:6px;">
@@ -36,6 +36,44 @@
             <span>⚙️ Rules</span>
         </a>
     </div>
+
+    <!-- Institution Node Onboarding & Dynamic QR Code -->
+    {% if institution %}
+    <div class="card" style="padding:22px 26px;border:1.5px solid var(--bd);background:#FFFFFF;border-radius:18px;margin-bottom:22px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;">
+        <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;">
+            <div style="flex:none;text-align:center;">
+                <img src="{{ url_for('auth.institution_join_qr', inst_id=institution.id) }}" alt="Join QR Code" style="width:92px;height:92px;border-radius:12px;border:1.5px solid var(--bd);padding:4px;background:#FFF;display:block;">
+                <span style="font-size:10.5px;color:var(--tx-muted);font-weight:700;display:block;margin-top:4px;">Scan to Join</span>
+            </div>
+            <div>
+                <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,0.1);padding:3px 10px;border-radius:99px;font-size:11px;font-weight:800;color:#047857;margin-bottom:6px;">
+                    <span style="width:6px;height:6px;border-radius:50%;background:#10B981;"></span> Institutional Node Active
+                </div>
+                <h3 style="margin:0 0 4px;font-size:18px;font-weight:900;color:var(--tx);">{{ institution.name }}</h3>
+                <div style="font-size:12.5px;color:var(--tx-secondary);margin-bottom:8px;">
+                    Share this code or QR with students and faculty to onboard them automatically to this institution.
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                    <div style="background:#F1F5F9;border:1.5px solid var(--bd);padding:6px 12px;border-radius:8px;font-size:13px;font-family:monospace;font-weight:800;color:var(--indigo-primary);">
+                        Invite Code: <span id="instInviteCode">{{ institution.invite_code or institution.code }}</span>
+                    </div>
+                    <button type="button" class="btn secondary" onclick="navigator.clipboard.writeText('{{ url_for('auth.join_institution', code=institution.invite_code or institution.code, _external=True) }}');alert('Institution invite link copied to clipboard!');" style="font-size:12px;padding:6px 14px;">
+                        📋 Copy Invite Link
+                    </button>
+                    <a href="{{ url_for('auth.institution_join_qr', inst_id=institution.id) }}" download="Institution_Join_QR_{{ institution.code }}.png" class="btn secondary" style="font-size:12px;padding:6px 14px;">
+                        📥 Download QR
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align:right;">
+            <a href="{{ url_for('auth.create_institution') }}" class="btn secondary" style="font-size:12px;padding:8px 14px;">
+                ➕ Create Another Node
+            </a>
+        </div>
+    </div>
+    {% endif %}
 
     <!-- Metrics -->
     <div class="stat-grid">

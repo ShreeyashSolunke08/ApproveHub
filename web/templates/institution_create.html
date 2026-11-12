@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Establish Institutional Node — ApproveHub{% endblock %}
+
+{% block content %}
+<div style="min-height:85vh;display:flex;align-items:center;justify-content:center;padding:24px 16px;">
+    <div style="max-width:540px;width:100%;">
+        <!-- Header -->
+        <div style="text-align:center;margin-bottom:24px;">
+            <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(15,23,42,0.06);border:1.5px solid var(--bd);padding:5px 14px;border-radius:99px;font-size:12px;font-weight:800;color:var(--tx-secondary);margin-bottom:12px;">
+                <span>🏛️</span> Institutional Multi-Tenancy Architecture
+            </div>
+            <h2 style="margin:0 0 6px;font-size:26px;font-weight:900;color:var(--tx);letter-spacing:-0.025em;">Establish Your Institution</h2>
+            <p style="color:var(--tx-muted);margin:0;font-size:13.5px;">
+                Create a dedicated verification node for your college, university, or academic organization.
+            </p>
+        </div>
+
+        <div class="card" style="padding:34px 30px;border:1.5px solid var(--bd);background:#FFFFFF;box-shadow:0 12px 36px rgba(15,23,42,0.07);">
+            {% if error %}
+            <div style="background:#FFF1F2;color:#9F1239;padding:12px 16px;border-radius:12px;margin-bottom:20px;font-size:13px;border:1.5px solid rgba(225,29,72,0.3);display:flex;align-items:center;gap:8px;">
+                <span>⚠</span> {{ error }}
+            </div>
+            {% endif %}
+
+            <form method="POST" action="{{ url_for('auth.create_institution') }}" style="display:flex;flex-direction:column;gap:16px;">
+                <div>
+                    <label style="display:block;font-size:12px;font-weight:800;color:var(--tx);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.04em;">
+                        Institution Full Name
+                    </label>
+                    <input type="text" name="institution_name" required placeholder="e.g. Vishwakarma Institute of Technology, Pune" style="width:100%;padding:12px 14px;border:1.5px solid var(--bd);border-radius:10px;font-size:13.5px;box-sizing:border-box;background:#FFFFFF;outline:none;">
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                    <div>
+                        <label style="display:block;font-size:12px;font-weight:800;color:var(--tx);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.04em;">
+                            Acronym / Node Code
+                        </label>
+                        <input type="text" name="institution_code" required placeholder="e.g. VITP" style="width:100%;padding:12px 14px;border:1.5px solid var(--bd);border-radius:10px;font-size:13.5px;box-sizing:border-box;background:#FFFFFF;text-transform:uppercase;outline:none;">
+                    </div>
+                    <div>
+                        <label style="display:block;font-size:12px;font-weight:800;color:var(--tx);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.04em;">
+                            Primary Department
+                        </label>
+                        <input type="text" name="department" value="Academic Administration" required style="width:100%;padding:12px 14px;border:1.5px solid var(--bd);border-radius:10px;font-size:13.5px;box-sizing:border-box;background:#FFFFFF;outline:none;">
+                    </div>
+                </div>
+
+                <hr style="border:none;border-top:1.5px dashed var(--bd);margin:6px 0;">
+
+                <div style="font-size:12px;font-weight:800;color:var(--indigo-primary);text-transform:uppercase;letter-spacing:0.04em;">
+                    Administrator Credentials
+                </div>
+
+                <div>
+                    <label style="display:block;font-size:12px;font-weight:700;color:var(--tx);margin-bottom:6px;">Administrator Full Name</label>
+                    <input type="text" name="admin_name" required placeholder="e.g. Dr. Registrar / Principal" style="width:100%;padding:12px 14px;border:1.5px solid var(--bd);border-radius:10px;font-size:13.5px;box-sizing:border-box;background:#FFFFFF;outline:none;">
+                </div>
+
+                <div>
+                    <label style="display:block;font-size:12px;font-weight:700;color:var(--tx);margin-bottom:6px;">Official Institutional Email</label>
+                    <input type="email" name="admin_email" required placeholder="admin@vit.edu" style="width:100%;padding:12px 14px;border:1.5px solid var(--bd);border-radius:10px;font-size:13.5px;box-sizing:border-box;background:#FFFFFF;outline:none;">
+                </div>
+
+                <div>
+                    <label style="display:block;font-size:12px;font-weight:700;color:var(--tx);margin-bottom:6px;">Security Password</label>
+                    <input type="password" name="admin_password" required placeholder="••••••••" style="width:100%;padding:12px 14px;border:1.5px solid var(--bd);border-radius:10px;font-size:13.5px;box-sizing:border-box;background:#FFFFFF;outline:none;">
+                </div>
+
+                <button type="submit" class="btn full" style="padding:14px;font-size:14px;font-weight:800;border-radius:12px;margin-top:8px;">
+                    Establish Node &amp; Generate Join QR →
+                </button>
+            </form>
+
+            <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--bd);text-align:center;">
+                <span style="font-size:12.5px;color:var(--tx-muted);">Already have an institution?</span>
+                <a href="{{ url_for('auth.join_institution') }}" style="font-size:12.5px;color:var(--indigo-primary);text-decoration:none;font-weight:800;margin-left:6px;">Join Existing Node via Invite Code &rarr;</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

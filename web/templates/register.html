@@ -88,7 +88,16 @@
                 <button type="submit" class="btn full" style="margin-top:4px;padding:13px;border-radius:14px;font-size:14px;">Complete Registration</button>
             </form>
 
-            <div style="text-align:center;margin-top:20px;font-size:13px;">
+            <div style="margin-top:20px;padding-top:16px;border-top:1.5px dashed var(--bd);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;font-size:12.5px;">
+                <a href="{{ url_for('auth.join_institution') }}" style="color:var(--indigo-primary);text-decoration:none;font-weight:800;">
+                    🔗 Join via Institution Code / QR &rarr;
+                </a>
+                <a href="{{ url_for('auth.create_institution') }}" style="color:var(--tx-secondary);text-decoration:none;font-weight:700;">
+                    🏛️ Register New Institution
+                </a>
+            </div>
+
+            <div style="text-align:center;margin-top:16px;font-size:13px;">
                 Already have an account? <a href="{{ url_for('auth.login_page') }}" style="color:var(--indigo-primary);font-weight:700;text-decoration:none;">Log in</a>
             </div>
         </div>
