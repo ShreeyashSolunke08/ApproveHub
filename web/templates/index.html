@@ -81,220 +81,345 @@
 {% endblock %}
 
 {% block content %}
-<div style="max-width:1160px;margin:0 auto;padding:20px 20px 60px;">
+<div style="max-width:1200px;margin:0 auto;padding:24px 20px 60px;">
 
-    <!-- 1. HERO SECTION -->
-    <div class="hero-section-grid" style="background:linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%);border:1.5px solid rgba(99,102,241,0.2);border-radius:28px;padding:54px 44px;margin-bottom:36px;box-shadow:0 20px 60px rgba(79,70,229,0.07);position:relative;overflow:hidden;display:grid;grid-template-columns:1.2fr 0.8fr;gap:40px;align-items:center;">
-        
-        <!-- Decorative subtle background glow -->
-        <div style="position:absolute;top:-100px;right:-80px;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle, rgba(79,70,229,0.12) 0%, transparent 70%);pointer-events:none;"></div>
-        <div style="position:absolute;bottom:-100px;left:-60px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle, rgba(6,182,212,0.10) 0%, transparent 70%);pointer-events:none;"></div>
+    <!-- 1. HIGH-IMPACT HERO SECTION -->
+    <div class="hero-card-v2">
+        <!-- Ambient Background Glows -->
+        <div style="position:absolute;top:-120px;left:-60px;width:380px;height:380px;border-radius:50%;background:radial-gradient(circle, rgba(99,102,241,0.14) 0%, transparent 70%);pointer-events:none;"></div>
+        <div style="position:absolute;bottom:-100px;right:-80px;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle, rgba(6,182,212,0.12) 0%, transparent 70%);pointer-events:none;"></div>
 
+        <!-- Left Column: Core Value Proposition & Live Indicators -->
         <div style="position:relative;z-index:2;">
-            <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(79,70,229,0.08);border:1px solid rgba(79,70,229,0.2);padding:6px 14px;border-radius:99px;font-size:12px;font-weight:800;color:var(--indigo-primary);margin-bottom:18px;">
-                <span>🏛️</span> Vishwakarma Institute of Technology, Pune • EDI Capstone
+            <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(79,70,229,0.08);border:1px solid rgba(79,70,229,0.22);padding:6px 14px;border-radius:99px;font-size:12px;font-weight:800;color:var(--indigo-primary);margin-bottom:20px;box-shadow:0 2px 6px rgba(79,70,229,0.06);">
+                <span style="width:8px;height:8px;border-radius:50%;background:#10B981;box-shadow:0 0 0 3px rgba(16,185,129,0.25);display:inline-block;"></span>
+                <span>Vishwakarma Institute of Technology, Pune • EDI Capstone Node</span>
             </div>
 
-            <div style="margin-bottom:20px;">
-                <img src="{{ url_for('static', filename='img/brand-logo.png') }}" alt="ApproveHub — Verified Digital Approvals" style="max-height:86px;width:auto;display:block;">
-            </div>
-
-            <h1 style="font-size:36px;line-height:1.25;font-weight:900;color:#0F172A;letter-spacing:-0.03em;margin:0 0 16px;">
-                Next-Gen Institutional Document Approval &amp; Cryptographic Verification Platform
+            <h1 style="font-size:38px;line-height:1.2;font-weight:900;color:#0F172A;letter-spacing:-0.035em;margin:0 0 16px;">
+                Institutional Approvals.<br>
+                <span class="gradient-headline">Cryptographically Verified.</span>
             </h1>
 
-            <p style="font-size:16px;line-height:1.6;color:#475569;margin:0 0 28px;">
-                Eliminate physical paperwork delays, manual stamp chasing, and forgery risks. ApproveHub delivers sequential multi-tier workflows, smartphone QR finger signing, PyMuPDF vector stamping, and instant public tamper verification.
+            <p style="font-size:15.5px;line-height:1.65;color:#475569;margin:0 0 28px;max-width:560px;">
+                Eliminate physical paperwork friction, manual stamp chasing, and forgery risks. ApproveHub delivers deterministic multi-tier authority signoffs, zero-install smartphone touch signatures, PyMuPDF vector stamping, and public tamper verification.
             </p>
 
-            <!-- Action Buttons -->
-            <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;">
+            <!-- Action CTAs -->
+            <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:28px;">
                 {% if current_user %}
                     {% if current_user.role == 'applicant' %}
-                        <a href="{{ url_for('documents.applicant_dashboard') }}" class="btn" style="padding:14px 28px;font-size:15px;font-weight:700;border-radius:14px;">
+                        <a href="{{ url_for('documents.applicant_dashboard') }}" class="btn" style="padding:13px 26px;font-size:14.5px;font-weight:700;border-radius:12px;box-shadow:0 8px 20px rgba(79,70,229,0.25);">
                             🚀 Open My Documents Desk →
                         </a>
-                        <a href="{{ url_for('documents.upload_document') }}" class="btn secondary" style="padding:14px 24px;font-size:15px;font-weight:700;border-radius:14px;">
+                        <a href="{{ url_for('documents.upload_document') }}" class="btn secondary" style="padding:13px 22px;font-size:14.5px;font-weight:700;border-radius:12px;">
                             ➕ Submit New Request
                         </a>
                     {% elif current_user.role == 'approver' %}
-                        <a href="{{ url_for('approvals.approver_inbox') }}" class="btn" style="padding:14px 28px;font-size:15px;font-weight:700;border-radius:14px;">
+                        <a href="{{ url_for('approvals.approver_inbox') }}" class="btn" style="padding:13px 26px;font-size:14.5px;font-weight:700;border-radius:12px;box-shadow:0 8px 20px rgba(79,70,229,0.25);">
                             📥 Open Approval Desk →
                         </a>
                     {% elif current_user.role == 'admin' %}
-                        <a href="{{ url_for('admin.admin_dashboard') }}" class="btn" style="padding:14px 28px;font-size:15px;font-weight:700;border-radius:14px;">
+                        <a href="{{ url_for('admin.admin_dashboard') }}" class="btn" style="padding:13px 26px;font-size:14.5px;font-weight:700;border-radius:12px;box-shadow:0 8px 20px rgba(79,70,229,0.25);">
                             📊 Open Admin Portal →
                         </a>
                     {% endif %}
                 {% else %}
-                    <a href="{{ url_for('auth.login_page') }}" class="btn" style="padding:14px 28px;font-size:15px;font-weight:700;border-radius:14px;">
+                    <a href="{{ url_for('auth.login_page') }}" class="btn" style="padding:13px 26px;font-size:14.5px;font-weight:700;border-radius:12px;box-shadow:0 8px 20px rgba(79,70,229,0.25);">
                         Sign In with College ID →
                     </a>
-                    <a href="{{ url_for('auth.register_page') }}" class="btn secondary" style="padding:14px 24px;font-size:15px;font-weight:700;border-radius:14px;">
+                    <a href="{{ url_for('auth.register_page') }}" class="btn secondary" style="padding:13px 22px;font-size:14.5px;font-weight:700;border-radius:12px;">
                         Create New Account
                     </a>
                 {% endif %}
 
-                <a href="{{ url_for('verification.public_verify_page') }}" class="btn secondary" style="padding:14px 20px;font-size:14.5px;border-radius:14px;background:#FFF;">
-                    🔍 Verify a Document
-                </a>
-                <a href="{{ url_for('auth.create_institution') }}" class="btn secondary" style="padding:14px 20px;font-size:14.5px;border-radius:14px;background:#FFF;">
-                    🏛️ Establish Institution Node
+                <a href="{{ url_for('auth.create_institution') }}" class="btn secondary" style="padding:13px 20px;font-size:14px;border-radius:12px;background:#FFF;" title="Establish your college or department node">
+                    🏛️ Establish Node
                 </a>
             </div>
 
-            <!-- Key Specs Pointers -->
-            <div style="display:flex;gap:20px;margin-top:32px;padding-top:24px;border-top:1px dashed #CBD5E1;flex-wrap:wrap;">
-                <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#334155;">
-                    <span style="color:var(--emerald);">✓</span> SHA-256 Tamper-Proof
-                </div>
-                <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#334155;">
-                    <span style="color:var(--indigo-primary);">✓</span> Zero-App Phone QR Signing
-                </div>
-                <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#334155;">
-                    <span style="color:var(--emerald);">✓</span> Installable PWA Mobile
-                </div>
-                <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#334155;">
-                    <span style="color:var(--indigo-primary);">✓</span> Institutional SSO
-                </div>
+            <!-- Engineering Specs Chips -->
+            <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding-top:20px;border-top:1.5px dashed #E2E8F0;">
+                <span style="font-size:12.5px;font-weight:700;color:#334155;display:inline-flex;align-items:center;gap:6px;">
+                    <span style="color:#059669;">✓</span> SHA-256 Tamper Proof
+                </span>
+                <span style="font-size:12.5px;font-weight:700;color:#334155;display:inline-flex;align-items:center;gap:6px;">
+                    <span style="color:var(--indigo-primary);">✓</span> Phone QR Touch Sign
+                </span>
+                <span style="font-size:12.5px;font-weight:700;color:#334155;display:inline-flex;align-items:center;gap:6px;">
+                    <span style="color:#0284C7;">✓</span> Vector Stamping
+                </span>
+                <span style="font-size:12.5px;font-weight:700;color:#334155;display:inline-flex;align-items:center;gap:6px;">
+                    <span style="color:#059669;">✓</span> Native PWA &amp; APK
+                </span>
             </div>
         </div>
 
-        <!-- Hero Right: Direct Homepage Login Portal & Quick Role Switcher -->
-        <div style="position:relative;display:flex;justify-content:center;align-items:stretch;">
+        <!-- Right Column: Interactive Command Console / Identity HUD -->
+        <div style="position:relative;z-index:2;">
             {% if current_user %}
-            <!-- Logged In User State Card -->
-            <div style="background:#FFFFFF;border:2px solid rgba(99,102,241,0.25);border-radius:24px;padding:30px 26px;box-shadow:0 24px 50px rgba(15,23,42,0.08);width:100%;max-width:380px;display:flex;flex-direction:column;justify-content:space-between;">
-                <div>
-                    <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,0.1);padding:4px 10px;border-radius:99px;font-size:11.5px;font-weight:800;color:#047857;margin-bottom:16px;">
-                        <span style="width:7px;height:7px;border-radius:50%;background:#10B981;display:inline-block;"></span> Active Session
+            <!-- Logged-in Identity HUD -->
+            <div class="hero-console">
+                <div class="hero-console-bar">
+                    <div class="console-dots">
+                        <span class="console-dot red"></span>
+                        <span class="console-dot yellow"></span>
+                        <span class="console-dot green"></span>
                     </div>
-                    <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;">
-                        <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg, var(--indigo-primary), #06B6D4);color:#FFF;display:grid;place-items:center;font-weight:900;font-size:22px;border:2px solid #E0E7FF;box-shadow:0 6px 16px rgba(79,70,229,0.25);">
-                            {{ current_user.full_name[:2].upper() }}
-                        </div>
-                        <div>
-                            <h3 style="margin:0 0 4px;font-size:18px;font-weight:800;color:#0F172A;">{{ current_user.full_name }}</h3>
-                            <div style="font-size:12.5px;color:#64748B;">@{{ current_user.username }} • <span style="font-weight:700;color:var(--indigo-primary);text-transform:capitalize;">{{ current_user.role }}</span></div>
-                        </div>
-                    </div>
-                    <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:14px;padding:12px;font-size:12.5px;color:#475569;margin-bottom:20px;line-height:1.5;">
-                        <strong style="color:#0F172A;">Department:</strong> {{ current_user.department or 'Information Technology' }}<br>
-                        <strong style="color:#0F172A;">Institutional Email:</strong> {{ current_user.email }}
-                    </div>
+                    <span>IDENTITY HUD // ACTIVE SESSION</span>
+                    <span style="color:#10B981;font-weight:800;">[ ONLINE ]</span>
                 </div>
 
-                <div style="display:flex;flex-direction:column;gap:10px;">
-                    {% if current_user.role == 'applicant' %}
-                        <a href="{{ url_for('documents.applicant_dashboard') }}" class="btn full" style="padding:12px;font-size:14px;border-radius:12px;font-weight:700;">🚀 Open My Documents Desk →</a>
-                        <a href="{{ url_for('documents.upload_document') }}" class="btn secondary full" style="padding:11px;font-size:13px;border-radius:12px;">➕ Submit New Request</a>
-                    {% elif current_user.role == 'approver' %}
-                        <a href="{{ url_for('approvals.approver_inbox') }}" class="btn full" style="padding:12px;font-size:14px;border-radius:12px;font-weight:700;">📥 Open Approval Desk →</a>
-                    {% elif current_user.role == 'admin' %}
-                        <a href="{{ url_for('admin.admin_dashboard') }}" class="btn full" style="padding:12px;font-size:14px;border-radius:12px;font-weight:700;">📊 Open Admin Portal →</a>
-                    {% endif %}
-                    <a href="{{ url_for('auth.logout') }}" style="text-align:center;font-size:12.5px;color:#EF4444;text-decoration:none;font-weight:700;margin-top:4px;">Log Out & Switch Account</a>
+                <div class="hero-console-body">
+                    <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
+                        <div style="width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg, var(--indigo-primary), #06B6D4);color:#FFF;display:grid;place-items:center;font-weight:900;font-size:20px;border:2px solid #E0E7FF;box-shadow:0 6px 16px rgba(79,70,229,0.25);">
+                            {{ current_user.name[:2].upper() }}
+                        </div>
+                        <div>
+                            <h3 style="margin:0 0 4px;font-size:17px;font-weight:800;color:#0F172A;">{{ current_user.name }}</h3>
+                            <div style="font-size:12px;color:#64748B;">
+                                <span style="font-weight:700;color:var(--indigo-primary);text-transform:capitalize;">{{ current_user.role }}</span> • {{ current_user.institution.name if current_user.institution else "VIT Pune" }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:12px 14px;font-size:12px;color:#475569;margin-bottom:18px;line-height:1.6;">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                            <span style="color:#64748B;">Department:</span>
+                            <strong style="color:#0F172A;">{{ current_user.department or 'Information Technology' }}</strong>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;">
+                            <span style="color:#64748B;">Institutional Email:</span>
+                            <strong style="color:#0F172A;">{{ current_user.email }}</strong>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;flex-direction:column;gap:8px;">
+                        {% if current_user.role == 'applicant' %}
+                            <a href="{{ url_for('documents.applicant_dashboard') }}" class="btn full" style="padding:11px;font-size:13.5px;border-radius:10px;font-weight:700;">🚀 Open My Documents Desk →</a>
+                            <a href="{{ url_for('documents.upload_document') }}" class="btn secondary full" style="padding:10px;font-size:12.5px;border-radius:10px;">➕ Submit New Request</a>
+                        {% elif current_user.role == 'approver' %}
+                            <a href="{{ url_for('approvals.approver_inbox') }}" class="btn full" style="padding:11px;font-size:13.5px;border-radius:10px;font-weight:700;">📥 Open Approval Desk →</a>
+                        {% elif current_user.role == 'admin' %}
+                            <a href="{{ url_for('admin.admin_dashboard') }}" class="btn full" style="padding:11px;font-size:13.5px;border-radius:10px;font-weight:700;">📊 Open Admin Portal →</a>
+                        {% endif %}
+                        <a href="{{ url_for('auth.logout') }}" style="text-align:center;font-size:12px;color:#EF4444;text-decoration:none;font-weight:700;margin-top:2px;">Switch Session / Log Out</a>
+                    </div>
                 </div>
             </div>
             {% else %}
-            <!-- Direct Homepage Login Card -->
-            <div style="background:#FFFFFF;border:2px solid rgba(99,102,241,0.25);border-radius:24px;padding:26px 24px;box-shadow:0 24px 50px rgba(15,23,42,0.1);width:100%;max-width:380px;">
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-                    <div style="font-size:16px;font-weight:800;color:#0F172A;display:flex;align-items:center;gap:6px;">
-                        <span>🔐</span> Portal Quick Login
+            <!-- Interactive Multi-Mode Security Gateway Terminal -->
+            <div class="hero-console" id="heroConsole">
+                <div class="hero-console-bar">
+                    <div class="console-dots">
+                        <span class="console-dot red"></span>
+                        <span class="console-dot yellow"></span>
+                        <span class="console-dot green"></span>
                     </div>
-                    <span style="font-size:11px;background:#EEF2FF;color:var(--indigo-primary);padding:3px 8px;border-radius:99px;font-weight:700;">All Devices</span>
+                    <span>APPROVEHUB GATEWAY // v2.4</span>
+                    <span style="color:#10B981;font-weight:800;">[ READY ]</span>
                 </div>
 
-                <form method="POST" action="{{ url_for('auth.login_page') }}" style="display:flex;flex-direction:column;gap:12px;">
-                    <div>
-                        <label style="display:block;font-size:11.5px;font-weight:700;color:#475569;margin-bottom:4px;">College ID / Email / PRN</label>
-                        <input type="text" id="homeLoginUser" name="username" required placeholder="Enter student PRN or institutional email" style="width:100%;padding:10px 12px;border:1.5px solid #CBD5E1;border-radius:10px;font-size:13px;box-sizing:border-box;background:#F8FAFC;outline:none;">
-                    </div>
-                    <div>
-                        <label style="display:block;font-size:11.5px;font-weight:700;color:#475569;margin-bottom:4px;">Password</label>
-                        <input type="password" id="homeLoginPass" name="password" required placeholder="••••••••" style="width:100%;padding:10px 12px;border:1.5px solid #CBD5E1;border-radius:10px;font-size:13px;box-sizing:border-box;background:#F8FAFC;outline:none;">
-                    </div>
-                    <div style="display:flex;justify-content:space-between;align-items:center;font-size:11.5px;">
-                        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;color:#64748B;">
-                            <input type="checkbox" name="remember" checked style="accent-color:var(--indigo-primary);"> Remember me
-                        </label>
-                        <a href="{{ url_for('auth.forgot_password_page') }}" style="color:var(--indigo-primary);text-decoration:none;font-weight:700;">Forgot PIN?</a>
-                    </div>
-                    <button type="submit" class="btn full" style="padding:11px;font-size:13.5px;font-weight:700;border-radius:10px;">
-                        Sign In with Institutional ID →
+                <!-- Console Mode Tabs -->
+                <div class="hero-console-tabs">
+                    <button type="button" class="hero-console-tab active" onclick="switchConsoleTab('login')">
+                        <span>🔐</span> Quick Login
                     </button>
-                </form>
+                    <button type="button" class="hero-console-tab" onclick="switchConsoleTab('verify')">
+                        <span>🛡️</span> Instant Verify
+                    </button>
+                    <button type="button" class="hero-console-tab" onclick="switchConsoleTab('qr')">
+                        <span>📷</span> Scan QR
+                    </button>
+                </div>
 
-                <div style="margin-top:18px;padding-top:14px;border-top:1.5px solid #CBD5E1;text-align:center;">
-                    <a href="{{ url_for('auth.register_page') }}" style="font-size:12.5px;color:var(--indigo-primary);text-decoration:none;font-weight:700;">
-                        New student or faculty member? Create Account &rarr;
-                    </a>
+                <div class="hero-console-body">
+                    <!-- Tab 1: Quick Login -->
+                    <div id="tabContentLogin">
+                        <form method="POST" action="{{ url_for('auth.login_page') }}" style="display:flex;flex-direction:column;gap:12px;">
+                            <div>
+                                <label style="display:block;font-size:11.5px;font-weight:700;color:#475569;margin-bottom:4px;">College ID / Email / PRN</label>
+                                <input type="text" id="homeLoginUser" name="username" required placeholder="Enter student PRN or institutional email" style="width:100%;padding:10px 12px;border:1.5px solid #CBD5E1;border-radius:10px;font-size:13px;box-sizing:border-box;background:#F8FAFC;outline:none;font-weight:600;">
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:11.5px;font-weight:700;color:#475569;margin-bottom:4px;">Security PIN / Password</label>
+                                <input type="password" id="homeLoginPass" name="password" required placeholder="••••••••" style="width:100%;padding:10px 12px;border:1.5px solid #CBD5E1;border-radius:10px;font-size:13px;box-sizing:border-box;background:#F8FAFC;outline:none;">
+                            </div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;font-size:11.5px;">
+                                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;color:#64748B;">
+                                    <input type="checkbox" name="remember" checked style="accent-color:var(--indigo-primary);"> Remember me
+                                </label>
+                                <a href="{{ url_for('auth.forgot_password_page') }}" style="color:var(--indigo-primary);text-decoration:none;font-weight:700;">Forgot PIN?</a>
+                            </div>
+                            <button type="submit" class="btn full" style="padding:11px;font-size:13.5px;font-weight:700;border-radius:10px;margin-top:2px;">
+                                Sign In with Institutional ID →
+                            </button>
+                        </form>
+                        <div style="margin-top:14px;padding-top:10px;border-top:1px solid #E2E8F0;text-align:center;">
+                            <a href="{{ url_for('auth.register_page') }}" style="font-size:12px;color:var(--indigo-primary);text-decoration:none;font-weight:700;">
+                                New student or faculty member? Register here &rarr;
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: Quick Verify -->
+                    <div id="tabContentVerify" style="display:none;">
+                        <p style="font-size:12.5px;color:#475569;margin:0 0 12px;line-height:1.5;">
+                            Inspect official signatures, tamper verification, and signing authority certificates instantly:
+                        </p>
+                        <form method="GET" action="{{ url_for('verification.public_verify_page') }}" onsubmit="handleDirectVerify(event, this)" style="display:flex;flex-direction:column;gap:12px;">
+                            <div>
+                                <label style="display:block;font-size:11.5px;font-weight:700;color:#475569;margin-bottom:4px;">Official Approval Number</label>
+                                <input type="text" id="consoleApprovalInput" placeholder="e.g. AH-26-IT-0412-9LM4" required style="width:100%;padding:10px 12px;border:1.5px solid #CBD5E1;border-radius:10px;font-size:13px;box-sizing:border-box;background:#F8FAFC;font-weight:700;outline:none;">
+                            </div>
+                            <button type="submit" class="btn full" style="background:#047857;padding:11px;font-size:13.5px;font-weight:700;border-radius:10px;">
+                                Verify Cryptographic Integrity →
+                            </button>
+                        </form>
+                        <div style="margin-top:12px;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:8px 10px;font-size:11px;color:#166534;">
+                            💡 Click to test: <a href="javascript:void(0)" onclick="setSampleVerify('AH-26-IT-0412-9LM4')" style="color:#047857;font-weight:800;text-decoration:underline;">AH-26-IT-0412-9LM4</a>
+                        </div>
+                    </div>
+
+                    <!-- Tab 3: Scan QR -->
+                    <div id="tabContentQr" style="display:none;text-align:center;padding:10px 0;">
+                        <div style="font-size:42px;margin-bottom:8px;">📷</div>
+                        <h4 style="margin:0 0 6px;font-size:15px;font-weight:800;color:#0F172A;">Instant QR Document Scanner</h4>
+                        <p style="font-size:12px;color:#64748B;margin:0 0 16px;line-height:1.5;">
+                            Point your device camera at any printed or digital ApproveHub QR mark to inspect validity.
+                        </p>
+                        <a href="{{ url_for('verification.scan_qr_page') }}" class="btn full" style="padding:11px;font-size:13.5px;font-weight:700;border-radius:10px;text-decoration:none;">
+                            Launch Camera QR Scanner →
+                        </a>
+                    </div>
                 </div>
             </div>
             {% endif %}
         </div>
     </div>
 
-    <!-- 2. NATIVE MOBILE APP SHOWCASE (.APK + PWA FOR ANY DEVICE LIKE YT / WHATSAPP / ZOMATO / SWIGGY) -->
-    <div class="card" style="padding:32px 36px;margin-bottom:36px;border:2px solid rgba(79,70,229,0.25);background:linear-gradient(135deg, #FFFFFF 0%, #F5F7FF 100%);border-radius:24px;">
-        <div class="mobile-app-showcase-grid" style="display:grid;grid-template-columns:auto 1fr auto;gap:28px;align-items:center;">
-            <div style="flex:none;">
-                <img src="{{ url_for('static', filename='img/app-logo.png') }}" alt="ApproveHub Mobile App" style="width:128px;height:128px;border-radius:28px;box-shadow:0 16px 36px rgba(15,23,42,0.16);border:3px solid #CBD5E1;display:block;">
-            </div>
-
-            <div>
-                <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(79,70,229,0.1);padding:4px 12px;border-radius:99px;font-size:11.5px;font-weight:800;color:var(--indigo-primary);margin-bottom:8px;">
-                    <span>📲</span> Standalone Mobile Application • Android &amp; iOS
-                </div>
-                <h3 style="margin:0 0 6px;font-size:22px;font-weight:900;color:#0F172A;">
-                    ApproveHub Standalone Mobile App — Use Anywhere, Anytime, on Any Device
-                </h3>
-                <p style="font-size:13.5px;color:#475569;margin:0 0 10px;line-height:1.5;">
-                    Engineered with a modern cross-platform progressive architecture, ApproveHub operates as a <strong>fully standalone application</strong> on your mobile home screen. Submit requisitions, receive real-time status alerts, and authorize multi-level signoffs with native touch-canvas fidelity.
-                </p>
-                <div style="display:flex;gap:18px;font-size:12.5px;color:#64748B;flex-wrap:wrap;">
-                    <span>⚡ <strong>Individual Cloud Database</strong>: Your profile and documents stay privately isolated</span>
-                    <span>🌐 <strong>Multi-Device Sync</strong>: Switch between phone, tablet, and PC seamlessly</span>
-                </div>
-            </div>
-
-            <div style="display:flex;flex-direction:column;gap:10px;min-width:210px;flex:none;">
-                <a href="{{ url_for('documents.download_apk') }}" class="btn" style="padding:12px 18px;font-size:13.5px;font-weight:800;border-radius:12px;text-align:center;box-shadow:0 8px 20px rgba(79,70,229,0.3);text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;">
-                    <span>🤖</span> Download Android APK
-                </a>
-                <button type="button" class="btn secondary" onclick="installPWA()" style="padding:10px 16px;font-size:12.5px;font-weight:700;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:6px;background:#FFF;">
-                    <span>🍎</span> Install PWA (iOS / Web)
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 2. LIVE DOCUMENT VERIFICATION PORTAL WIDGET -->
-    <div class="card" style="padding:28px 32px;margin-bottom:36px;border:1.5px solid rgba(16,185,129,0.3);background:linear-gradient(135deg, #FFFFFF 0%, #F0FDF4 100%);">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px;">
-            <div style="max-width:540px;">
-                <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,0.1);padding:4px 10px;border-radius:99px;font-size:11.5px;font-weight:800;color:#047857;margin-bottom:8px;">
-                    <span>🛡️</span> Instant Verification Engine
-                </div>
-                <h3 style="margin:0 0 6px;font-size:20px;font-weight:800;color:#0F172A;">Verify Any Approved Document Instantly</h3>
-                <p style="font-size:13.5px;color:#475569;margin:0;">
-                    Have an approved document? Enter its official approval number to inspect cryptographic integrity, signoff timestamps, and signing authorities.
-                </p>
-            </div>
-
-            <form method="GET" action="{{ url_for('verification.public_verify_page') }}" style="display:flex;gap:10px;flex:1;max-width:440px;" onsubmit="handleDirectVerify(event, this)">
-                <input type="text" id="directApprovalInput" name="code" placeholder="e.g. AH-26-IT-0412-9LM4" required style="flex:1;padding:12px 16px;border:1.5px solid #CBD5E1;border-radius:12px;font-size:13.5px;background:#FFF;font-weight:600;outline:none;">
-                <button type="submit" class="btn" style="background:#047857;padding:12px 20px;font-size:13.5px;border-radius:12px;font-weight:700;white-space:nowrap;">
-                    Verify Now →
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- 3. WORKFLOW PIPELINE: HOW APPROVEHUB WORKS (PLACED BEFORE ARCHITECTURAL PILLARS) -->
-    <div class="card" style="padding:34px;margin-bottom:44px;border:1.5px solid #CBD5E1;box-shadow:0 10px 30px rgba(15,23,42,0.06);">
+    <!-- 2. INTERACTIVE BENTO GRID SHOWCASE (HIGH AESTHETIC & COOLER PRESENTATION) -->
+    <div style="margin-bottom:44px;">
         <div style="text-align:center;margin-bottom:28px;">
+            <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(67,56,202,0.1);padding:4px 12px;border-radius:99px;font-size:11.5px;font-weight:800;color:var(--indigo-primary);margin-bottom:8px;">
+                <span>⚡</span> Architectural Highlights
+            </div>
+            <h2 style="font-size:28px;font-weight:900;color:#0F172A;margin:0 0 8px;letter-spacing:-0.025em;">
+                Engineered for Academic Speed &amp; Security
+            </h2>
+            <p style="font-size:14.5px;color:#475569;margin:0;">
+                Next-generation cryptographic workflows replacing outdated manual institutional procedures
+            </p>
+        </div>
+
+        <div class="bento-grid">
+            <!-- Bento 1: Standalone Mobile App & PWA (7 Columns) -->
+            <div class="bento-card bento-col-7" style="background:linear-gradient(135deg, #FFFFFF 0%, #F5F7FF 100%);">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                    <span style="font-size:11.5px;font-weight:800;color:var(--indigo-primary);background:rgba(79,70,229,0.1);padding:3px 10px;border-radius:99px;">
+                        📲 Standalone Mobile Architecture
+                    </span>
+                    <span style="font-size:11.5px;font-weight:800;color:#059669;background:#ECFDF5;padding:3px 10px;border-radius:99px;">
+                        Cross-Platform
+                    </span>
+                </div>
+                <h3 style="font-size:21px;font-weight:900;color:#0F172A;margin:0 0 8px;">
+                    Native Mobile &amp; Progressive Web App
+                </h3>
+                <p style="font-size:13.5px;line-height:1.6;color:#475569;margin:0 0 20px;">
+                    Use ApproveHub anywhere, anytime. Operates as a <strong>standalone application</strong> on Android and iOS home screens with touch-canvas fidelity, real-time push alerts, and private tenant data isolation.
+                </p>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:auto;">
+                    <a href="{{ url_for('documents.download_apk') }}" class="btn" style="padding:11px 18px;font-size:13px;font-weight:800;border-radius:10px;display:inline-flex;align-items:center;gap:8px;box-shadow:0 6px 16px rgba(79,70,229,0.25);">
+                        <span>🤖</span> Download Android APK
+                    </a>
+                    <button type="button" class="btn secondary" onclick="installPWA()" style="padding:10px 16px;font-size:12.5px;font-weight:700;border-radius:10px;display:inline-flex;align-items:center;gap:6px;background:#FFF;">
+                        <span>🍎</span> Install PWA (iOS / Web)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bento 2: PyMuPDF Vector Stamping (5 Columns) -->
+            <div class="bento-card bento-col-5">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                    <span style="font-size:11.5px;font-weight:800;color:#0284C7;background:rgba(2,132,199,0.1);padding:3px 10px;border-radius:99px;">
+                        🔏 PyMuPDF Vector Engine
+                    </span>
+                </div>
+                <h3 style="font-size:20px;font-weight:900;color:#0F172A;margin:0 0 8px;">
+                    Sub-Pixel Vector Stamping
+                </h3>
+                <p style="font-size:13px;line-height:1.6;color:#475569;margin:0 0 16px;">
+                    Bakes vector signatures, departmental seals, and dynamic QR verification slips directly into original PDF streams with sub-pixel resolution and zero loss of quality.
+                </p>
+                <div class="micro-terminal" style="margin-top:auto;">
+                    <div><span class="prompt">$</span> fitz.open(doc.pdf).insert_image()</div>
+                    <div><span class="highlight">Target Rect:</span> [420.0, 720.0, 560.0, 770.0]</div>
+                    <div><span class="prompt">Resolution:</span> 150 DPI Crisp Vector Output</div>
+                </div>
+            </div>
+
+            <!-- Bento 3: Smartphone Zero-Install QR Signing (4 Columns) -->
+            <div class="bento-card bento-col-4">
+                <div style="width:44px;height:44px;border-radius:12px;background:rgba(79,70,229,0.1);color:var(--indigo-primary);display:grid;place-items:center;font-size:20px;margin-bottom:14px;">
+                    📱
+                </div>
+                <h4 style="font-size:17px;font-weight:800;color:#0F172A;margin:0 0 6px;">Zero-App Smartphone QR Signing</h4>
+                <p style="font-size:13px;line-height:1.6;color:#475569;margin:0;">
+                    Approvers scan the dynamic mark QR on their desktop screen to open a high-precision finger-touch canvas on their phone. Zero app installation needed on the signing handset.
+                </p>
+            </div>
+
+            <!-- Bento 4: Immutable SHA-256 Ledger (4 Columns) -->
+            <div class="bento-card bento-col-4">
+                <div style="width:44px;height:44px;border-radius:12px;background:rgba(5,150,105,0.1);color:#059669;display:grid;place-items:center;font-size:20px;margin-bottom:14px;">
+                    🛡️
+                </div>
+                <h4 style="font-size:17px;font-weight:800;color:#0F172A;margin:0 0 6px;">SHA-256 Cryptographic Nonces</h4>
+                <p style="font-size:13px;line-height:1.6;color:#475569;margin:0;">
+                    Generates 256-bit mathematical fingerprints combining file binary streams, authority credentials, and approval nonces. Any modification on disk is immediately detected and flagged.
+                </p>
+            </div>
+
+            <!-- Bento 5: Multi-Tenant Onboarding (4 Columns) -->
+            <div class="bento-card bento-col-4">
+                <div style="width:44px;height:44px;border-radius:12px;background:rgba(217,119,6,0.1);color:#D97706;display:grid;place-items:center;font-size:20px;margin-bottom:14px;">
+                    🏛️
+                </div>
+                <h4 style="font-size:17px;font-weight:800;color:#0F172A;margin:0 0 6px;">Institution QR &amp; Invite Codes</h4>
+                <p style="font-size:13px;line-height:1.6;color:#475569;margin:0;">
+                    Colleges and autonomous departments can establish independent nodes in seconds, generating customized invite codes and dynamic join QR codes for students and faculty.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. INSTANT VERIFICATION SPOTLIGHT (FLOATING COMMAND BAR) -->
+    <div class="verify-spotlight">
+        <div style="max-width:500px;">
+            <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,0.12);padding:4px 10px;border-radius:99px;font-size:11.5px;font-weight:800;color:#047857;margin-bottom:6px;">
+                <span>🛡️</span> Zero-Trust Verification Engine
+            </div>
+            <h3 style="margin:0 0 4px;font-size:20px;font-weight:900;color:#0F172A;">Public Document Tamper Verification</h3>
+            <p style="font-size:13px;color:#475569;margin:0;">
+                Embassies, employers, and academic institutions can verify any approved credential in sub-seconds.
+            </p>
+        </div>
+
+        <form method="GET" action="{{ url_for('verification.public_verify_page') }}" style="display:flex;gap:10px;flex:1;max-width:520px;" onsubmit="handleDirectVerify(event, this)">
+            <div class="verify-input-group">
+                <span style="color:#64748B;font-size:14px;margin-right:6px;">🔍</span>
+                <input type="text" id="directApprovalInput" name="code" placeholder="Enter approval code (e.g. AH-26-IT-0412-9LM4)" required>
+            </div>
+            <button type="submit" class="btn" style="background:#047857;padding:12px 22px;font-size:13.5px;border-radius:12px;font-weight:700;white-space:nowrap;box-shadow:0 6px 16px rgba(5,150,105,0.25);">
+                Verify Now →
+            </button>
+        </form>
+    </div>
+
+    <!-- 4. WORKFLOW PIPELINE: HOW APPROVEHUB WORKS -->
+    <div class="card" style="padding:36px;margin-bottom:44px;border:1.5px solid #CBD5E1;box-shadow:0 10px 30px rgba(15,23,42,0.06);border-radius:24px;">
+        <div style="text-align:center;margin-bottom:30px;">
             <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(67,56,202,0.1);padding:4px 12px;border-radius:99px;font-size:11.5px;font-weight:800;color:var(--indigo-primary);margin-bottom:8px;">
                 <span>⚡</span> End-to-End Verification Lifecycle
             </div>
@@ -302,141 +427,38 @@
             <p style="font-size:13.5px;color:#475569;margin:0;">From applicant requisition submission to cryptographically sealed certificate in 4 deterministic stages</p>
         </div>
 
-        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:20px;position:relative;">
-            <div style="background:#F1F5F9;border:1.5px solid #CBD5E1;border-radius:18px;padding:22px;text-align:center;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(230px, 1fr));gap:20px;position:relative;">
+            <div style="background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:18px;padding:22px;text-align:center;transition:transform 0.2s ease;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
                 <div style="width:38px;height:38px;border-radius:50%;background:var(--indigo-primary);color:#FFF;display:grid;place-items:center;font-weight:800;font-size:15px;margin:0 auto 12px;box-shadow:0 4px 12px rgba(67,56,202,0.3);">1</div>
                 <h5 style="margin:0 0 6px;font-size:15px;font-weight:800;color:#0F172A;">Submit &amp; Place Marks</h5>
-                <p style="font-size:12.5px;color:#475569;margin:0;line-height:1.5;">Applicant uploads PDF, chooses approval chain, and positions mark placeholders.</p>
+                <p style="font-size:12.5px;color:#475569;margin:0;line-height:1.5;">Applicant uploads PDF, chooses approval chain, and positions resizable mark placeholders on real document pages.</p>
             </div>
 
-            <div style="background:#F1F5F9;border:1.5px solid #CBD5E1;border-radius:18px;padding:22px;text-align:center;">
+            <div style="background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:18px;padding:22px;text-align:center;transition:transform 0.2s ease;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
                 <div style="width:38px;height:38px;border-radius:50%;background:#0284C7;color:#FFF;display:grid;place-items:center;font-weight:800;font-size:15px;margin:0 auto 12px;box-shadow:0 4px 12px rgba(2,132,199,0.3);">2</div>
                 <h5 style="margin:0 0 6px;font-size:15px;font-weight:800;color:#0F172A;">Review &amp; Authority Sign</h5>
-                <p style="font-size:12.5px;color:#475569;margin:0;line-height:1.5;">Approver signs via smartphone QR touch canvas or sketch pad with secure authorization.</p>
+                <p style="font-size:12.5px;color:#475569;margin:0;line-height:1.5;">Approver signs via smartphone QR touch canvas or sketch pad with cryptographically secured PIN authorization.</p>
             </div>
 
-            <div style="background:#F1F5F9;border:1.5px solid #CBD5E1;border-radius:18px;padding:22px;text-align:center;">
+            <div style="background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:18px;padding:22px;text-align:center;transition:transform 0.2s ease;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
                 <div style="width:38px;height:38px;border-radius:50%;background:#059669;color:#FFF;display:grid;place-items:center;font-weight:800;font-size:15px;margin:0 auto 12px;box-shadow:0 4px 12px rgba(5,150,105,0.3);">3</div>
                 <h5 style="margin:0 0 6px;font-size:15px;font-weight:800;color:#0F172A;">PyMuPDF Stamping</h5>
-                <p style="font-size:12.5px;color:#475569;margin:0;line-height:1.5;">Engine dynamically bakes signatures, seals, and QR verification codes onto original PDF pages.</p>
+                <p style="font-size:12.5px;color:#475569;margin:0;line-height:1.5;">Engine dynamically bakes signatures, seals, and QR verification codes onto original PDF pages with sub-pixel precision.</p>
             </div>
 
-            <div style="background:#F1F5F9;border:1.5px solid #CBD5E1;border-radius:18px;padding:22px;text-align:center;">
+            <div style="background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:18px;padding:22px;text-align:center;transition:transform 0.2s ease;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
                 <div style="width:38px;height:38px;border-radius:50%;background:#D97706;color:#FFF;display:grid;place-items:center;font-weight:800;font-size:15px;margin:0 auto 12px;box-shadow:0 4px 12px rgba(217,119,6,0.3);">4</div>
                 <h5 style="margin:0 0 6px;font-size:15px;font-weight:800;color:#0F172A;">Instant Verification</h5>
-                <p style="font-size:12.5px;color:#475569;margin:0;line-height:1.5;">Embassies, employers, or colleges scan the QR code to verify authenticity in real-time.</p>
+                <p style="font-size:12.5px;color:#475569;margin:0;line-height:1.5;">Embassies, employers, or colleges scan the QR code to verify authenticity in real-time with zero-trust validation.</p>
             </div>
         </div>
     </div>
 
-    <!-- 4. FOUR CORE ARCHITECTURAL PILLARS (ENGINEERING INNOVATION FOR ACADEMIC GOVERNANCE) -->
-    <div style="margin-bottom:44px;">
-        <div style="text-align:center;margin-bottom:28px;">
-            <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(67,56,202,0.1);padding:4px 12px;border-radius:99px;font-size:11.5px;font-weight:800;color:var(--indigo-primary);margin-bottom:8px;">
-                <span>🏛️</span> Institutional Engineering Core
-            </div>
-            <h2 style="font-size:26px;font-weight:900;color:#0F172A;margin:0 0 8px;letter-spacing:-0.02em;">
-                Engineering Innovation for Academic Governance
-            </h2>
-            <p style="font-size:14px;color:#475569;margin:0;">
-                Designed specifically to solve real administrative bottlenecks in higher education institutions
-            </p>
-        </div>
-
-        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));gap:22px;">
-            <!-- Pillar 1 -->
-            <div class="card" style="padding:26px;border-radius:20px;border:1.5px solid #CBD5E1;transition:all 0.25s ease;" onmouseover="this.style.transform='translateY(-4px)';" onmouseout="this.style.transform='translateY(0)';">
-                <div style="width:48px;height:48px;border-radius:14px;background:rgba(67,56,202,0.1);color:var(--indigo-primary);display:grid;place-items:center;font-size:22px;margin-bottom:16px;">
-                    📱
-                </div>
-                <h4 style="margin:0 0 8px;font-size:17px;font-weight:800;color:#0F172A;">Smartphone QR Signing</h4>
-                <p style="font-size:13px;line-height:1.6;color:#475569;margin:0;">
-                    Approvers can scan a dynamic QR code on their laptop with their smartphone camera to sign on a smooth touch canvas with their finger. Zero app installation needed on the signing device.
-                </p>
-            </div>
-
-            <!-- Pillar 2 -->
-            <div class="card" style="padding:26px;border-radius:20px;border:1.5px solid #CBD5E1;transition:all 0.25s ease;" onmouseover="this.style.transform='translateY(-4px)';" onmouseout="this.style.transform='translateY(0)';">
-                <div style="width:48px;height:48px;border-radius:14px;background:rgba(2,132,199,0.1);color:#0284C7;display:grid;place-items:center;font-size:22px;margin-bottom:16px;">
-                    ⚡
-                </div>
-                <h4 style="margin:0 0 8px;font-size:17px;font-weight:800;color:#0F172A;">High-Volume Batch Sign</h4>
-                <p style="font-size:13px;line-height:1.6;color:#475569;margin:0;">
-                    During peak examination or end-of-term rushes, faculty can batch-select 20+ applications and authorize them simultaneously with verified cryptographic nonces.
-                </p>
-            </div>
-
-            <!-- Pillar 3 -->
-            <div class="card" style="padding:26px;border-radius:20px;border:1.5px solid #CBD5E1;transition:all 0.25s ease;" onmouseover="this.style.transform='translateY(-4px)';" onmouseout="this.style.transform='translateY(0)';">
-                <div style="width:48px;height:48px;border-radius:14px;background:rgba(5,150,105,0.1);color:#059669;display:grid;place-items:center;font-size:22px;margin-bottom:16px;">
-                    🔏
-                </div>
-                <h4 style="margin:0 0 8px;font-size:17px;font-weight:800;color:#0F172A;">PyMuPDF Vector Stamping</h4>
-                <p style="font-size:13px;line-height:1.6;color:#475569;margin:0;">
-                    Digitally bakes vector signatures, departmental seals, and verification QR slips directly onto original PDF pages with sub-pixel resolution and zero fidelity loss.
-                </p>
-            </div>
-
-            <!-- Pillar 4: Cryptographic SHA-256 Nonce & Tamper Detection -->
-            <div class="card" style="padding:26px;border-radius:20px;border:1.5px solid #CBD5E1;transition:all 0.25s ease;" onmouseover="this.style.transform='translateY(-4px)';" onmouseout="this.style.transform='translateY(0)';">
-                <div style="width:48px;height:48px;border-radius:14px;background:rgba(67,56,202,0.1);color:var(--indigo-primary);display:grid;place-items:center;font-size:22px;margin-bottom:16px;">
-                    🛡️
-                </div>
-                <h4 style="margin:0 0 8px;font-size:17px;font-weight:800;color:#0F172A;">SHA-256 Cryptographic Proof</h4>
-                <p style="font-size:13px;line-height:1.6;color:#475569;margin:0;">
-                    Calculates immutable 256-bit cryptographic message digests across document binary streams, authorization nonces, and timestamp vectors to guarantee mathematical tamper detection upon public scan.
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <!-- 5. MULTI-DEVICE CLOUD ARCHITECTURE & SEPARATE DATABASE ISOLATION -->
-    <div class="card" style="padding:32px 36px;margin-bottom:44px;border:1.5px solid #E2E8F0;background:#FFFFFF;border-radius:24px;">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
-            <div style="width:40px;height:40px;border-radius:12px;background:rgba(79,70,229,0.1);color:var(--indigo-primary);display:grid;place-items:center;font-size:20px;">
-                ☁️
-            </div>
-            <div>
-                <h3 style="margin:0;font-size:20px;font-weight:900;color:#0F172A;">Multi-Device Cloud Architecture &amp; Isolated User Databases</h3>
-                <p style="margin:0;font-size:13px;color:#64748B;">Built for scale, privacy, and continuous 24/7 availability across all your devices</p>
-            </div>
-        </div>
-
-        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:20px;">
-            <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:16px;padding:20px;">
-                <div style="font-size:14.5px;font-weight:800;color:#0F172A;margin-bottom:6px;display:flex;align-items:center;gap:8px;">
-                    <span>🔒</span> Individual Data Isolation
-                </div>
-                <p style="font-size:12.5px;color:#64748B;line-height:1.5;margin:0;">
-                    Every registered student and faculty member receives a distinct tenant ID in the database. Personal documents, private touch signatures, security PIN hashes, and audit logs are strictly isolated and never mixed or accessible to unauthorized users.
-                </p>
-            </div>
-
-            <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:16px;padding:20px;">
-                <div style="font-size:14.5px;font-weight:800;color:#0F172A;margin-bottom:6px;display:flex;align-items:center;gap:8px;">
-                    <span>📱</span> Multi-Device Real-Time Sync
-                </div>
-                <p style="font-size:12.5px;color:#64748B;line-height:1.5;margin:0;">
-                    Initiate a requisition from a desktop workstation and monitor or authorize it instantly via mobile. Real-time relational database synchronization guarantees deterministic state updates across smartphones, tablets, and administrative terminals.
-                </p>
-            </div>
-
-            <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:16px;padding:20px;">
-                <div style="font-size:14.5px;font-weight:800;color:#0F172A;margin-bottom:6px;display:flex;align-items:center;gap:8px;">
-                    <span>🗄️</span> Cloud Database Engine
-                </div>
-                <p style="font-size:12.5px;color:#64748B;line-height:1.5;margin:0;">
-                    Engineered with SQLAlchemy ORM supporting production PostgreSQL on Render / Railway. Fully managed, persistent cloud storage ensures high availability and zero data loss even during heavy multi-user peak submission cycles.
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <!-- 6. LEADERSHIP & ARCHITECT CREDITS (PROJECT LEAD PROFILE - SHREEYASH SOLUNKE) -->
-    <div class="card" style="padding:36px;margin-bottom:44px;border-left:6px solid var(--indigo-primary);background:linear-gradient(135deg, #FFFFFF 0%, #FAFBFF 100%);border-radius:24px;">
+    <!-- 5. LEADERSHIP & ARCHITECT CREDITS (PROJECT LEAD PROFILE - SHREEYASH SOLUNKE) -->
+    <div class="card" style="padding:36px;margin-bottom:44px;border-left:6px solid var(--indigo-primary);background:linear-gradient(135deg, #FFFFFF 0%, #FAFBFF 100%);border-radius:24px;box-shadow:0 12px 30px rgba(15,23,42,0.06);">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:24px;">
             <div style="display:flex;align-items:flex-start;gap:22px;">
-                <div style="width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg, var(--indigo-primary), #06B6D4);color:#FFF;display:grid;place-items:center;font-size:34px;font-weight:900;box-shadow:0 12px 28px rgba(79,70,229,0.3);flex:none;border:3px solid #FFF;">
+                <div style="width:84px;height:84px;border-radius:50%;background:linear-gradient(135deg, var(--indigo-primary), #06B6D4);color:#FFF;display:grid;place-items:center;font-size:32px;font-weight:900;box-shadow:0 12px 28px rgba(79,70,229,0.3);flex:none;border:3px solid #FFF;">
                     SS
                 </div>
                 <div>
@@ -447,7 +469,7 @@
                     <div style="font-size:14px;color:#475569;margin-bottom:10px;font-weight:600;">
                         Department of Information Technology • Vishwakarma Institute of Technology (VIT), Pune
                     </div>
-                    <p style="font-size:13.5px;color:#64748B;margin:0 0 16px;max-width:680px;line-height:1.6;">
+                    <p style="font-size:13.5px;color:#64748B;margin:0 0 16px;max-width:700px;line-height:1.6;">
                         Conceived, designed, and engineered the complete ApproveHub platform end-to-end as an EDI Capstone initiative. Built the sequential multi-tier workflow engine, PyMuPDF cryptographic vector stamping, zero-install smartphone signature bridge, standalone Android mobile application (.apk), installable PWA, and tamper verification portal.
                     </p>
 
@@ -473,12 +495,12 @@
         </div>
     </div>
 
-    <!-- 7. FOOTER -->
+    <!-- 6. FOOTER -->
     <div style="text-align:center;padding-top:24px;border-top:1.5px solid #CBD5E1;font-size:13px;color:#475569;">
-        <div style="display:flex;justify-content:center;margin-bottom:14px;">
-            <img src="{{ url_for('static', filename='img/brand-logo.png') }}" alt="ApproveHub" style="max-height:54px;width:auto;display:block;">
+        <div style="display:flex;justify-content:center;margin-bottom:12px;">
+            <img src="{{ url_for('static', filename='img/brand-logo.png') }}" alt="ApproveHub" style="max-height:48px;width:auto;display:block;">
         </div>
-        <p style="margin:0 0 8px;font-weight:600;">
+        <p style="margin:0 0 6px;font-weight:600;">
             ApproveHub — Verified Institutional Document Approvals &amp; Tamper-Evident Verification Platform.
         </p>
         <p style="margin:0;font-size:12px;color:#64748B;">
@@ -489,9 +511,43 @@
 </div>
 
 <script>
+function switchConsoleTab(mode) {
+    const tabs = document.querySelectorAll('.hero-console-tab');
+    tabs.forEach(t => t.classList.remove('active'));
+
+    const tabLogin = document.getElementById('tabContentLogin');
+    const tabVerify = document.getElementById('tabContentVerify');
+    const tabQr = document.getElementById('tabContentQr');
+
+    if (mode === 'login') {
+        tabs[0].classList.add('active');
+        if (tabLogin) tabLogin.style.display = 'block';
+        if (tabVerify) tabVerify.style.display = 'none';
+        if (tabQr) tabQr.style.display = 'none';
+    } else if (mode === 'verify') {
+        tabs[1].classList.add('active');
+        if (tabLogin) tabLogin.style.display = 'none';
+        if (tabVerify) tabVerify.style.display = 'block';
+        if (tabQr) tabQr.style.display = 'none';
+    } else if (mode === 'qr') {
+        tabs[2].classList.add('active');
+        if (tabLogin) tabLogin.style.display = 'none';
+        if (tabVerify) tabVerify.style.display = 'none';
+        if (tabQr) tabQr.style.display = 'block';
+    }
+}
+
+function setSampleVerify(code) {
+    const inp = document.getElementById('consoleApprovalInput');
+    if (inp) {
+        inp.value = code;
+    }
+}
+
 function handleDirectVerify(e, form) {
     e.preventDefault();
-    const code = document.getElementById("directApprovalInput").value.trim();
+    const input = form.querySelector('input[type="text"]') || document.getElementById("directApprovalInput") || document.getElementById("consoleApprovalInput");
+    const code = input ? input.value.trim() : "";
     if (code) {
         window.location.href = "/verify/" + encodeURIComponent(code);
     }
