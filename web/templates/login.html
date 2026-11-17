@@ -3,22 +3,23 @@
 {% block title %}Log In — ApproveHub{% endblock %}
 
 {% block content %}
-<div style="min-height:80vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;">
+<div style="min-height:80vh;display:flex;align-items:flex-start;justify-content:center;padding:32px 16px 60px;position:relative;overflow:visible;">
     <!-- Decorative gradient orbs -->
-    <div style="position:absolute;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle,rgba(79,70,229,0.12),transparent 70%);top:-80px;left:-60px;pointer-events:none;"></div>
-    <div style="position:absolute;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(6,182,212,0.10),transparent 70%);bottom:-60px;right:-40px;pointer-events:none;"></div>
+    <div style="position:fixed;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle,rgba(79,70,229,0.10),transparent 70%);top:-80px;left:-60px;pointer-events:none;z-index:0;"></div>
+    <div style="position:fixed;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(6,182,212,0.08),transparent 70%);bottom:-60px;right:-40px;pointer-events:none;z-index:0;"></div>
 
-    <div style="max-width:440px;width:100%;margin:24px 16px;position:relative;z-index:2;">
-        <div class="card" style="padding:36px 32px;border:1.5px solid rgba(99,102,241,0.15);box-shadow:0 20px 50px rgba(79,70,229,0.08);">
+    <div style="max-width:460px;width:100%;position:relative;z-index:2;">
+        <div class="card" style="padding:32px 28px;border:1.5px solid rgba(99,102,241,0.15);box-shadow:0 20px 50px rgba(79,70,229,0.08);">
+
             <!-- Brand Header -->
-            <div style="text-align:center;margin-bottom:24px;">
-                <img src="{{ url_for('static', filename='img/brand-logo.png') }}" alt="ApproveHub" style="max-height:56px;width:auto;margin:0 auto 16px;display:block;">
-                <h2 style="margin:0 0 6px;font-size:24px;font-weight:800;color:var(--tx);">Welcome back</h2>
-                <p style="color:var(--tx-muted);margin:0;font-size:13.5px;">Sign in to your institutional account</p>
+            <div style="text-align:center;margin-bottom:22px;">
+                <img src="{{ url_for('static', filename='img/brand-logo.png') }}" alt="ApproveHub" style="max-height:52px;width:auto;margin:0 auto 14px;display:block;">
+                <h2 style="margin:0 0 5px;font-size:22px;font-weight:800;color:var(--tx);">Welcome back</h2>
+                <p style="color:var(--tx-muted);margin:0;font-size:13px;">Sign in to your institutional account</p>
             </div>
 
             <!-- Google SSO -->
-            <a href="{{ url_for('auth.google_login') }}" class="btn google full" style="margin-bottom:18px;padding:12px;border-radius:14px;text-decoration:none;">
+            <a href="{{ url_for('auth.google_login') }}" class="btn google full" style="margin-bottom:16px;padding:11px;border-radius:13px;text-decoration:none;">
                 <svg width="18" height="18" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                     <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -29,46 +30,237 @@
             </a>
 
             <!-- Divider -->
-            <div style="display:flex;align-items:center;margin:20px 0;gap:12px;">
+            <div style="display:flex;align-items:center;margin:16px 0;gap:12px;">
                 <hr style="flex:1;border:none;border-top:1px solid var(--bd);">
                 <span style="font-size:11px;color:var(--tx-faint);text-transform:uppercase;letter-spacing:0.06em;font-weight:600;">or sign in with password</span>
                 <hr style="flex:1;border:none;border-top:1px solid var(--bd);">
             </div>
 
             {% if error %}
-            <div style="background:rgba(225,29,72,0.08);color:#BE123C;padding:12px 16px;border-radius:12px;margin-bottom:16px;font-size:13px;border:1px solid rgba(225,29,72,0.2);display:flex;align-items:center;gap:8px;">
+            <div style="background:rgba(225,29,72,0.08);color:#BE123C;padding:11px 14px;border-radius:11px;margin-bottom:14px;font-size:13px;border:1px solid rgba(225,29,72,0.2);display:flex;align-items:center;gap:8px;">
                 <span>⚠</span> {{ error }}
             </div>
             {% endif %}
 
             <form method="POST" action="{{ url_for('auth.login_page') }}">
-                <div class="form-group" style="margin-bottom:16px;">
-                    <label style="display:block;font-size:12.5px;font-weight:700;color:var(--tx);margin-bottom:6px;">Institutional Email</label>
+                <div class="form-group" style="margin-bottom:14px;">
+                    <label style="display:block;font-size:12.5px;font-weight:700;color:var(--tx);margin-bottom:5px;">Institutional Email</label>
                     <input type="email" name="email" id="emailInput" required placeholder="your.name@vit.edu" autocomplete="email" style="width:100%;box-sizing:border-box;">
                 </div>
 
-                <div class="form-group" style="margin-bottom:14px;">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                <div class="form-group" style="margin-bottom:12px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
                         <label style="font-size:12.5px;font-weight:700;color:var(--tx);margin:0;">Password</label>
                         <a href="{{ url_for('auth.forgot_password_page') }}" style="font-size:12px;color:var(--indigo-primary);text-decoration:none;font-weight:600;">Forgot password?</a>
                     </div>
                     <input type="password" name="password" id="passwordInput" required placeholder="••••••••" autocomplete="current-password" style="width:100%;box-sizing:border-box;">
                 </div>
 
-                <div style="display:flex;align-items:center;margin-bottom:20px;">
+                <div style="display:flex;align-items:center;margin-bottom:18px;">
                     <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--tx-muted);cursor:pointer;user-select:none;">
                         <input type="checkbox" name="remember" value="1" style="width:16px;height:16px;accent-color:var(--indigo-primary);cursor:pointer;">
                         Keep me signed in on this device
                     </label>
                 </div>
 
-                <button type="submit" class="btn full" style="padding:13px;border-radius:14px;font-size:14px;font-weight:700;">Sign in to ApproveHub</button>
+                <button type="submit" id="signInBtn" class="btn full" style="padding:13px;border-radius:13px;font-size:14px;font-weight:700;">Sign in to ApproveHub</button>
             </form>
 
-            <div style="text-align:center;margin-top:22px;font-size:13px;color:var(--tx-muted);">
+            <div style="text-align:center;margin-top:18px;font-size:13px;color:var(--tx-muted);">
                 Need a new account? <a href="{{ url_for('auth.register_page') }}" style="color:var(--indigo-primary);font-weight:700;text-decoration:none;">Sign up here</a>
             </div>
+
+            <!-- ══════════════════════════════════════════════
+                 DEMO ACCOUNTS — Tabbed Panel (inside card)
+            ══════════════════════════════════════════════ -->
+            <div style="margin-top:24px;">
+
+                <!-- Section label -->
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:13px;">
+                    <hr style="flex:1;border:none;border-top:1px solid var(--bd);">
+                    <span style="font-size:10.5px;color:var(--tx-faint);text-transform:uppercase;letter-spacing:0.08em;font-weight:700;white-space:nowrap;">
+                        🎓 Try a Demo Account
+                    </span>
+                    <hr style="flex:1;border:none;border-top:1px solid var(--bd);">
+                </div>
+
+                <!-- Tab bar -->
+                <div style="display:flex;gap:5px;margin-bottom:11px;background:var(--bg-secondary);padding:4px;border-radius:13px;">
+                    <button onclick="switchTab('students')" id="tab-students"
+                        style="flex:1;padding:7px 4px;border:none;border-radius:9px;font-size:11.5px;font-weight:700;cursor:pointer;transition:all .18s;background:#4F46E5;color:#fff;">
+                        👨‍🎓 Students
+                    </button>
+                    <button onclick="switchTab('faculty')" id="tab-faculty"
+                        style="flex:1;padding:7px 4px;border:none;border-radius:9px;font-size:11.5px;font-weight:700;cursor:pointer;transition:all .18s;background:transparent;color:var(--tx-muted);">
+                        👨‍🏫 Faculty
+                    </button>
+                    <button onclick="switchTab('admin')" id="tab-admin"
+                        style="flex:1;padding:7px 4px;border:none;border-radius:9px;font-size:11.5px;font-weight:700;cursor:pointer;transition:all .18s;background:transparent;color:var(--tx-muted);">
+                        🛡️ Admin
+                    </button>
+                </div>
+
+                <!-- ── Students Panel ── -->
+                <div id="panel-students">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">
+
+                        <button type="button" onclick="fillDemo('shreeyash@vit.edu')" class="dc" style="border-color:rgba(99,102,241,0.25);background:rgba(79,70,229,0.05);">
+                            <div class="dav" style="background:linear-gradient(135deg,#4F46E5,#7C3AED);">SS</div>
+                            <div class="di">
+                                <div class="dn">Shreeyash Solunke</div>
+                                <div class="dt" style="color:#4F46E5;">F.Y. B.Tech · IT</div>
+                                <div class="de">shreeyash@vit.edu</div>
+                            </div>
+                        </button>
+
+                        <button type="button" onclick="fillDemo('aditi@vit.edu')" class="dc" style="border-color:rgba(99,102,241,0.25);background:rgba(79,70,229,0.05);">
+                            <div class="dav" style="background:linear-gradient(135deg,#6366F1,#8B5CF6);">AK</div>
+                            <div class="di">
+                                <div class="dn">Aditi Kulkarni</div>
+                                <div class="dt" style="color:#4F46E5;">S.Y. B.Tech · IT</div>
+                                <div class="de">aditi@vit.edu</div>
+                            </div>
+                        </button>
+
+                        <button type="button" onclick="fillDemo('rahul.sharma@vit.edu')" class="dc" style="border-color:rgba(99,102,241,0.25);background:rgba(79,70,229,0.05);">
+                            <div class="dav" style="background:linear-gradient(135deg,#3730A3,#4F46E5);">RS</div>
+                            <div class="di">
+                                <div class="dn">Rahul Sharma</div>
+                                <div class="dt" style="color:#4F46E5;">T.Y. B.Tech · IT</div>
+                                <div class="de">rahul.sharma@vit.edu</div>
+                            </div>
+                        </button>
+
+                        <button type="button" onclick="fillDemo('priya.desai@vit.edu')" class="dc" style="border-color:rgba(99,102,241,0.25);background:rgba(79,70,229,0.05);">
+                            <div class="dav" style="background:linear-gradient(135deg,#7C3AED,#A855F7);">PD</div>
+                            <div class="di">
+                                <div class="dn">Priya Desai</div>
+                                <div class="dt" style="color:#4F46E5;">B.E. Final Year · IT</div>
+                                <div class="de">priya.desai@vit.edu</div>
+                            </div>
+                        </button>
+
+                    </div>
+                </div>
+
+                <!-- ── Faculty Panel ── -->
+                <div id="panel-faculty" style="display:none;">
+                    <div style="display:flex;flex-direction:column;gap:7px;">
+
+                        <button type="button" onclick="fillDemo('prof.kulkarni@vit.edu')" class="dc dc-row" style="border-color:rgba(6,182,212,0.28);background:rgba(6,182,212,0.05);">
+                            <div class="dav" style="background:linear-gradient(135deg,#0891B2,#06B6D4);">MK</div>
+                            <div class="di">
+                                <div class="dn">Prof. Meera Kulkarni</div>
+                                <div class="dt" style="color:#0891B2;">Faculty Guide · IT Dept.</div>
+                                <div class="de">prof.kulkarni@vit.edu</div>
+                            </div>
+                            <span class="tier-badge" style="background:rgba(6,182,212,0.12);color:#0891B2;">Tier 1</span>
+                        </button>
+
+                        <button type="button" onclick="fillDemo('dr.patil@vit.edu')" class="dc dc-row" style="border-color:rgba(6,182,212,0.28);background:rgba(6,182,212,0.05);">
+                            <div class="dav" style="background:linear-gradient(135deg,#0E7490,#0891B2);">RP</div>
+                            <div class="di">
+                                <div class="dn">Dr. R. Patil</div>
+                                <div class="dt" style="color:#0891B2;">HOD · Dept. of IT</div>
+                                <div class="de">dr.patil@vit.edu</div>
+                            </div>
+                            <span class="tier-badge" style="background:rgba(6,182,212,0.12);color:#0891B2;">Tier 2</span>
+                        </button>
+
+                        <button type="button" onclick="fillDemo('dr.rao@vit.edu')" class="dc dc-row" style="border-color:rgba(6,182,212,0.28);background:rgba(6,182,212,0.05);">
+                            <div class="dav" style="background:linear-gradient(135deg,#155E75,#0E7490);">VR</div>
+                            <div class="di">
+                                <div class="dn">Dr. V. Rao</div>
+                                <div class="dt" style="color:#0891B2;">Dean Academics · Comp. Engg.</div>
+                                <div class="de">dr.rao@vit.edu</div>
+                            </div>
+                            <span class="tier-badge" style="background:rgba(6,182,212,0.12);color:#0891B2;">Tier 3</span>
+                        </button>
+
+                    </div>
+                </div>
+
+                <!-- ── Admin Panel ── -->
+                <div id="panel-admin" style="display:none;">
+
+                    <button type="button" onclick="fillDemo('admin@vit.edu')" class="dc dc-row" style="width:100%;border-color:rgba(239,68,68,0.22);background:rgba(239,68,68,0.04);">
+                        <div class="dav" style="background:linear-gradient(135deg,#B91C1C,#DC2626);">IA</div>
+                        <div class="di">
+                            <div class="dn">Institutional Admin</div>
+                            <div class="dt" style="color:#DC2626;">System Controller · Administration</div>
+                            <div class="de">admin@vit.edu</div>
+                        </div>
+                        <span class="tier-badge" style="background:rgba(239,68,68,0.10);color:#DC2626;">Admin</span>
+                    </button>
+
+                    <div style="margin-top:10px;background:rgba(239,68,68,0.04);border:1px solid rgba(239,68,68,0.14);border-radius:11px;padding:11px 13px;font-size:11.5px;color:var(--tx-muted);line-height:1.6;">
+                        <strong style="color:var(--tx);">Admin can:</strong> manage all users, view full audit trails, configure institution settings, build approval hierarchy, and monitor every document across all roles.
+                    </div>
+
+                </div>
+
+                <!-- Credentials hint -->
+                <p style="text-align:center;font-size:10px;color:var(--tx-faint);margin:12px 0 0;">
+                    All demo accounts · password&nbsp;<code style="background:var(--bg-secondary);padding:1px 5px;border-radius:4px;">demo1234</code>&nbsp;· PIN&nbsp;<code style="background:var(--bg-secondary);padding:1px 5px;border-radius:4px;">1234</code>
+                </p>
+
+            </div>
+            <!-- end demo panel -->
+
         </div>
     </div>
 </div>
+
+<style>
+/* Demo card base */
+.dc {
+    display:flex;align-items:center;gap:9px;
+    border:1.5px solid;border-radius:12px;padding:9px 10px;
+    cursor:pointer;text-align:left;
+    transition:transform .15s, box-shadow .15s;
+    box-sizing:border-box;width:100%;
+}
+.dc:hover { transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,0.09); }
+.dc-row { flex-direction:row; }
+/* Avatar circle */
+.dav {
+    width:36px;height:36px;border-radius:50%;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:800;color:#fff;letter-spacing:.4px;
+}
+/* Info block */
+.di  { min-width:0;flex:1; }
+.dn  { font-size:11.5px;font-weight:800;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.dt  { font-size:10px;font-weight:600;margin-top:1px; }
+.de  { font-size:9.5px;color:var(--tx-faint);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+/* Tier badge */
+.tier-badge {
+    flex-shrink:0;margin-left:auto;padding-left:8px;
+    font-size:9.5px;font-weight:700;padding:3px 8px;
+    border-radius:20px;white-space:nowrap;
+}
+</style>
+
+<script>
+/* ── Tab switcher ── */
+const TAB_COLOURS = { students:'#4F46E5', faculty:'#0891B2', admin:'#DC2626' };
+
+function switchTab(tab) {
+    ['students','faculty','admin'].forEach(t => {
+        document.getElementById('panel-' + t).style.display = 'none';
+        const btn = document.getElementById('tab-' + t);
+        btn.style.background = 'transparent';
+        btn.style.color = 'var(--tx-muted)';
+    });
+    document.getElementById('panel-' + tab).style.display = '';
+    const active = document.getElementById('tab-' + tab);
+    active.style.background = TAB_COLOURS[tab];
+    active.style.color = '#fff';
+}
+
+/* ── Instant 1-Click Login on card click ── */
+function fillDemo(email) {
+    window.location.href = '/demo-login/' + encodeURIComponent(email);
+}
+</script>
 {% endblock %}

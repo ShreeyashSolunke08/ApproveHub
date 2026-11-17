@@ -223,10 +223,13 @@
                 <!-- Console Mode Tabs -->
                 <div class="hero-console-tabs">
                     <button type="button" class="hero-console-tab active" onclick="switchConsoleTab('login')">
-                        <span>🔐</span> Quick Login
+                        <span>🔐</span> Login
+                    </button>
+                    <button type="button" class="hero-console-tab" onclick="switchConsoleTab('demo')">
+                        <span>🎓</span> Demo Roles
                     </button>
                     <button type="button" class="hero-console-tab" onclick="switchConsoleTab('verify')">
-                        <span>🛡️</span> Instant Verify
+                        <span>🛡️</span> Verify
                     </button>
                     <button type="button" class="hero-console-tab" onclick="switchConsoleTab('qr')">
                         <span>📷</span> Scan QR
@@ -260,41 +263,258 @@
                                 New student or faculty member? Register here &rarr;
                             </a>
                         </div>
-                    </div>
-
-                    <!-- Tab 2: Quick Verify -->
-                    <div id="tabContentVerify" style="display:none;">
-                        <p style="font-size:12.5px;color:#475569;margin:0 0 12px;line-height:1.5;">
-                            Inspect official signatures, tamper verification, and signing authority certificates instantly:
+                    <!-- Tab 4: Demo Profiles (Inside Hero Console) -->
+                    <div id="tabContentDemo" style="display:none;">
+                        <p style="font-size:12px;color:#64748B;margin:0 0 10px;line-height:1.4;">
+                            Instant 1-click test identities for guides &amp; evaluators:
                         </p>
-                        <form method="GET" action="{{ url_for('verification.public_verify_page') }}" onsubmit="handleDirectVerify(event, this)" style="display:flex;flex-direction:column;gap:12px;">
-                            <div>
-                                <label style="display:block;font-size:11.5px;font-weight:700;color:#475569;margin-bottom:4px;">Official Approval Number</label>
-                                <input type="text" id="consoleApprovalInput" placeholder="e.g. AH-26-IT-0412-9LM4" required style="width:100%;padding:10px 12px;border:1.5px solid #CBD5E1;border-radius:10px;font-size:13px;box-sizing:border-box;background:#F8FAFC;font-weight:700;outline:none;">
-                            </div>
-                            <button type="submit" class="btn full" style="background:#047857;padding:11px;font-size:13.5px;font-weight:700;border-radius:10px;">
-                                Verify Cryptographic Integrity →
-                            </button>
-                        </form>
-                        <div style="margin-top:12px;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:8px 10px;font-size:11px;color:#166534;">
-                            💡 Click to test: <a href="javascript:void(0)" onclick="setSampleVerify('AH-26-IT-0412-9LM4')" style="color:#047857;font-weight:800;text-decoration:underline;">AH-26-IT-0412-9LM4</a>
+                        <div style="display:flex;gap:4px;margin-bottom:10px;background:#F1F5F9;padding:3px;border-radius:10px;">
+                            <button type="button" onclick="switchMiniDemoTab('s')" id="miniTab-s" style="flex:1;padding:5px 2px;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;background:#4F46E5;color:#fff;">Students</button>
+                            <button type="button" onclick="switchMiniDemoTab('f')" id="miniTab-f" style="flex:1;padding:5px 2px;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;background:transparent;color:#64748B;">Faculty</button>
+                            <button type="button" onclick="switchMiniDemoTab('a')" id="miniTab-a" style="flex:1;padding:5px 2px;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;background:transparent;color:#64748B;">Admin</button>
                         </div>
-                    </div>
-
-                    <!-- Tab 3: Scan QR -->
-                    <div id="tabContentQr" style="display:none;text-align:center;padding:10px 0;">
-                        <div style="font-size:42px;margin-bottom:8px;">📷</div>
-                        <h4 style="margin:0 0 6px;font-size:15px;font-weight:800;color:#0F172A;">Instant QR Document Scanner</h4>
-                        <p style="font-size:12px;color:#64748B;margin:0 0 16px;line-height:1.5;">
-                            Point your device camera at any printed or digital ApproveHub QR mark to inspect validity.
-                        </p>
-                        <a href="{{ url_for('verification.scan_qr_page') }}" class="btn full" style="padding:11px;font-size:13.5px;font-weight:700;border-radius:10px;text-decoration:none;">
-                            Launch Camera QR Scanner →
-                        </a>
+                        <div id="miniPanel-s" style="display:flex;flex-direction:column;gap:6px;">
+                            <a href="/demo-login/shreeyash@vit.edu" class="mini-demo-btn" style="border-color:rgba(79,70,229,0.3);background:rgba(79,70,229,0.06);">
+                                <strong>🎓 Shreeyash Solunke</strong> <span>(F.Y. B.Tech) &rarr;</span>
+                            </a>
+                            <a href="/demo-login/aditi@vit.edu" class="mini-demo-btn" style="border-color:rgba(79,70,229,0.3);background:rgba(79,70,229,0.06);">
+                                <strong>📋 Aditi Kulkarni</strong> <span>(S.Y. B.Tech) &rarr;</span>
+                            </a>
+                            <a href="/demo-login/rahul.sharma@vit.edu" class="mini-demo-btn" style="border-color:rgba(79,70,229,0.3);background:rgba(79,70,229,0.06);">
+                                <strong>🔬 Rahul Sharma</strong> <span>(T.Y. B.Tech) &rarr;</span>
+                            </a>
+                            <a href="/demo-login/priya.desai@vit.edu" class="mini-demo-btn" style="border-color:rgba(79,70,229,0.3);background:rgba(79,70,229,0.06);">
+                                <strong>💼 Priya Desai</strong> <span>(B.E. Final Year) &rarr;</span>
+                            </a>
+                        </div>
+                        <div id="miniPanel-f" style="display:none;flex-direction:column;gap:6px;">
+                            <a href="/demo-login/prof.kulkarni@vit.edu" class="mini-demo-btn" style="border-color:rgba(6,182,212,0.3);background:rgba(6,182,212,0.06);">
+                                <strong>✍️ Prof. Meera Kulkarni</strong> <span>(Tier 1 Guide) &rarr;</span>
+                            </a>
+                            <a href="/demo-login/dr.patil@vit.edu" class="mini-demo-btn" style="border-color:rgba(6,182,212,0.3);background:rgba(6,182,212,0.06);">
+                                <strong>🏛️ Dr. R. Patil</strong> <span>(Tier 2 HOD) &rarr;</span>
+                            </a>
+                            <a href="/demo-login/dr.rao@vit.edu" class="mini-demo-btn" style="border-color:rgba(6,182,212,0.3);background:rgba(6,182,212,0.06);">
+                                <strong>🎖️ Dr. V. Rao</strong> <span>(Tier 3 Dean) &rarr;</span>
+                            </a>
+                        </div>
+                        <div id="miniPanel-a" style="display:none;flex-direction:column;gap:6px;">
+                            <a href="/demo-login/admin@vit.edu" class="mini-demo-btn" style="border-color:rgba(239,68,68,0.3);background:rgba(239,68,68,0.06);">
+                                <strong>🛡️ Institutional Admin</strong> <span>(System Controller) &rarr;</span>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
             {% endif %}
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         INTERACTIVE DEMO PROFILES SECTION FOR GUIDE EVALUATION & DEMO
+    ══════════════════════════════════════════════════════════════════ -->
+    <div id="demo-profiles-section" style="margin-bottom:44px;background:#FFFFFF;border:2px solid #E0E7FF;border-radius:24px;padding:32px;box-shadow:0 12px 36px rgba(79,70,229,0.08);">
+        <div style="text-align:center;margin-bottom:24px;">
+            <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(79,70,229,0.1);padding:4px 14px;border-radius:99px;font-size:12px;font-weight:800;color:var(--indigo-primary);margin-bottom:10px;">
+                <span>🎓</span> Live Institutional Demo Accounts
+            </div>
+            <h2 style="font-size:26px;font-weight:900;color:#0F172A;margin:0 0 8px;letter-spacing:-0.025em;">
+                Explore ApproveHub Across Every Institutional Role
+            </h2>
+            <p style="font-size:14px;color:#64748B;margin:0 auto;max-width:640px;">
+                Switch effortlessly between student applicants, reviewing faculty guides, departmental HODs, academic deans, and system administrators. Click any card for instant 1-click login.
+            </p>
+        </div>
+
+        <!-- Role Category Tabs -->
+        <div style="display:flex;justify-content:center;margin-bottom:24px;">
+            <div style="display:inline-flex;background:#F1F5F9;padding:5px;border-radius:16px;gap:6px;max-width:540px;width:100%;">
+                <button type="button" onclick="switchHomeDemoTab('students')" id="homeTab-students"
+                    style="flex:1;padding:10px 16px;border:none;border-radius:12px;font-size:13.5px;font-weight:800;cursor:pointer;transition:all 0.2s ease;background:#4F46E5;color:#FFFFFF;display:inline-flex;align-items:center;justify-content:center;gap:8px;">
+                    <span>👨‍🎓</span> Students (4)
+                </button>
+                <button type="button" onclick="switchHomeDemoTab('faculty')" id="homeTab-faculty"
+                    style="flex:1;padding:10px 16px;border:none;border-radius:12px;font-size:13.5px;font-weight:800;cursor:pointer;transition:all 0.2s ease;background:transparent;color:#64748B;display:inline-flex;align-items:center;justify-content:center;gap:8px;">
+                    <span>👨‍🏫</span> Faculty &amp; HOD (3)
+                </button>
+                <button type="button" onclick="switchHomeDemoTab('admin')" id="homeTab-admin"
+                    style="flex:1;padding:10px 16px;border:none;border-radius:12px;font-size:13.5px;font-weight:800;cursor:pointer;transition:all 0.2s ease;background:transparent;color:#64748B;display:inline-flex;align-items:center;justify-content:center;gap:8px;">
+                    <span>🛡️</span> Admin (1)
+                </button>
+            </div>
+        </div>
+
+        <!-- ── TAB 1: STUDENTS ── -->
+        <div id="homePanel-students">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));gap:16px;">
+                <!-- Student 1: Shreeyash -->
+                <div class="demo-profile-box" style="border-top:4px solid #4F46E5;">
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                        <div class="demo-avatar-lg" style="background:linear-gradient(135deg,#4F46E5,#7C3AED);">SS</div>
+                        <div>
+                            <div style="font-size:16px;font-weight:900;color:#0F172A;">Shreeyash Solunke</div>
+                            <div style="font-size:12px;font-weight:700;color:#4F46E5;">F.Y. B.Tech • IT</div>
+                        </div>
+                    </div>
+                    <div style="font-size:12px;color:#64748B;margin-bottom:14px;line-height:1.5;">
+                        <div><strong>PRN:</strong> 2026-IT-0412</div>
+                        <div><strong>Email:</strong> shreeyash@vit.edu</div>
+                        <div style="color:#059669;font-weight:700;margin-top:4px;">• 2 Active Requisitions in Vault</div>
+                    </div>
+                    <a href="/demo-login/shreeyash@vit.edu" class="btn full" style="padding:10px;font-size:13px;border-radius:10px;font-weight:800;text-decoration:none;display:block;text-align:center;">
+                        🚀 1-Click Login as Shreeyash &rarr;
+                    </a>
+                </div>
+
+                <!-- Student 2: Aditi -->
+                <div class="demo-profile-box" style="border-top:4px solid #6366F1;">
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                        <div class="demo-avatar-lg" style="background:linear-gradient(135deg,#6366F1,#8B5CF6);">AK</div>
+                        <div>
+                            <div style="font-size:16px;font-weight:900;color:#0F172A;">Aditi Kulkarni</div>
+                            <div style="font-size:12px;font-weight:700;color:#6366F1;">S.Y. B.Tech • IT</div>
+                        </div>
+                    </div>
+                    <div style="font-size:12px;color:#64748B;margin-bottom:14px;line-height:1.5;">
+                        <div><strong>PRN:</strong> 2025-IT-0219</div>
+                        <div><strong>Email:</strong> aditi@vit.edu</div>
+                        <div style="color:#059669;font-weight:700;margin-top:4px;">• 1 Stamped &amp; Approved NOC</div>
+                    </div>
+                    <a href="/demo-login/aditi@vit.edu" class="btn full" style="padding:10px;font-size:13px;border-radius:10px;font-weight:800;text-decoration:none;display:block;text-align:center;">
+                        🚀 1-Click Login as Aditi &rarr;
+                    </a>
+                </div>
+
+                <!-- Student 3: Rahul -->
+                <div class="demo-profile-box" style="border-top:4px solid #3730A3;">
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                        <div class="demo-avatar-lg" style="background:linear-gradient(135deg,#3730A3,#4F46E5);">RS</div>
+                        <div>
+                            <div style="font-size:16px;font-weight:900;color:#0F172A;">Rahul Sharma</div>
+                            <div style="font-size:12px;font-weight:700;color:#3730A3;">T.Y. B.Tech • IT</div>
+                        </div>
+                    </div>
+                    <div style="font-size:12px;color:#64748B;margin-bottom:14px;line-height:1.5;">
+                        <div><strong>PRN:</strong> 2024-IT-0188</div>
+                        <div><strong>Email:</strong> rahul.sharma@vit.edu</div>
+                        <div style="color:#D97706;font-weight:700;margin-top:4px;">• Student Requisition Applicant</div>
+                    </div>
+                    <a href="/demo-login/rahul.sharma@vit.edu" class="btn full" style="padding:10px;font-size:13px;border-radius:10px;font-weight:800;text-decoration:none;display:block;text-align:center;">
+                        🚀 1-Click Login as Rahul &rarr;
+                    </a>
+                </div>
+
+                <!-- Student 4: Priya -->
+                <div class="demo-profile-box" style="border-top:4px solid #7C3AED;">
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                        <div class="demo-avatar-lg" style="background:linear-gradient(135deg,#7C3AED,#A855F7);">PD</div>
+                        <div>
+                            <div style="font-size:16px;font-weight:900;color:#0F172A;">Priya Desai</div>
+                            <div style="font-size:12px;font-weight:700;color:#7C3AED;">B.E. Final Year • IT</div>
+                        </div>
+                    </div>
+                    <div style="font-size:12px;color:#64748B;margin-bottom:14px;line-height:1.5;">
+                        <div><strong>PRN:</strong> 2023-IT-0094</div>
+                        <div><strong>Email:</strong> priya.desai@vit.edu</div>
+                        <div style="color:#4F46E5;font-weight:700;margin-top:4px;">• Capstone Project Candidate</div>
+                    </div>
+                    <a href="/demo-login/priya.desai@vit.edu" class="btn full" style="padding:10px;font-size:13px;border-radius:10px;font-weight:800;text-decoration:none;display:block;text-align:center;">
+                        🚀 1-Click Login as Priya &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── TAB 2: FACULTY & APPROVERS ── -->
+        <div id="homePanel-faculty" style="display:none;">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:16px;">
+                <!-- Faculty 1: Prof. Meera Kulkarni -->
+                <div class="demo-profile-box" style="border-top:4px solid #0891B2;">
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                        <div class="demo-avatar-lg" style="background:linear-gradient(135deg,#0891B2,#06B6D4);">MK</div>
+                        <div>
+                            <div style="font-size:16px;font-weight:900;color:#0F172A;">Prof. Meera Kulkarni</div>
+                            <div style="font-size:12px;font-weight:700;color:#0891B2;">Faculty Guide • IT Dept.</div>
+                        </div>
+                        <span style="margin-left:auto;background:rgba(6,182,212,0.12);color:#0891B2;font-size:11px;font-weight:800;padding:4px 10px;border-radius:99px;">Tier 1</span>
+                    </div>
+                    <div style="font-size:12px;color:#64748B;margin-bottom:14px;line-height:1.5;">
+                        <div><strong>Role:</strong> Initial Reviewer &amp; Academic Verification</div>
+                        <div><strong>Email:</strong> prof.kulkarni@vit.edu</div>
+                        <div style="color:#0891B2;font-weight:700;margin-top:4px;">• Reviews student bonafide &amp; grant submissions</div>
+                    </div>
+                    <a href="/demo-login/prof.kulkarni@vit.edu" class="btn full" style="background:#0891B2;padding:10px;font-size:13px;border-radius:10px;font-weight:800;text-decoration:none;display:block;text-align:center;">
+                        ✍️ 1-Click Login (Review Desk) &rarr;
+                    </a>
+                </div>
+
+                <!-- Faculty 2: Dr. R. Patil -->
+                <div class="demo-profile-box" style="border-top:4px solid #0E7490;">
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                        <div class="demo-avatar-lg" style="background:linear-gradient(135deg,#0E7490,#0891B2);">RP</div>
+                        <div>
+                            <div style="font-size:16px;font-weight:900;color:#0F172A;">Dr. R. Patil</div>
+                            <div style="font-size:12px;font-weight:700;color:#0891B2;">Head of Department (HOD)</div>
+                        </div>
+                        <span style="margin-left:auto;background:rgba(6,182,212,0.12);color:#0891B2;font-size:11px;font-weight:800;padding:4px 10px;border-radius:99px;">Tier 2</span>
+                    </div>
+                    <div style="font-size:12px;color:#64748B;margin-bottom:14px;line-height:1.5;">
+                        <div><strong>Role:</strong> Departmental Signoff &amp; Seal Authorization</div>
+                        <div><strong>Email:</strong> dr.patil@vit.edu</div>
+                        <div style="color:#0891B2;font-weight:700;margin-top:4px;">• Applies official department seal &amp; approval no.</div>
+                    </div>
+                    <a href="/demo-login/dr.patil@vit.edu" class="btn full" style="background:#0891B2;padding:10px;font-size:13px;border-radius:10px;font-weight:800;text-decoration:none;display:block;text-align:center;">
+                        🏛️ 1-Click Login (HOD Desk) &rarr;
+                    </a>
+                </div>
+
+                <!-- Faculty 3: Dr. V. Rao -->
+                <div class="demo-profile-box" style="border-top:4px solid #155E75;">
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                        <div class="demo-avatar-lg" style="background:linear-gradient(135deg,#155E75,#0E7490);">VR</div>
+                        <div>
+                            <div style="font-size:16px;font-weight:900;color:#0F172A;">Dr. V. Rao</div>
+                            <div style="font-size:12px;font-weight:700;color:#0891B2;">Dean Academics • Computer Engg.</div>
+                        </div>
+                        <span style="margin-left:auto;background:rgba(6,182,212,0.12);color:#0891B2;font-size:11px;font-weight:800;padding:4px 10px;border-radius:99px;">Tier 3</span>
+                    </div>
+                    <div style="font-size:12px;color:#64748B;margin-bottom:14px;line-height:1.5;">
+                        <div><strong>Role:</strong> Institutional Apex Sanctions &amp; Dean Approvals</div>
+                        <div><strong>Email:</strong> dr.rao@vit.edu</div>
+                        <div style="color:#0891B2;font-weight:700;margin-top:4px;">• Final authorization for multi-tier applications</div>
+                    </div>
+                    <a href="/demo-login/dr.rao@vit.edu" class="btn full" style="background:#0891B2;padding:10px;font-size:13px;border-radius:10px;font-weight:800;text-decoration:none;display:block;text-align:center;">
+                        🎖️ 1-Click Login (Dean Desk) &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── TAB 3: ADMIN ── -->
+        <div id="homePanel-admin" style="display:none;">
+            <div style="max-width:680px;margin:0 auto;">
+                <div class="demo-profile-box" style="border-top:4px solid #DC2626;">
+                    <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
+                        <div class="demo-avatar-lg" style="background:linear-gradient(135deg,#B91C1C,#DC2626);">IA</div>
+                        <div>
+                            <div style="font-size:18px;font-weight:900;color:#0F172A;">Institutional Node Administrator</div>
+                            <div style="font-size:13px;font-weight:700;color:#DC2626;">System Controller • VIT Pune Administration</div>
+                        </div>
+                        <span style="margin-left:auto;background:rgba(239,68,68,0.10);color:#DC2626;font-size:12px;font-weight:800;padding:5px 12px;border-radius:99px;">Super Admin</span>
+                    </div>
+                    <div style="background:#FEF2F2;border:1px solid #FEE2E2;border-radius:12px;padding:14px;font-size:12.5px;color:#991B1B;line-height:1.6;margin-bottom:18px;">
+                        <strong>Admin Capabilities:</strong> Complete oversight of all institutional workflows, live tamper audit trail, institution invite code generation, user role management, sequential signing rule toggling, and emergency access overrides.
+                    </div>
+                    <a href="/demo-login/admin@vit.edu" class="btn full" style="background:#DC2626;padding:12px;font-size:14px;border-radius:12px;font-weight:800;text-decoration:none;display:block;text-align:center;box-shadow:0 6px 18px rgba(220,38,38,0.25);">
+                        🛡️ 1-Click Login to Admin Console &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Credentials Footer Info -->
+        <div style="text-align:center;margin-top:22px;padding-top:16px;border-top:1px dashed #CBD5E1;font-size:12px;color:#64748B;">
+            💡 <strong>Manual Credentials (if prompted):</strong> All demo accounts use Password <code style="background:#F1F5F9;padding:2px 8px;border-radius:6px;font-weight:700;color:#0F172A;">demo1234</code> &amp; Security PIN <code style="background:#F1F5F9;padding:2px 8px;border-radius:6px;font-weight:700;color:#0F172A;">1234</code>
         </div>
     </div>
 
@@ -516,25 +736,68 @@ function switchConsoleTab(mode) {
     tabs.forEach(t => t.classList.remove('active'));
 
     const tabLogin = document.getElementById('tabContentLogin');
+    const tabDemo = document.getElementById('tabContentDemo');
     const tabVerify = document.getElementById('tabContentVerify');
     const tabQr = document.getElementById('tabContentQr');
 
     if (mode === 'login') {
         tabs[0].classList.add('active');
         if (tabLogin) tabLogin.style.display = 'block';
+        if (tabDemo) tabDemo.style.display = 'none';
+        if (tabVerify) tabVerify.style.display = 'none';
+        if (tabQr) tabQr.style.display = 'none';
+    } else if (mode === 'demo') {
+        tabs[1].classList.add('active');
+        if (tabLogin) tabLogin.style.display = 'none';
+        if (tabDemo) tabDemo.style.display = 'block';
         if (tabVerify) tabVerify.style.display = 'none';
         if (tabQr) tabQr.style.display = 'none';
     } else if (mode === 'verify') {
-        tabs[1].classList.add('active');
+        tabs[2].classList.add('active');
         if (tabLogin) tabLogin.style.display = 'none';
+        if (tabDemo) tabDemo.style.display = 'none';
         if (tabVerify) tabVerify.style.display = 'block';
         if (tabQr) tabQr.style.display = 'none';
     } else if (mode === 'qr') {
-        tabs[2].classList.add('active');
+        tabs[3].classList.add('active');
         if (tabLogin) tabLogin.style.display = 'none';
+        if (tabDemo) tabDemo.style.display = 'none';
         if (tabVerify) tabVerify.style.display = 'none';
         if (tabQr) tabQr.style.display = 'block';
     }
+}
+
+/* Home Demo Showcase Tab Switcher */
+function switchHomeDemoTab(tab) {
+    const panels = ['students', 'faculty', 'admin'];
+    const colours = { students: '#4F46E5', faculty: '#0891B2', admin: '#DC2626' };
+    panels.forEach(p => {
+        const pan = document.getElementById('homePanel-' + p);
+        const btn = document.getElementById('homeTab-' + p);
+        if (pan) pan.style.display = (p === tab) ? 'block' : 'none';
+        if (btn) {
+            if (p === tab) {
+                btn.style.background = colours[p];
+                btn.style.color = '#FFFFFF';
+            } else {
+                btn.style.background = 'transparent';
+                btn.style.color = '#64748B';
+            }
+        }
+    });
+}
+
+/* Mini demo tab switcher inside hero console */
+function switchMiniDemoTab(role) {
+    ['s', 'f', 'a'].forEach(r => {
+        const p = document.getElementById('miniPanel-' + r);
+        const b = document.getElementById('miniTab-' + r);
+        if (p) p.style.display = (r === role) ? 'flex' : 'none';
+        if (b) {
+            b.style.background = (r === role) ? '#4F46E5' : 'transparent';
+            b.style.color = (r === role) ? '#FFFFFF' : '#64748B';
+        }
+    });
 }
 
 function setSampleVerify(code) {
@@ -553,4 +816,49 @@ function handleDirectVerify(e, form) {
     }
 }
 </script>
+
+<style>
+.demo-profile-box {
+    background: #FFFFFF;
+    border: 1.5px solid #E2E8F0;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 14px rgba(15,23,42,0.04);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.demo-profile-box:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(79,70,229,0.12);
+}
+.demo-avatar-lg {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 900;
+    flex-shrink: 0;
+}
+.mini-demo-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid;
+    text-decoration: none;
+    font-size: 12px;
+    color: #0F172A;
+    transition: all 0.15s ease;
+}
+.mini-demo-btn:hover {
+    transform: translateX(3px);
+}
+</style>
 {% endblock %}

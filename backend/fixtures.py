@@ -180,6 +180,20 @@ def seed_database(app):
                     "role": "applicant",
                     "department": "Information Technology",
                     "designation": "Student (S.Y. B.Tech)"
+                },
+                {
+                    "name": "Rahul Sharma",
+                    "email": "rahul.sharma@vit.edu",
+                    "role": "applicant",
+                    "department": "Information Technology",
+                    "designation": "Student (T.Y. B.Tech)"
+                },
+                {
+                    "name": "Priya Desai",
+                    "email": "priya.desai@vit.edu",
+                    "role": "applicant",
+                    "department": "Information Technology",
+                    "designation": "Student (B.E. Final Year)"
                 }
             ]
             
