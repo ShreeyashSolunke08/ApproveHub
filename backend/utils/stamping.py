@@ -15,6 +15,7 @@ import pymupdf  # PyMuPDF
 import qrcode
 from PIL import Image
 from datetime import datetime, timezone
+from flask import request, has_request_context
 from backend.utils.hashing import sha256_file, verify_file
 
 def generate_qr_code_image(approval_no, verify_url, output_path):
@@ -34,11 +35,18 @@ def generate_qr_code_image(approval_no, verify_url, output_path):
     img.save(output_path)
     return output_path
 
-def stamp_final_document(document, base_url="http://127.0.0.1:5000"):
+def stamp_final_document(document, base_url=None):
     """
     Applies vector marks, approver assets, and public verification QR code at user-defined coordinates.
     Guarantees that original file remains 100% pristine and unaltered.
     """
+    if not base_url:
+        if has_request_context():
+            f_proto = request.headers.get("X-Forwarded-Proto", request.scheme)
+            f_host = request.headers.get("X-Forwarded-Host", request.host)
+            base_url = f"{f_proto}://{f_host}".rstrip("/")
+        else:
+            base_url = "http://127.0.0.1:5000"
     # 1. Tamper check before stamping
     if not verify_file(document.file_path, document.original_hash):
         raise ValueError("Original file failed cryptographic tamper check! Stamping aborted.")

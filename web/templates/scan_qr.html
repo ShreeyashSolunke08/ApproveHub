@@ -1,37 +1,208 @@
 {% extends "base.html" %}
 
-{% block title %}Scan QR Code — ApproveHub{% endblock %}
+{% block title %}Instant Document QR Scanner — ApproveHub{% endblock %}
+
+{% block extra_head %}
+<!-- HTML5 QR Code Scanner Library via CDN -->
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+{% endblock %}
 
 {% block content %}
-<div style="max-width:440px;margin:28px auto;text-align:center;">
-    <h2 style="margin:0 0 6px;font-size:22px;font-weight:800;">Scan Verification QR</h2>
-    <p style="color:var(--tx-muted);margin:0 0 22px;font-size:13.5px;">Point camera at the QR code printed on the official document</p>
+<div style="max-width:480px;margin:20px auto 40px;padding:0 14px;text-align:center;">
+    <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,0.12);padding:4px 12px;border-radius:99px;font-size:12px;font-weight:800;color:#047857;margin-bottom:8px;">
+        <span>🛡️</span> Zero-Trust Document Verification
+    </div>
+    <h2 style="margin:0 0 6px;font-size:24px;font-weight:900;color:var(--tx);">Scan Verification QR</h2>
+    <p style="color:var(--tx-muted);margin:0 0 20px;font-size:13.5px;">Point your camera at the official ApproveHub QR badge on any document, or upload a photo to verify authenticity.</p>
 
-    <!-- Camera Viewfinder -->
-    <div style="background:linear-gradient(145deg,#0F172A,#1E293B);border-radius:28px;height:360px;position:relative;display:grid;place-items:center;color:#FFF;overflow:hidden;box-shadow:0 20px 50px rgba(15,23,42,0.3);">
-        <!-- Scan frame -->
-        <div style="position:absolute;inset:50px 40px;border:2.5px solid rgba(99,102,241,0.7);border-radius:20px;box-shadow:0 0 30px rgba(99,102,241,0.15);"></div>
-        <!-- Corner accents -->
-        <div style="position:absolute;top:42px;left:32px;width:24px;height:24px;border-top:3px solid var(--cyan-neon);border-left:3px solid var(--cyan-neon);border-radius:4px 0 0 0;"></div>
-        <div style="position:absolute;top:42px;right:32px;width:24px;height:24px;border-top:3px solid var(--cyan-neon);border-right:3px solid var(--cyan-neon);border-radius:0 4px 0 0;"></div>
-        <div style="position:absolute;bottom:42px;left:32px;width:24px;height:24px;border-bottom:3px solid var(--cyan-neon);border-left:3px solid var(--cyan-neon);border-radius:0 0 0 4px;"></div>
-        <div style="position:absolute;bottom:42px;right:32px;width:24px;height:24px;border-bottom:3px solid var(--cyan-neon);border-right:3px solid var(--cyan-neon);border-radius:0 0 4px 0;"></div>
+    <!-- Mode Selector: Camera Scan vs Upload File -->
+    <div style="display:flex;gap:6px;background:var(--bg-secondary);padding:4px;border-radius:14px;margin-bottom:16px;">
+        <button type="button" id="tabCameraBtn" onclick="switchScanMode('camera')" class="btn" style="flex:1;padding:8px;font-size:12.5px;font-weight:700;border-radius:10px;">
+            📷 Live Camera
+        </button>
+        <button type="button" id="tabUploadBtn" onclick="switchScanMode('upload')" class="btn secondary" style="flex:1;padding:8px;font-size:12.5px;font-weight:700;border-radius:10px;background:transparent;border:none;">
+            📁 Upload Image
+        </button>
+    </div>
 
-        <div style="text-align:center;position:relative;z-index:2;">
-            <div style="font-size:52px;margin-bottom:10px;">📷</div>
-            <div style="font-size:13px;opacity:0.8;font-weight:500;">Align QR within frame</div>
+    <!-- 1. LIVE CAMERA SCANNER VIEW -->
+    <div id="cameraScanSection" class="card" style="padding:16px;border-radius:24px;background:#FFFFFF;border:1.5px solid var(--bd);box-shadow:var(--shadow-md);position:relative;overflow:hidden;">
+        <!-- Camera Viewfinder Box -->
+        <div id="reader" style="width:100%;min-height:300px;border-radius:18px;overflow:hidden;background:#0F172A;position:relative;"></div>
+        
+        <div id="scannerStatus" style="margin-top:12px;font-size:12px;color:var(--tx-muted);display:flex;align-items:center;justify-content:center;gap:6px;">
+            <span style="width:8px;height:8px;border-radius:50%;background:#10B981;display:inline-block;animation:pulseGlow 2s infinite;"></span>
+            <span id="statusText">Starting camera feed...</span>
+        </div>
+
+        <div style="display:flex;gap:8px;justify-content:center;margin-top:10px;">
+            <button type="button" id="toggleCameraBtn" class="btn secondary" onclick="restartScanner()" style="padding:6px 12px;font-size:11.5px;font-weight:700;">
+                🔄 Flip Camera
+            </button>
         </div>
     </div>
 
-    <div style="margin-top:24px;">
-        <button type="button" class="btn full" onclick="window.location.href='/verify/AH-26-IT-0412-7KQ3'" style="padding:14px;font-size:14px;border-radius:14px;">
-            ⚡ Simulate Sample QR Scan
-        </button>
-        <div style="margin-top:14px;">
-            <a href="{{ url_for('verification.public_verify_page') }}" style="color:var(--indigo-primary);text-decoration:none;font-size:13px;font-weight:600;">
-                Or enter approval code manually →
-            </a>
+    <!-- 2. FILE UPLOAD SCANNER VIEW (Hidden by default) -->
+    <div id="uploadScanSection" class="card" style="display:none;padding:28px 20px;border-radius:24px;background:#FFFFFF;border:1.5px solid var(--bd);box-shadow:var(--shadow-md);text-align:center;">
+        <div style="width:54px;height:54px;border-radius:50%;background:rgba(79,70,229,0.1);color:var(--indigo-primary);display:grid;place-items:center;font-size:24px;margin:0 auto 14px;">
+            📄
         </div>
+        <h4 style="margin:0 0 6px;font-size:16px;font-weight:800;color:var(--tx);">Upload Document / QR Photo</h4>
+        <p style="font-size:12.5px;color:var(--tx-muted);margin:0 0 18px;line-height:1.5;">Select a screenshot, photo, or scan of the document. The scanner will automatically detect and verify the QR code.</p>
+
+        <input type="file" id="qrFileInput" accept="image/*" style="display:none;" onchange="handleQrFileUpload(event)">
+        <button type="button" class="btn full" onclick="document.getElementById('qrFileInput').click()" style="padding:12px;font-size:13.5px;border-radius:12px;font-weight:700;">
+            Choose Document Image
+        </button>
+        <div id="uploadResultStatus" style="margin-top:12px;font-size:12px;color:var(--tx-muted);"></div>
+    </div>
+
+    <!-- Verification Result Toast / Loading -->
+    <div id="verifySuccessBox" style="display:none;margin-top:16px;background:#ECFDF5;border:1.5px solid #10B981;border-radius:14px;padding:14px;color:#065F46;font-size:13px;font-weight:700;animation:fadeIn 0.3s ease;">
+        🎉 QR Code Detected! Redirecting to official verification ledger...
+    </div>
+
+    <!-- Manual Code Fallback -->
+    <div style="margin-top:24px;padding-top:16px;border-top:1px dashed var(--bd);text-align:center;">
+        <span style="font-size:12px;color:var(--tx-muted);">Can't scan? </span>
+        <a href="{{ url_for('verification.public_verify_page') }}" style="color:var(--indigo-primary);text-decoration:none;font-size:12.5px;font-weight:700;">
+            Enter Approval Code manually &rarr;
+        </a>
     </div>
 </div>
+
+<script>
+let html5QrCode = null;
+let currentFacingMode = "environment"; // Use rear camera by default
+
+function parseApprovalCodeFromQr(qrData) {
+    if (!qrData) return null;
+    qrData = qrData.trim();
+
+    // 1. If it's a URL (e.g. https://approvehub.onrender.com/verify/AH-26-IT-0412-7KQ3 or http://127.0.0.1:5000/verify/...)
+    if (qrData.includes("/verify/")) {
+        const parts = qrData.split("/verify/");
+        if (parts.length > 1) {
+            let code = parts[1].split("?")[0].split("#")[0].trim();
+            return code;
+        }
+    }
+    // 2. If it's directly the approval number format (e.g. AH-26-IT-0412-7KQ3 or AH-...)
+    if (qrData.startsWith("AH-") || qrData.includes("-IT-") || qrData.includes("-COMP-") || qrData.length >= 8) {
+        return qrData.split(" ")[0].trim();
+    }
+    // 3. Fallback: try raw content
+    return qrData;
+}
+
+function onScanSuccess(decodedText, decodedResult) {
+    if (html5QrCode) {
+        html5QrCode.stop().catch(() => {});
+    }
+    const successBox = document.getElementById("verifySuccessBox");
+    if (successBox) successBox.style.display = "block";
+
+    const code = parseApprovalCodeFromQr(decodedText);
+    if (code) {
+        setTimeout(() => {
+            window.location.href = "/verify/" + encodeURIComponent(code);
+        }, 500);
+    } else {
+        alert("Scanned QR code content: " + decodedText);
+    }
+}
+
+function startCameraScanner() {
+    const readerElement = document.getElementById("reader");
+    if (!readerElement) return;
+
+    if (html5QrCode) {
+        html5QrCode.stop().catch(() => {}).then(() => {
+            initScannerInstance();
+        });
+    } else {
+        initScannerInstance();
+    }
+}
+
+function initScannerInstance() {
+    html5QrCode = new Html5Qrcode("reader");
+    const config = { fps: 15, qrbox: { width: 230, height: 230 }, aspectRatio: 1.0 };
+
+    html5QrCode.start(
+        { facingMode: currentFacingMode },
+        config,
+        onScanSuccess
+    ).then(() => {
+        document.getElementById("statusText").textContent = "Camera active. Align QR badge in viewfinder.";
+    }).catch(err => {
+        document.getElementById("statusText").innerHTML = "<span style='color:#BE123C;'>Camera access unavailable. Use Upload Image tab or check browser permissions.</span>";
+    });
+}
+
+function restartScanner() {
+    currentFacingMode = (currentFacingMode === "environment") ? "user" : "environment";
+    startCameraScanner();
+}
+
+function switchScanMode(mode) {
+    const camSection = document.getElementById("cameraScanSection");
+    const upSection = document.getElementById("uploadScanSection");
+    const camBtn = document.getElementById("tabCameraBtn");
+    const upBtn = document.getElementById("tabUploadBtn");
+
+    if (mode === "camera") {
+        camSection.style.display = "block";
+        upSection.style.display = "none";
+        camBtn.className = "btn";
+        camBtn.style.background = "";
+        upBtn.className = "btn secondary";
+        upBtn.style.background = "transparent";
+        startCameraScanner();
+    } else {
+        if (html5QrCode) {
+            html5QrCode.stop().catch(() => {});
+        }
+        camSection.style.display = "none";
+        upSection.style.display = "block";
+        upBtn.className = "btn";
+        upBtn.style.background = "";
+        camBtn.className = "btn secondary";
+        camBtn.style.background = "transparent";
+    }
+}
+
+function handleQrFileUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const status = document.getElementById("uploadResultStatus");
+    status.textContent = "Scanning document image...";
+
+    const fileScanner = new Html5Qrcode("reader");
+    fileScanner.scanFile(file, true)
+        .then(decodedText => {
+            status.innerHTML = `<span style='color:#059669;font-weight:700;'>✓ QR Code found! Redirecting...</span>`;
+            onScanSuccess(decodedText);
+        })
+        .catch(err => {
+            status.innerHTML = `<span style='color:#BE123C;'>Could not detect a valid QR code in this image. Please try a clearer photo or enter the code manually.</span>`;
+        });
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+    // Check if Html5Qrcode loaded
+    if (typeof Html5Qrcode !== "undefined") {
+        startCameraScanner();
+    } else {
+        document.getElementById("statusText").textContent = "Scanner library loading...";
+        const timer = setInterval(() => {
+            if (typeof Html5Qrcode !== "undefined") {
+                clearInterval(timer);
+                startCameraScanner();
+            }
+        }, 300);
+    }
+});
+</script>
 {% endblock %}

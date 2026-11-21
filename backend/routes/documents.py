@@ -2,7 +2,7 @@ import os
 import uuid
 import pymupdf
 from datetime import datetime, timezone
-from flask import Blueprint, render_template, request, redirect, url_for, jsonify, send_file, current_app, abort, Response
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify, send_file, current_app, abort, Response, flash
 from werkzeug.utils import secure_filename
 from backend.models import db, Document, ApprovalStep, Timeline, User
 from backend.utils.security import login_required, get_current_user, generate_random_approval_no
@@ -333,3 +333,42 @@ def preview_document(doc_id):
     document = Document.query.get_or_404(doc_id)
     target_path = document.final_path if (document.status == "approved" and document.final_path) else document.file_path
     return send_file(target_path, mimetype="application/pdf")
+
+@documents_bp.route("/documents/<int:doc_id>/withdraw", methods=["POST"])
+@login_required
+def withdraw_document(doc_id):
+    """
+    Allows the applicant (or admin) to withdraw / take back an active application.
+    Halts any pending approval steps and marks the document as withdrawn.
+    """
+    user = get_current_user()
+    document = Document.query.get_or_404(doc_id)
+    
+    if document.applicant_id != user.id and user.role != "admin":
+        abort(403, description="You are not authorized to withdraw this application.")
+        
+    if document.status == "approved":
+        flash("Approved documents have already been sealed and cannot be withdrawn.", "danger")
+        return redirect(url_for("documents.document_detail", doc_id=doc_id))
+        
+    document.status = "withdrawn"
+    
+    # Cancel any waiting, pending, or compliance steps
+    for step in document.approval_steps:
+        if step.status in ["waiting", "pending", "compliance"]:
+            step.status = "rejected"
+            step.remark = f"Application withdrawn by applicant {user.name}."
+            
+    # Record in timeline
+    tl = Timeline(
+        document_id=document.id,
+        user_id=user.id,
+        event="APPLICATION_WITHDRAWN",
+        details=f"Application '{document.title}' was taken back / withdrawn by applicant {user.name}."
+    )
+    db.session.add(tl)
+    db.session.commit()
+    
+    flash(f"Application '{document.title}' has been successfully withdrawn.", "info")
+    return redirect(url_for("documents.applicant_dashboard"))
+

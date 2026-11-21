@@ -18,6 +18,7 @@ from io import BytesIO
 from datetime import datetime
 import qrcode
 from PIL import Image
+from flask import request, has_request_context
 
 # In-memory session registry for mobile real-time signing bridge
 # token -> { "user_id": int, "created_at": float, "status": "pending" | "completed" }
@@ -27,27 +28,70 @@ def get_lan_ip():
     """
     Auto-detects the host machine's Wi-Fi / Local Area Network IP address
     so mobile devices on the same Wi-Fi network can connect directly.
+    Prioritizes 192.168.x.x and 10.x LAN interfaces over virtual adapters.
     """
+    candidate_ips = []
+    try:
+        hostname = socket.gethostname()
+        for info in socket.getaddrinfo(hostname, None, socket.AF_INET):
+            candidate = info[4][0]
+            if candidate and not candidate.startswith("127."):
+                candidate_ips.append(candidate)
+    except Exception:
+        pass
+
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.settimeout(1.0)
         s.connect(("8.8.8.8", 80))
-        ip = s.getsockname()[0]
+        routed_ip = s.getsockname()[0]
         s.close()
-        return ip
+        if routed_ip and not routed_ip.startswith("127."):
+            candidate_ips.insert(0, routed_ip)
     except Exception:
-        return "127.0.0.1"
+        pass
 
-def create_mobile_session(user_id, port=5000):
+    # Prefer common home/office WiFi subnets (192.168.x.x, 172.16-31.x.x, 10.x)
+    for ip in candidate_ips:
+        if ip.startswith("192.168."):
+            return ip
+    for ip in candidate_ips:
+        if not ip.startswith("10.2.") and not ip.startswith("127."): # avoid hyper-v default virtual switch
+            return ip
+    return candidate_ips[0] if candidate_ips else "127.0.0.1"
+
+def create_mobile_session(user_id, port=5000, base_url=None):
     """
     Initializes a new mobile signature session, generates a secure URL,
     and returns both the mobile URL and an inline base64 QR code image.
+    Automatically detects cloud deployment (e.g. Render / HTTPS) so mobile
+    QR scans resolve directly to the live domain.
     """
     token = secrets.token_urlsafe(16)
-    lan_ip = get_lan_ip()
     
-    mobile_url = f"http://{lan_ip}:{port}/mobile-sign/{token}"
-    local_url = f"http://127.0.0.1:{port}/mobile-sign/{token}"
+    # 1. Detect if we are on a deployed cloud domain or custom host
+    resolved_base = None
+    if base_url:
+        resolved_base = base_url.rstrip("/")
+    elif has_request_context():
+        # Check for forwarded headers from Render/cloud reverse proxies
+        f_proto = request.headers.get("X-Forwarded-Proto", request.scheme)
+        f_host = request.headers.get("X-Forwarded-Host", request.host)
+        
+        # If running on cloud (e.g. onrender.com) or custom domain:
+        if "127.0.0.1" not in f_host and "localhost" not in f_host:
+            resolved_base = f"{f_proto}://{f_host}".rstrip("/")
+        else:
+            # Running locally with localhost request
+            lan_ip = get_lan_ip()
+            req_port = request.environ.get("SERVER_PORT", port)
+            resolved_base = f"http://{lan_ip}:{req_port}".rstrip("/")
+    else:
+        lan_ip = get_lan_ip()
+        resolved_base = f"http://{lan_ip}:{port}"
+
+    mobile_url = f"{resolved_base}/mobile-sign/{token}"
+    local_url = f"/mobile-sign/{token}"
 
     # Generate high-contrast QR code
     qr = qrcode.QRCode(

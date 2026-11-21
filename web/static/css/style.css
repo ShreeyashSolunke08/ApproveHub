@@ -471,7 +471,7 @@ body.mobile-mode .content-area {
   box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15);
 }
 
-.pill.rejected {
+.pill.rejected, .pill.withdrawn {
   background: rgba(225, 29, 72, 0.12);
   color: #BE123C;
   border: 1px solid rgba(225, 29, 72, 0.3);
@@ -735,6 +735,12 @@ body.mobile-mode .content-area {
   color: var(--tx);
   user-select: none;
   box-sizing: border-box;
+}
+
+.stamp-mark.active-selected-mark,
+.qr-stamp-mark.active-selected-mark {
+  border-color: #4F46E5 !important;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.35), 0 8px 24px rgba(79, 70, 229, 0.2) !important;
 }
 
 .stamp-mark:active {

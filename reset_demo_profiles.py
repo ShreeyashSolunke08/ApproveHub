@@ -31,7 +31,7 @@ DEMO_PASSWORD = "demo1234"
 DEMO_PIN      = "1234"
 
 DEMO_PROFILES = [
-    # ── Students ─────────────────────────────────────────────
+    # ── Student (Applicant) ──────────────────────────────────
     {
         "email": "shreeyash@vit.edu",
         "name": "Shreeyash Solunke",
@@ -39,50 +39,22 @@ DEMO_PROFILES = [
         "department": "Information Technology",
         "designation": "Student (F.Y. B.Tech)",
     },
-    {
-        "email": "aditi@vit.edu",
-        "name": "Aditi Kulkarni",
-        "role": "applicant",
-        "department": "Information Technology",
-        "designation": "Student (S.Y. B.Tech)",
-    },
-    {
-        "email": "rahul.sharma@vit.edu",
-        "name": "Rahul Sharma",
-        "role": "applicant",
-        "department": "Information Technology",
-        "designation": "Student (T.Y. B.Tech)",
-    },
-    {
-        "email": "priya.desai@vit.edu",
-        "name": "Priya Desai",
-        "role": "applicant",
-        "department": "Information Technology",
-        "designation": "Student (B.E. Final Year)",
-    },
-    # ── Faculty ───────────────────────────────────────────────
+    # ── Faculty Approvers ────────────────────────────────────
     {
         "email": "prof.kulkarni@vit.edu",
         "name": "Prof. Meera Kulkarni",
         "role": "approver",
         "department": "Information Technology",
-        "designation": "Professor",
+        "designation": "Faculty Guide",
     },
     {
         "email": "dr.patil@vit.edu",
         "name": "Dr. R. Patil",
         "role": "approver",
         "department": "Information Technology",
-        "designation": "HOD",
+        "designation": "HOD - IT",
     },
-    {
-        "email": "dr.rao@vit.edu",
-        "name": "Dr. V. Rao",
-        "role": "approver",
-        "department": "Computer Engineering",
-        "designation": "Dean Academics",
-    },
-    # ── Admin ─────────────────────────────────────────────────
+    # ── System Administrator ─────────────────────────────────
     {
         "email": "admin@vit.edu",
         "name": "Institutional Admin",
@@ -257,10 +229,10 @@ def reset_demo():
         db.session.commit()
         print(f"   ✓ Doc A (in_progress): '{docA.title}' — Shreeyash → awaiting HOD")
 
-        # ─ Doc B: Fully Approved (2 of 2 steps) — Aditi
+        # ─ Doc B: Fully Approved (2 of 2 steps) — Shreeyash
         docB = Document(
             institution_id=inst.id,
-            applicant_id=aditi.id,
+            applicant_id=shreeyash.id,
             title="NOC for Industry Internship",
             document_type="noc_project",
             file_path=sample_pdf,
@@ -309,7 +281,7 @@ def reset_demo():
         db.session.add_all([stepB1, stepB2])
 
         db.session.add_all([
-            Timeline(document_id=docB.id, user_id=aditi.id,
+            Timeline(document_id=docB.id, user_id=shreeyash.id,
                      event="DOCUMENT_UPLOADED",
                      details="NOC for internship submitted.",
                      timestamp=now - timedelta(days=1, hours=6)),
@@ -323,7 +295,7 @@ def reset_demo():
                      timestamp=now - timedelta(days=1)),
         ])
         db.session.commit()
-        print(f"   ✓ Doc B (approved):    'NOC for Industry Internship' — Aditi (fully signed)")
+        print(f"   ✓ Doc B (approved):    'NOC for Industry Internship' — Shreeyash (fully signed)")
 
         # ─ Doc C: Pending (fresh upload, awaiting Tier 1) — Shreeyash
         docC = Document(
@@ -335,7 +307,7 @@ def reset_demo():
             original_hash=orig_hash,
             status="pending",
             current_step=1,
-            total_steps=3,
+            total_steps=2,
         )
         db.session.add(docC)
         db.session.commit()
@@ -356,40 +328,31 @@ def reset_demo():
             approver_id=hod.id,
             step_order=2,
             mark_type="stamp",
-            page_no=1, pos_x=0.42, pos_y=0.74,
+            page_no=1, pos_x=0.50, pos_y=0.74,
             status="waiting",
         )
-        stepC3 = ApprovalStep(
-            document_id=docC.id,
-            approver_id=dean.id,
-            step_order=3,
-            mark_type="both",
-            page_no=1, pos_x=0.70, pos_y=0.74,
-            status="waiting",
-        )
-        db.session.add_all([stepC1, stepC2, stepC3])
+        db.session.add_all([stepC1, stepC2])
 
         db.session.add(Timeline(
             document_id=docC.id, user_id=shreeyash.id,
             event="DOCUMENT_UPLOADED",
-            details="Research grant application submitted for 3-tier review.",
+            details="Research grant application submitted for review.",
             timestamp=now - timedelta(minutes=30)
         ))
         db.session.commit()
+        print(f"   ✓ Doc C (pending):     'Research Grant Application (EDI)' — awaiting Guide review")
         print(f"   ✓ Doc C (pending):     'Research Grant Application (EDI)' — 3-tier chain")
 
         # ── 5. Summary
         print("\n" + "=" * 65)
-        print("  RESET COMPLETE — Demo credentials:")
+        print("  RESET COMPLETE — 4 Canonical Demo Profiles:")
         print("  Password : demo1234")
         print("  PIN      : 1234")
         print("=" * 65)
-        print(f"\n  shreeyash@vit.edu   → Applicant (2 docs)")
-        print(f"  aditi@vit.edu       → Applicant (1 approved doc)")
-        print(f"  prof.kulkarni@vit.edu → Approver (1 pending inbox item)")
-        print(f"  dr.patil@vit.edu    → Approver (1 inbox item)")
-        print(f"  dr.rao@vit.edu      → Approver (waiting for chain)")
-        print(f"  admin@vit.edu       → Admin")
+        print(f"\n  shreeyash@vit.edu     → Student / Applicant (3 demo requisitions)")
+        print(f"  prof.kulkarni@vit.edu → Faculty Guide (Tier 1 Approver)")
+        print(f"  dr.patil@vit.edu      → HOD IT (Tier 2 Approver)")
+        print(f"  admin@vit.edu         → Institutional Administrator")
         print()
 
 

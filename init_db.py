@@ -27,12 +27,8 @@ def init_database():
         if inst:
             demo_users = [
                 {"name": "Shreeyash Solunke", "email": "shreeyash@vit.edu", "role": "applicant", "department": "Information Technology", "designation": "Student (F.Y. B.Tech)"},
-                {"name": "Aditi Kulkarni", "email": "aditi@vit.edu", "role": "applicant", "department": "Information Technology", "designation": "Student (S.Y. B.Tech)"},
-                {"name": "Rahul Sharma", "email": "rahul.sharma@vit.edu", "role": "applicant", "department": "Information Technology", "designation": "Student (T.Y. B.Tech)"},
-                {"name": "Priya Desai", "email": "priya.desai@vit.edu", "role": "applicant", "department": "Information Technology", "designation": "Student (B.E. Final Year)"},
-                {"name": "Prof. Meera Kulkarni", "email": "prof.kulkarni@vit.edu", "role": "approver", "department": "Information Technology", "designation": "Professor"},
-                {"name": "Dr. R. Patil", "email": "dr.patil@vit.edu", "role": "approver", "department": "Information Technology", "designation": "HOD"},
-                {"name": "Dr. V. Rao", "email": "dr.rao@vit.edu", "role": "approver", "department": "Computer Engineering", "designation": "Dean Academics"},
+                {"name": "Prof. Meera Kulkarni", "email": "prof.kulkarni@vit.edu", "role": "approver", "department": "Information Technology", "designation": "Faculty Guide"},
+                {"name": "Dr. R. Patil", "email": "dr.patil@vit.edu", "role": "approver", "department": "Information Technology", "designation": "HOD - IT"},
                 {"name": "Institutional Admin", "email": "admin@vit.edu", "role": "admin", "department": "Administration", "designation": "System Controller"},
             ]
             from backend.fixtures import ensure_default_signature

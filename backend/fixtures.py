@@ -151,21 +151,14 @@ def seed_database(app):
                     "email": "prof.kulkarni@vit.edu",
                     "role": "approver",
                     "department": "Information Technology",
-                    "designation": "Professor"
+                    "designation": "Faculty Guide"
                 },
                 {
                     "name": "Dr. R. Patil",
                     "email": "dr.patil@vit.edu",
                     "role": "approver",
                     "department": "Information Technology",
-                    "designation": "HOD"
-                },
-                {
-                    "name": "Dr. V. Rao",
-                    "email": "dr.rao@vit.edu",
-                    "role": "approver",
-                    "department": "Computer Engineering",
-                    "designation": "Dean Academics"
+                    "designation": "HOD - IT"
                 },
                 {
                     "name": "Institutional Admin",
@@ -173,27 +166,6 @@ def seed_database(app):
                     "role": "admin",
                     "department": "Administration",
                     "designation": "System Controller"
-                },
-                {
-                    "name": "Aditi Kulkarni",
-                    "email": "aditi@vit.edu",
-                    "role": "applicant",
-                    "department": "Information Technology",
-                    "designation": "Student (S.Y. B.Tech)"
-                },
-                {
-                    "name": "Rahul Sharma",
-                    "email": "rahul.sharma@vit.edu",
-                    "role": "applicant",
-                    "department": "Information Technology",
-                    "designation": "Student (T.Y. B.Tech)"
-                },
-                {
-                    "name": "Priya Desai",
-                    "email": "priya.desai@vit.edu",
-                    "role": "applicant",
-                    "department": "Information Technology",
-                    "designation": "Student (B.E. Final Year)"
                 }
             ]
             

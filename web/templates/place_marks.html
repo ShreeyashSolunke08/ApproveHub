@@ -116,19 +116,44 @@
                     </div>
                 </div>
 
-                <!-- Multi-Page Document Navigator -->
-                <div style="display:flex;align-items:center;gap:6px;background:#F1F5F9;border:1.5px solid var(--bd);padding:4px 10px;border-radius:10px;">
-                    <button type="button" class="btn secondary" onclick="changeDocPage(-1)" style="padding:3px 8px;font-size:11px;">◀</button>
-                    <span style="font-size:12px;font-weight:800;color:var(--tx-secondary);min-width:70px;text-align:center;">
-                        Page <span id="curDocPage">1</span> / <span id="totDocPages">1</span>
-                    </span>
-                    <button type="button" class="btn secondary" onclick="changeDocPage(1)" style="padding:3px 8px;font-size:11px;">▶</button>
+                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                    <!-- Canvas Size / Workspace Scale -->
+                    <div style="display:flex;align-items:center;gap:4px;background:#F1F5F9;border:1.5px solid var(--bd);padding:3px 8px;border-radius:10px;font-size:12px;">
+                        <span style="font-weight:700;color:var(--tx-muted);margin-right:2px;">Workspace:</span>
+                        <button type="button" class="btn secondary" onclick="setCanvasScale(500)" style="padding:2px 7px;font-size:11px;font-weight:700;">Standard</button>
+                        <button type="button" class="btn secondary" onclick="setCanvasScale(560)" style="padding:2px 7px;font-size:11px;font-weight:700;">Roomy</button>
+                        <button type="button" class="btn secondary" onclick="setCanvasScale(620)" style="padding:2px 7px;font-size:11px;font-weight:700;">Large</button>
+                    </div>
+
+                    <!-- Multi-Page Document Navigator -->
+                    <div style="display:flex;align-items:center;gap:6px;background:#F1F5F9;border:1.5px solid var(--bd);padding:4px 10px;border-radius:10px;">
+                        <button type="button" class="btn secondary" onclick="changeDocPage(-1)" style="padding:3px 8px;font-size:11px;">◀</button>
+                        <span style="font-size:12px;font-weight:800;color:var(--tx-secondary);min-width:70px;text-align:center;">
+                            Page <span id="curDocPage">1</span> / <span id="totDocPages">1</span>
+                        </span>
+                        <button type="button" class="btn secondary" onclick="changeDocPage(1)" style="padding:3px 8px;font-size:11px;">▶</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Precision Micro-Nudge D-Pad Bar -->
+            <div style="display:flex;align-items:center;justify-content:space-between;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:8px 14px;margin-bottom:12px;font-size:12px;flex-wrap:wrap;gap:8px;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span style="font-weight:800;color:var(--indigo-primary);">🎯 Precision 1px Nudge:</span>
+                    <span style="color:#64748B;" id="selectedMarkLabel">Click any stamp to select</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:4px;">
+                    <button type="button" class="btn secondary" onclick="nudgeSelected(-1, 0)" style="padding:3px 8px;font-size:11px;font-weight:800;" title="Move 1px Left (or Left Arrow)">◀</button>
+                    <button type="button" class="btn secondary" onclick="nudgeSelected(0, -1)" style="padding:3px 8px;font-size:11px;font-weight:800;" title="Move 1px Up (or Up Arrow)">▲</button>
+                    <button type="button" class="btn secondary" onclick="nudgeSelected(0, 1)" style="padding:3px 8px;font-size:11px;font-weight:800;" title="Move 1px Down (or Down Arrow)">▼</button>
+                    <button type="button" class="btn secondary" onclick="nudgeSelected(1, 0)" style="padding:3px 8px;font-size:11px;font-weight:800;" title="Move 1px Right (or Right Arrow)">▶</button>
+                    <span style="font-size:11px;color:#94A3B8;margin-left:6px;">(Or use Keyboard Arrow Keys)</span>
                 </div>
             </div>
 
             <!-- Canvas Container with the REAL DOCUMENT loaded as crisp background image -->
-            <div class="a4-container" style="margin:10px 0;">
-                <div class="a4-page" id="a4Canvas" style="position:relative;width:500px;height:707px;background:#FFFFFF;border:2px solid #CBD5E1;box-shadow:0 12px 36px rgba(15,23,42,0.12);overflow:hidden;border-radius:8px;">
+            <div class="a4-container" style="margin:10px 0;overflow-x:auto;">
+                <div class="a4-page" id="a4Canvas" style="position:relative;width:540px;height:764px;background:#FFFFFF;border:2px solid #CBD5E1;box-shadow:0 12px 36px rgba(15,23,42,0.12);overflow:hidden;border-radius:8px;">
                     <!-- Real Document Rendered Page Background Image -->
                     <img id="realDocPageImg" src="{{ url_for('documents.render_document_page', doc_id=document.id, page_num=1) }}" alt="Real Document Page" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:fill;pointer-events:none;z-index:1;user-select:none;">
 
@@ -261,6 +286,82 @@ function resizeQr(delta) {
     if (txt) txt.textContent = `${pts} pt`;
 }
 
+let currentSelectedElement = null;
+
+function setCanvasScale(widthPx) {
+    const canvas = document.getElementById('a4Canvas');
+    if (!canvas) return;
+    const heightPx = Math.round(widthPx * 1.4142);
+    canvas.style.width = widthPx + 'px';
+    canvas.style.height = heightPx + 'px';
+}
+
+function selectMark(el) {
+    document.querySelectorAll('.stamp-mark, .qr-stamp-mark').forEach(m => {
+        m.classList.remove('active-selected-mark');
+        m.style.outline = 'none';
+    });
+    currentSelectedElement = el;
+    el.classList.add('active-selected-mark');
+    el.style.outline = '2.5px solid #4F46E5';
+    el.style.outlineOffset = '2px';
+
+    const label = document.getElementById('selectedMarkLabel');
+    if (label) {
+        const isQr = el.classList.contains('qr-stamp-mark');
+        const name = isQr ? 'QR Verification Code' : (el.querySelector('.mark-name')?.textContent?.trim() || 'Signature Mark');
+        label.innerHTML = `Selected: <strong style="color:#0F172A;">${name}</strong> <span style="font-family:monospace;font-size:11px;">(X:${parseInt(el.style.left)||0}px, Y:${parseInt(el.style.top)||0}px)</span>`;
+    }
+}
+
+function nudgeSelected(dx, dy) {
+    if (!currentSelectedElement) {
+        // Auto select first mark if none selected
+        const first = document.querySelector('.stamp-mark') || document.querySelector('.qr-stamp-mark');
+        if (first) selectMark(first);
+        else return;
+    }
+    const el = currentSelectedElement;
+    const canvas = document.getElementById('a4Canvas');
+    const pRect = canvas.getBoundingClientRect();
+
+    let curLeft = parseFloat(el.style.left) || 0;
+    let curTop = parseFloat(el.style.top) || 0;
+
+    let newX = Math.round(Math.max(0, Math.min(curLeft + dx, pRect.width - el.offsetWidth)));
+    let newY = Math.round(Math.max(0, Math.min(curTop + dy, pRect.height - el.offsetHeight)));
+
+    el.style.left = `${newX}px`;
+    el.style.top = `${newY}px`;
+
+    el.dataset.posX = (newX / pRect.width).toFixed(4);
+    el.dataset.posY = (newY / pRect.height).toFixed(4);
+
+    const label = document.getElementById('selectedMarkLabel');
+    if (label) {
+        const isQr = el.classList.contains('qr-stamp-mark');
+        const name = isQr ? 'QR Verification Code' : (el.querySelector('.mark-name')?.textContent?.trim() || 'Signature Mark');
+        label.innerHTML = `Selected: <strong style="color:#0F172A;">${name}</strong> <span style="font-family:monospace;font-size:11px;">(X:${newX}px, Y:${newY}px)</span>`;
+    }
+}
+
+// Global Keyboard Precision Listener for Arrow Keys
+window.addEventListener('keydown', (e) => {
+    if (!currentSelectedElement) return;
+    if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+        // If user is focused on an input/select, don't hijack
+        if (['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement?.tagName)) return;
+        e.preventDefault();
+        const step = e.shiftKey ? 5 : 1; // 1px default micro-step, 5px with Shift!
+        let dx = 0, dy = 0;
+        if (e.key === 'ArrowLeft') dx = -step;
+        if (e.key === 'ArrowRight') dx = step;
+        if (e.key === 'ArrowUp') dy = -step;
+        if (e.key === 'ArrowDown') dy = step;
+        nudgeSelected(dx, dy);
+    }
+});
+
 // Setup Interactive Resizing Corner Grip and Dragging
 function initAdvancedMarks() {
     const canvas = document.getElementById('a4Canvas');
@@ -269,6 +370,10 @@ function initAdvancedMarks() {
     document.querySelectorAll('.stamp-mark, .qr-stamp-mark').forEach(el => {
         setupElementDragAndResize(el, canvas);
     });
+
+    // Auto select first mark
+    const initial = document.querySelector('.stamp-mark');
+    if (initial) selectMark(initial);
 }
 
 function setupElementDragAndResize(el, canvas) {
@@ -283,6 +388,7 @@ function setupElementDragAndResize(el, canvas) {
     if (grip) {
         grip.addEventListener('pointerdown', (e) => {
             e.stopPropagation();
+            selectMark(el);
             isResizing = true;
             el.classList.add('resizing');
             grip.setPointerCapture(e.pointerId);
@@ -331,6 +437,7 @@ function setupElementDragAndResize(el, canvas) {
     // Dragging whole element
     el.addEventListener('pointerdown', (e) => {
         if (e.target.closest('.resize-grip') || e.target.closest('.mark-ctrl-btn')) return;
+        selectMark(el);
         isDragging = true;
         el.setPointerCapture(e.pointerId);
         const rect = el.getBoundingClientRect();
@@ -348,14 +455,22 @@ function setupElementDragAndResize(el, canvas) {
         const deltaX = e.clientX - startX;
         const deltaY = e.clientY - startY;
 
-        let newX = Math.max(5, Math.min(startLeft + deltaX, pRect.width - el.offsetWidth - 5));
-        let newY = Math.max(5, Math.min(startTop + deltaY, pRect.height - el.offsetHeight - 5));
+        // Smooth fine-grained movement with zero border constraint (0px to max edge)
+        let newX = Math.round(Math.max(0, Math.min(startLeft + deltaX, pRect.width - el.offsetWidth)));
+        let newY = Math.round(Math.max(0, Math.min(startTop + deltaY, pRect.height - el.offsetHeight)));
 
         el.style.left = `${newX}px`;
         el.style.top = `${newY}px`;
 
         el.dataset.posX = (newX / pRect.width).toFixed(4);
         el.dataset.posY = (newY / pRect.height).toFixed(4);
+
+        const label = document.getElementById('selectedMarkLabel');
+        if (label) {
+            const isQr = el.classList.contains('qr-stamp-mark');
+            const name = isQr ? 'QR Verification Code' : (el.querySelector('.mark-name')?.textContent?.trim() || 'Signature Mark');
+            label.innerHTML = `Selected: <strong style="color:#0F172A;">${name}</strong> <span style="font-family:monospace;font-size:11px;">(X:${newX}px, Y:${newY}px)</span>`;
+        }
     });
 
     el.addEventListener('pointerup', (e) => {
