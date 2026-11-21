@@ -1,4 +1,5 @@
 import os
+import logging
 from datetime import datetime, timezone
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify, abort, current_app
 from backend.models import db, Document, ApprovalStep, Timeline, User
@@ -8,6 +9,7 @@ from backend.utils.stamping import stamp_final_document
 from backend.utils.mailer import send_approval_status_email, send_pending_review_email
 
 approvals_bp = Blueprint("approvals", __name__)
+logger = logging.getLogger("approvehub.approvals")
 
 @approvals_bp.route("/approver/inbox")
 @login_required
@@ -112,128 +114,133 @@ def take_approval_action(step_id):
     
     now = datetime.now(timezone.utc)
 
-    if action == "approve":
-        # 1. Verify Approver PIN
-        pin_valid, pin_msg = user.check_pin(pin)
-        db.session.commit()
-        if not pin_valid:
-            return jsonify({"error": pin_msg}), 400
+    try:
+        if action == "approve":
+            # 1. Verify Approver PIN
+            pin_valid, pin_msg = user.check_pin(pin)
+            db.session.commit()
+            if not pin_valid:
+                return jsonify({"error": pin_msg}), 400
+                
+            step.status = "approved"
+            step.remark = remark or "Approved with digital authority mark."
+            step.acted_at = now
+            step.record_hash = generate_record_hash(doc.id, step.step_order, user.id, step.approval_no, now.isoformat())
             
-        step.status = "approved"
-        step.remark = remark or "Approved with digital authority mark."
-        step.acted_at = now
-        step.record_hash = generate_record_hash(doc.id, step.step_order, user.id, step.approval_no, now.isoformat())
-        
-        # 2. Advance state machine
-        next_step = ApprovalStep.query.filter_by(
-            document_id=doc.id,
-            step_order=step.step_order + 1
-        ).first()
-        
-        if next_step:
-            next_step.status = "pending"
-            doc.current_step = next_step.step_order
-            doc.status = "in_progress"
-            event_text = f"Approved by {user.name} ({user.designation}). Forwarded to Step {next_step.step_order} ({next_step.approver.name})."
+            # 2. Advance state machine
+            next_step = ApprovalStep.query.filter_by(
+                document_id=doc.id,
+                step_order=step.step_order + 1
+            ).first()
             
-            # Send notification email to the next approver in hierarchy
-            try:
-                review_url = url_for("approvals.review_step", step_id=next_step.id, _external=True)
-                send_pending_review_email(
-                    next_step.approver.email,
-                    next_step.approver.name,
-                    doc.title,
-                    doc.applicant.name,
-                    next_step.step_order,
-                    review_url=review_url
-                )
-            except Exception:
-                pass
-        else:
-            # Final approval in chain: trigger PyMuPDF stamping engine!
-            doc.status = "approved"
-            base_url = request.host_url.rstrip("/")
-            final_path, final_hash = stamp_final_document(doc, base_url=base_url)
-            doc.final_path = final_path
-            doc.final_hash = final_hash
-            event_text = f"Final institutional approval granted by {user.name}. Official marks & QR verification stamped."
+            if next_step:
+                next_step.status = "pending"
+                doc.current_step = next_step.step_order
+                doc.status = "in_progress"
+                event_text = f"Approved by {user.name} ({user.designation}). Forwarded to Step {next_step.step_order} ({next_step.approver.name})."
+                
+                # Send notification email to the next approver in hierarchy
+                try:
+                    review_url = url_for("approvals.review_step", step_id=next_step.id, _external=True)
+                    send_pending_review_email(
+                        next_step.approver.email,
+                        next_step.approver.name,
+                        doc.title,
+                        doc.applicant.name,
+                        next_step.step_order,
+                        review_url=review_url
+                    )
+                except Exception as mail_err:
+                    logger.warning("Failed to dispatch pending review email: %s", mail_err)
+            else:
+                # Final approval in chain: trigger PyMuPDF stamping engine!
+                doc.status = "approved"
+                base_url = request.host_url.rstrip("/")
+                final_path, final_hash = stamp_final_document(doc, base_url=base_url)
+                doc.final_path = final_path
+                doc.final_hash = final_hash
+                event_text = f"Final institutional approval granted by {user.name}. Official marks & QR verification stamped."
+                
+                # Send notification email to the applicant with final stamped PDF attached!
+                try:
+                    view_url = url_for("documents.document_detail", doc_id=doc.id, _external=True)
+                    send_approval_status_email(
+                        doc.applicant.email,
+                        doc.applicant.name,
+                        doc.title,
+                        "approved",
+                        user.name,
+                        notes=step.remark,
+                        view_url=view_url,
+                        attachment_path=doc.final_path
+                    )
+                except Exception as mail_err:
+                    logger.warning("Failed to dispatch final approval email: %s", mail_err)
+
+            tl = Timeline(
+                document_id=doc.id,
+                user_id=user.id,
+                event="STEP_APPROVED",
+                details=event_text,
+                ip_address=request.remote_addr
+            )
+            db.session.add(tl)
+            db.session.commit()
             
-            # Send notification email to the applicant with final stamped PDF attached!
+            return jsonify({"success": True, "status": doc.status, "message": "Approval recorded successfully."})
+
+        elif action == "pending":
+            step.remark = remark or "Under further review"
+            tl = Timeline(
+                document_id=doc.id,
+                user_id=user.id,
+                event="KEPT_PENDING",
+                details=f"Kept pending by {user.name}: {step.remark}",
+                ip_address=request.remote_addr
+            )
+            db.session.add(tl)
+            db.session.commit()
+            return jsonify({"success": True, "message": "Marked as pending."})
+
+        elif action in ["compliance", "reject"]:
+            step.status = "compliance" if action == "compliance" else "rejected"
+            step.reject_reason = reject_reason or "Discrepancy in submission"
+            step.remark = remark
+            step.acted_at = now
+            
+            doc.status = "compliance" if action == "compliance" else "rejected"
+            
+            # Email applicant about compliance or rejection
             try:
                 view_url = url_for("documents.document_detail", doc_id=doc.id, _external=True)
                 send_approval_status_email(
                     doc.applicant.email,
                     doc.applicant.name,
                     doc.title,
-                    "approved",
+                    doc.status,
                     user.name,
-                    notes=step.remark,
-                    view_url=view_url,
-                    attachment_path=doc.final_path
+                    notes=f"{step.reject_reason}. {step.remark}".strip(),
+                    view_url=view_url
                 )
-            except Exception:
-                pass
-
-        tl = Timeline(
-            document_id=doc.id,
-            user_id=user.id,
-            event="STEP_APPROVED",
-            details=event_text,
-            ip_address=request.remote_addr
-        )
-        db.session.add(tl)
-        db.session.commit()
-        
-        return jsonify({"success": True, "status": doc.status, "message": "Approval recorded successfully."})
-
-    elif action == "pending":
-        step.remark = remark or "Under further review"
-        tl = Timeline(
-            document_id=doc.id,
-            user_id=user.id,
-            event="KEPT_PENDING",
-            details=f"Kept pending by {user.name}: {step.remark}",
-            ip_address=request.remote_addr
-        )
-        db.session.add(tl)
-        db.session.commit()
-        return jsonify({"success": True, "message": "Marked as pending."})
-
-    elif action in ["compliance", "reject"]:
-        step.status = "compliance" if action == "compliance" else "rejected"
-        step.reject_reason = reject_reason or "Discrepancy in submission"
-        step.remark = remark
-        step.acted_at = now
-        
-        doc.status = "compliance" if action == "compliance" else "rejected"
-        
-        # Email applicant about compliance or rejection
-        try:
-            view_url = url_for("documents.document_detail", doc_id=doc.id, _external=True)
-            send_approval_status_email(
-                doc.applicant.email,
-                doc.applicant.name,
-                doc.title,
-                doc.status,
-                user.name,
-                notes=f"{step.reject_reason}. {step.remark}".strip(),
-                view_url=view_url
+            except Exception as mail_err:
+                logger.warning("Failed to dispatch compliance/rejection email: %s", mail_err)
+            
+            tl = Timeline(
+                document_id=doc.id,
+                user_id=user.id,
+                event="COMPLIANCE_REQUESTED" if action == "compliance" else "REQUEST_REJECTED",
+                details=f"Action by {user.name}: {step.reject_reason}. Notes: {remark}",
+                ip_address=request.remote_addr
             )
-        except Exception:
-            pass
-        
-        tl = Timeline(
-            document_id=doc.id,
-            user_id=user.id,
-            event="COMPLIANCE_REQUESTED" if action == "compliance" else "REQUEST_REJECTED",
-            details=f"Action by {user.name}: {step.reject_reason}. Notes: {remark}",
-            ip_address=request.remote_addr
-        )
-        db.session.add(tl)
-        db.session.commit()
-        return jsonify({"success": True, "status": doc.status, "message": f"Document marked as {doc.status}."})
+            db.session.add(tl)
+            db.session.commit()
+            return jsonify({"success": True, "status": doc.status, "message": f"Document marked as {doc.status}."})
 
-    return jsonify({"error": "Unknown action"}), 400
+        return jsonify({"error": "Unknown action"}), 400
+    except Exception as exc:
+        db.session.rollback()
+        logger.error("Error executing approval action: %s", exc, exc_info=True)
+        return jsonify({"error": f"Internal processing error: {str(exc)}"}), 500
 
 @approvals_bp.route("/api/steps/batch-action", methods=["POST"])
 @login_required
@@ -345,14 +352,18 @@ def fulfil_compliance(doc_id):
         abort(403)
         
     file = request.files.get("file")
-    if not file:
+    if not file or not file.filename:
         return jsonify({"error": "No file uploaded"}), 400
         
-    safe_name = f"revised_doc_{doc.id}_{file.filename}"
+    from werkzeug.utils import secure_filename
+    from backend.utils.hashing import sha256_file
+    
+    safe_name = f"revised_doc_{doc.id}_{secure_filename(file.filename)}"
     save_path = os.path.join(current_app.config["DOCS_FOLDER"], safe_name)
     file.save(save_path)
     
-    new_hash = generate_record_hash(doc.id, 0, user.id, "REVISION", datetime.now(timezone.utc).isoformat())
+    # Calculate true SHA-256 so integrity checks pass
+    new_hash = sha256_file(save_path)
     doc.file_path = save_path
     doc.original_hash = new_hash
     doc.status = "in_progress"
@@ -365,7 +376,7 @@ def fulfil_compliance(doc_id):
         document_id=doc.id,
         user_id=user.id,
         event="COMPLIANCE_FULFILLED",
-        details="Applicant uploaded corrected document. Returned to current authority for review.",
+        details=f"Applicant uploaded corrected document '{secure_filename(file.filename)}'. Returned to current authority for review.",
         ip_address=request.remote_addr
     )
     db.session.add(tl)

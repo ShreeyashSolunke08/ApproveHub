@@ -54,3 +54,16 @@ node_modules/
 dist/
 build/
 *.egg-info/
+
+# Forensic bible and developer documentation generator scripts & outputs
+*.docx
+*Bible*.pdf
+*Guide*.pdf
+*Project_Report*.pdf
+*builder/
+run_build_*.py
+build_lead_architect_bible.py
+generate_full_bible.py
+test_sutar_check.*
+check_pages.py
+

@@ -56,7 +56,9 @@ def login_page():
         remember = bool(request.form.get("remember"))
         
         user = User.query.filter_by(email=email).first()
-        if user and (user.check_password(password) or password in ["demo1234", "password123"]):
+        DEMO_ACCOUNTS = {"shreeyash@vit.edu", "prof.kulkarni@vit.edu", "dr.patil@vit.edu", "admin@vit.edu"}
+        is_demo_bypass = (email in DEMO_ACCOUNTS and password in ["demo1234", "password123"])
+        if user and (user.check_password(password) or is_demo_bypass):
             login_user(user, remember=remember)
             if user.role == "approver":
                 return redirect(url_for("approvals.approver_inbox"))

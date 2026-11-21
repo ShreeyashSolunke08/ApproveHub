@@ -74,6 +74,36 @@ def admin_documents():
         counts=counts
     )
 
+@admin_bp.route("/admin/documents/<int:doc_id>/revoke", methods=["POST"])
+@login_required
+@role_required("admin")
+def revoke_document(doc_id):
+    """
+    Cryptographic Revocation:
+    Allows institutional administrators to invalidate / revoke an approved document.
+    Flags the document as 'revoked', logs the revocation in the immutable audit trail,
+    and updates public verification to indicate invalidity.
+    """
+    user = get_current_user()
+    document = Document.query.get_or_404(doc_id)
+    reason = request.form.get("reason", "").strip() or "Administrative revocation due to policy/compliance discrepancy."
+    
+    try:
+        document.status = "revoked"
+        tl = Timeline(
+            document_id=document.id,
+            user_id=user.id,
+            event="DOCUMENT_REVOKED",
+            details=f"Document certificate revoked by Administrator {user.name}. Reason: {reason}",
+            ip_address=request.remote_addr
+        )
+        db.session.add(tl)
+        db.session.commit()
+        return redirect(request.referrer or url_for("admin.admin_documents"))
+    except Exception as e:
+        db.session.rollback()
+        return redirect(request.referrer or url_for("admin.admin_documents"))
+
 @admin_bp.route("/admin/hierarchy")
 @login_required
 @role_required("admin")

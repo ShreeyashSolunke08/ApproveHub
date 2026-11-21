@@ -1,4 +1,6 @@
 import os
+import tempfile
+from werkzeug.utils import secure_filename
 from flask import Blueprint, render_template, request, jsonify
 from backend.models import Document, ApprovalStep, Timeline
 from backend.utils.hashing import sha256_file
@@ -20,6 +22,7 @@ def public_verify_page(approval_no=None):
             result = {
                 "approval_no": query_no,
                 "document_title": doc.title,
+                "document_id": doc.id,
                 "status": doc.status,
                 "institution_name": doc.institution.name if doc.institution else "VIT Pune",
                 "original_hash": doc.original_hash,
@@ -42,6 +45,16 @@ def api_verify_check():
         return jsonify({"valid": False, "message": "No official approval record found for this code."}), 404
         
     doc = step.document
+    if doc.status == "revoked":
+        return jsonify({
+            "valid": False,
+            "revoked": True,
+            "title": doc.title,
+            "status": "revoked",
+            "message": "NOTICE: This document was officially revoked by institutional administration.",
+            "final_hash": doc.final_hash
+        }), 200
+
     return jsonify({
         "valid": True,
         "title": doc.title,
@@ -62,19 +75,42 @@ def api_verify_check():
 def verify_uploaded_file():
     """
     Public 'Upload to verify' check: drops a PDF, compares hash against all final_hash entries.
+    Secured against Path Traversal and tempfile leakage.
     """
     file = request.files.get("file")
-    if not file:
+    if not file or not file.filename:
         return jsonify({"valid": False, "error": "No file uploaded."}), 400
         
-    temp_path = os.path.join("uploads", "docs", f"temp_verify_{file.filename}")
-    file.save(temp_path)
-    file_hash = sha256_file(temp_path)
-    if os.path.exists(temp_path):
-        os.remove(temp_path)
+    safe_name = secure_filename(file.filename)
+    if not safe_name.lower().endswith(".pdf"):
+        return jsonify({"valid": False, "error": "Only authentic PDF documents can be verified."}), 400
+
+    temp_path = None
+    try:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=f"_{safe_name}") as tmp:
+            file.save(tmp.name)
+            temp_path = tmp.name
+            
+        file_hash = sha256_file(temp_path)
+    finally:
+        if temp_path and os.path.exists(temp_path):
+            try:
+                os.remove(temp_path)
+            except OSError:
+                pass
         
     matching_doc = Document.query.filter_by(final_hash=file_hash).first()
     if matching_doc:
+        if matching_doc.status == "revoked":
+            return jsonify({
+                "valid": False,
+                "revoked": True,
+                "message": "REVOKED: This document matched an authentic certificate that was subsequently revoked by administration.",
+                "title": matching_doc.title,
+                "hash": file_hash,
+                "status": "revoked"
+            }), 200
+
         return jsonify({
             "valid": True,
             "message": "Cryptographic match confirmed! Document is authentic and unchanged.",

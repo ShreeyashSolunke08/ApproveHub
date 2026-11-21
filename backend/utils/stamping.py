@@ -176,8 +176,10 @@ def stamp_final_document(document, base_url=None):
 
 def restamp_user_approved_documents(user_id, base_url="http://127.0.0.1:5000"):
     """
-    Automatically re-stamps all approved documents where user_id is an approver,
-    ensuring newly drawn/updated signatures reflect immediately on all finalized documents.
+    Cryptographic Self-Healing Helper:
+    Only regenerates stamped output if an approved document's final file is missing on disk
+    (e.g., after container restarts). Strictly protects existing finalized documents from
+    mutation to maintain non-repudiation and cryptographic immutability.
     """
     from backend.models import db, Document, ApprovalStep
     try:
@@ -186,12 +188,15 @@ def restamp_user_approved_documents(user_id, base_url="http://127.0.0.1:5000"):
         for doc_id in doc_ids:
             doc = Document.query.get(doc_id)
             if doc and doc.status == "approved":
-                try:
-                    final_path, final_hash = stamp_final_document(doc, base_url=base_url)
-                    doc.final_path = final_path
-                    doc.final_hash = final_hash
-                except Exception as e:
-                    print(f"[RE-STAMP] Could not restamp doc {doc_id}: {e}")
+                # Only restamp if the final file is missing from disk (self-healing mode)
+                if not doc.final_path or not os.path.exists(doc.final_path):
+                    try:
+                        final_path, final_hash = stamp_final_document(doc, base_url=base_url)
+                        doc.final_path = final_path
+                        doc.final_hash = final_hash
+                    except Exception as e:
+                        print(f"[RE-STAMP] Could not generate missing stamp for doc {doc_id}: {e}")
         db.session.commit()
     except Exception as e:
+        db.session.rollback()
         print(f"[RE-STAMP] Error: {e}")

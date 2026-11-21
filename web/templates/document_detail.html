@@ -31,9 +31,23 @@
                 <a href="{{ url_for('documents.download_document', doc_id=document.id) }}" class="btn" style="background:linear-gradient(135deg, #10B981, #059669);box-shadow:0 4px 14px rgba(16,185,129,0.35);">
                     📥 Download Stamped PDF
                 </a>
+                <a href="{{ url_for('documents.download_audit_certificate', doc_id=document.id) }}" class="btn secondary" style="border:1.5px solid var(--indigo-primary);color:var(--indigo-primary);font-weight:700;display:inline-flex;align-items:center;gap:6px;">
+                    <span>📜</span> Audit Certificate
+                </a>
+                {% if current_user and current_user.role == 'admin' %}
+                <form method="POST" action="{{ url_for('admin.revoke_document', doc_id=document.id) }}" style="display:inline;" onsubmit="return confirm('ADMIN WARNING: Are you sure you want to revoke this verified document? This action is logged permanently.');">
+                    <input type="hidden" name="reason" value="Administrative revocation due to policy/compliance verification audit.">
+                    <button type="submit" class="btn secondary" style="background:#FFF1F2;border:1px solid #FECDD3;color:#BE123C;font-size:12px;font-weight:700;">
+                        🚫 Revoke
+                    </button>
+                </form>
+                {% endif %}
             {% else %}
                 <a href="{{ url_for('documents.preview_document', doc_id=document.id) }}" target="_blank" class="btn secondary">
                     👁️ Open in Full Window
+                </a>
+                <a href="{{ url_for('documents.download_audit_certificate', doc_id=document.id) }}" class="btn secondary" style="border:1.5px solid #CBD5E1;color:var(--tx-secondary);font-size:12.5px;font-weight:700;">
+                    📜 Audit Log PDF
                 </a>
                 {% if current_user and (current_user.id == document.applicant_id or current_user.role == 'admin') and document.status in ['pending', 'in_progress', 'compliance', 'draft'] %}
                 <form method="POST" action="{{ url_for('documents.withdraw_document', doc_id=document.id) }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to take back / withdraw this application? This will halt any pending approvals.');">
